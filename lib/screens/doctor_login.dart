@@ -50,64 +50,70 @@ class _DoctorLoginScreenState extends State<DoctorLoginScreen> {
     }
   }
 
-  Future<void> _googleLogin(BuildContext context) async {
-    try {
-      // Google ile giriş yap
-      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+Future<void> _googleLogin(BuildContext context) async {
+  try {
+    // Google ile giriş yap
+    final GoogleSignIn googleSignIn = GoogleSignIn();
+    
+    // Silently login'ı devre dışı bırak
+    await googleSignIn.signOut(); // Eğer daha önce giriş yapılmışsa oturumu kapat
 
-      if (googleUser == null) {
-        // Kullanıcı oturumu iptal etti
-        return;
-      }
+    final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
 
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+    if (googleUser == null) {
+      // Kullanıcı oturumu iptal etti
+      return;
+    }
 
-      final OAuthCredential credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-      );
+    final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
 
-      // Firebase ile giriş yap
-      UserCredential userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
+    final OAuthCredential credential = GoogleAuthProvider.credential(
+      accessToken: googleAuth.accessToken,
+      idToken: googleAuth.idToken,
+    );
 
-      // Kullanıcı UID'sini al
-      String uid = userCredential.user!.uid;
+    // Firebase ile giriş yap
+    UserCredential userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
 
-      // Kullanıcı Firestore'da kayıtlı mı kontrol et
-      DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
+    // Kullanıcı UID'sini al
+    String uid = userCredential.user!.uid;
 
-      if (!userDoc.exists) {
-        // Firebase'de kayıtlı değilse, yeni kullanıcıyı kaydet
-        await FirebaseFirestore.instance.collection('users').doc(uid).set({
-          'name': userCredential.user!.displayName,
-          'email': userCredential.user!.email,
-          'role': 'doctor', // Varsayılan olarak 'doctor' rolü atanıyor
-          'createdAt': FieldValue.serverTimestamp(),
-        });
+    // Kullanıcı Firestore'da kayıtlı mı kontrol et
+    DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
 
-        // Yeni kullanıcı kaydedildikten sonra, rolünü al
-        userDoc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
-      }
+    if (!userDoc.exists) {
+      // Firebase'de kayıtlı değilse, yeni kullanıcıyı kaydet
+      await FirebaseFirestore.instance.collection('users').doc(uid).set({
+        'name': userCredential.user!.displayName,
+        'email': userCredential.user!.email,
+        'role': 'doctor', // Varsayılan olarak 'doctor' rolü atanıyor
+        'createdAt': FieldValue.serverTimestamp(),
+      });
 
-      // Kullanıcı bilgilerini güncelledikten sonra rol kontrolünü yap
-      String role = userDoc['role'] ?? '';
+      // Yeni kullanıcı kaydedildikten sonra, rolünü al
+      userDoc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
+    }
 
-      if (role == 'doctor') {
-        // Rol 'doctor' ise doktor dashboard'una yönlendir
-        Navigator.pushReplacementNamed(context, '/doctorDashboard');
-      } else {
-        // Eğer rol uyumsuzsa, kullanıcıyı çıkış yapıp hata mesajı göster
-        await FirebaseAuth.instance.signOut();
-        setState(() {
-          _errorMessage = 'Giriş başarısız: Sadece doktorlar giriş yapabilir.';
-        });
-      }
-    } catch (e) {
+    // Kullanıcı bilgilerini güncelledikten sonra rol kontrolünü yap
+    String role = userDoc['role'] ?? '';
+
+    if (role == 'doctor') {
+      // Rol 'doctor' ise doktor dashboard'una yönlendir
+      Navigator.pushReplacementNamed(context, '/doctorDashboard');
+    } else {
+      // Eğer rol uyumsuzsa, kullanıcıyı çıkış yapıp hata mesajı göster
+      await FirebaseAuth.instance.signOut();
       setState(() {
-        _errorMessage = 'Giriş başarısız: $e';
+        _errorMessage = 'Giriş başarısız: Sadece doktorlar giriş yapabilir.';
       });
     }
+  } catch (e) {
+    setState(() {
+      _errorMessage = 'Giriş başarısız: $e';
+    });
   }
+}
+
 
   @override
   Widget build(BuildContext context) {
