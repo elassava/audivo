@@ -198,19 +198,27 @@ Future<void> _googleLogin(BuildContext context) async {
                 ),
                 SizedBox(height: 20),
                 // Google Login Button
-                ElevatedButton.icon(
-                  onPressed: () => _googleLogin(context), // Burada lambda fonksiyonu kullanıldı
-                  icon: Icon(Icons.login, color: Colors.white),
-                  label: Text('Google ile Giriş Yap', style: GoogleFonts.poppins(color: Colors.white)),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red,
-                    padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                ),
-                SizedBox(height: 20),
+             ElevatedButton.icon(
+  onPressed: () => _googleLogin(context),
+  icon: Padding(
+    padding: const EdgeInsets.only(right: 0.0),
+    child: Image.asset(
+      'assets/images/google_icon.png', // This loads the image from assets
+      height: 24, width: 25  // Adjust the size of the icon
+    ),
+  ),
+  label: Text('Google ile Giriş Yap',style: GoogleFonts.poppins(color: const Color.fromARGB(255, 8, 8, 8), fontSize: 12),
+  ),
+  style: ElevatedButton.styleFrom(
+    backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+    padding: EdgeInsets.symmetric(horizontal: 6, vertical: 14),
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(8),
+    ),
+  ),
+),
+
+                SizedBox(height: 10),
                 // Register Button
                 TextButton(
                   onPressed: () {
