@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "414971735571",
+    "project_id": "emotion-rec-mobile",
+    "storage_bucket": "emotion-rec-mobile.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:414971735571:android:cbff1d41932f41ae1499e6",
+        "android_client_info": {
+          "package_name": "com.example.emotionmobilversion"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC2fEFqf1pJKoIGVynz4Rbzc04OKxjPXqE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:414971735571:android:dbac300b76a72cbf1499e6",
+        "android_client_info": {
+          "package_name": "com.soundpath.emotionrec"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC2fEFqf1pJKoIGVynz4Rbzc04OKxjPXqE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
