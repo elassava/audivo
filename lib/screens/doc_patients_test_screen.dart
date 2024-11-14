@@ -1,3 +1,4 @@
+import 'package:emotionmobileversion/screens/audio_screens.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -31,7 +32,7 @@ class PatientTestsScreen extends StatelessWidget {
             padding: const EdgeInsets.all(16.0),
             child: Column(
               children: [
-                // İlk Test Alanı
+                // Video Test Card
                 SizedBox(
                   height: MediaQuery.of(context).size.height * 0.15,
                   child: Card(
@@ -47,8 +48,8 @@ class PatientTestsScreen extends StatelessWidget {
                     ),
                   ),
                 ),
-                SizedBox(height: 16.0), // Add some space between cards
-                // İkinci Test Alanı
+                SizedBox(height: 16.0),
+                // Görüntülü Test Card
                 SizedBox(
                   height: MediaQuery.of(context).size.height * 0.15,
                   child: Card(
@@ -64,8 +65,8 @@ class PatientTestsScreen extends StatelessWidget {
                     ),
                   ),
                 ),
-                SizedBox(height: 16.0), // Add some space between cards
-                // Üçüncü Test Alanı
+                SizedBox(height: 16.0),
+                // Maskeli Görüntü Test Card
                 SizedBox(
                   height: MediaQuery.of(context).size.height * 0.15,
                   child: Card(
@@ -77,6 +78,28 @@ class PatientTestsScreen extends StatelessWidget {
                       },
                       child: Center(
                         child: Text("Maskeli Görüntü Test", style: GoogleFonts.poppins(fontSize: 20)),
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 16.0),
+                // Audio Test Card
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.15,
+                  child: Card(
+                    color: Colors.white,
+                    child: InkWell(
+                      onTap: () {
+                        // Navigate to Audio Test page
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => AudioScreen(patientId: patientId),
+                          ),
+                        );
+                      },
+                      child: Center(
+                        child: Text("Audio Test", style: GoogleFonts.poppins(fontSize: 20)),
                       ),
                     ),
                   ),

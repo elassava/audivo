@@ -90,6 +90,14 @@ Future<void> _googleLogin(BuildContext context) async {
         'createdAt': FieldValue.serverTimestamp(),
       });
 
+      // Aynı veriyi doctor koleksiyonuna da kaydedelim
+      await FirebaseFirestore.instance.collection('doctors').doc(uid).set({
+        'name': userCredential.user!.displayName,
+        'email': userCredential.user!.email,
+        'role': 'doctor', // Varsayılan uzmanlık atanabilir
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+
       // Yeni kullanıcı kaydedildikten sonra, rolünü al
       userDoc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
     }

@@ -10,6 +10,7 @@ import 'screens/patient_login.dart';
 import 'screens/doctor_dashboard.dart';
 import 'screens/patient_dashboard.dart';
 import 'screens/doc_patients_screen.dart';
+import 'screens/audio_screens.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -33,6 +34,8 @@ class MyApp extends StatelessWidget {
         '/patientDashboard': (context) => PatientDashboard(),
         '/patientsScreen': (context) => PatientsScreen(), // PatientsScreen'e rota ekledik
         '/patientSettings': (context) => PSettingsScreen(),
+        '/audioScreen': (context) => AudioScreen(patientId: '',),
+
       },
     );
   }
