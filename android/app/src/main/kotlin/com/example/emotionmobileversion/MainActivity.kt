@@ -1,4 +1,4 @@
-package com.soundpath.emotionrec
+package com.example.emotionmobilversion
 
 import io.flutter.embedding.android.FlutterActivity
 

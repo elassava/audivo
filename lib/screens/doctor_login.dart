@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class DoctorLoginScreen extends StatefulWidget {
@@ -15,32 +16,90 @@ class _DoctorLoginScreenState extends State<DoctorLoginScreen> {
 
   Future<void> _login() async {
     try {
-      // Sign in with email and password
+      // Email ve şifre ile giriş yap
       UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
 
-      // Fetch user role from Firestore
+      // Kullanıcı rolünü Firestore'dan al
       String uid = userCredential.user!.uid;
       DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
 
       if (userDoc.exists) {
         String role = userDoc['role'] ?? '';
 
-        // Check if the role is "doctor"
+        // Kullanıcı rolünü kontrol et
         if (role == 'doctor') {
           Navigator.pushReplacementNamed(context, '/doctorDashboard');
         } else {
-          // Role is not "doctor"
           setState(() {
             _errorMessage = 'Giriş başarısız: Sadece doktorlar giriş yapabilir.';
           });
-          await FirebaseAuth.instance.signOut();  // Sign out the user
+          await FirebaseAuth.instance.signOut();  // Kullanıcıyı çıkış yap
         }
       } else {
         setState(() {
           _errorMessage = 'Kullanıcı rolü bulunamadı.';
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _errorMessage = 'Giriş başarısız: $e';
+      });
+    }
+  }
+
+  Future<void> _googleLogin(BuildContext context) async {
+    try {
+      // Google ile giriş yap
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+
+      if (googleUser == null) {
+        // Kullanıcı oturumu iptal etti
+        return;
+      }
+
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+
+      final OAuthCredential credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      // Firebase ile giriş yap
+      UserCredential userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
+
+      // Kullanıcı UID'sini al
+      String uid = userCredential.user!.uid;
+
+      // Kullanıcı Firestore'da kayıtlı mı kontrol et
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
+
+      if (!userDoc.exists) {
+        // Firebase'de kayıtlı değilse, yeni kullanıcıyı kaydet
+        await FirebaseFirestore.instance.collection('users').doc(uid).set({
+          'name': userCredential.user!.displayName,
+          'email': userCredential.user!.email,
+          'role': 'doctor', // Varsayılan olarak 'doctor' rolü atanıyor
+          'createdAt': FieldValue.serverTimestamp(),
+        });
+
+        // Yeni kullanıcı kaydedildikten sonra, rolünü al
+        userDoc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
+      }
+
+      // Kullanıcı bilgilerini güncelledikten sonra rol kontrolünü yap
+      String role = userDoc['role'] ?? '';
+
+      if (role == 'doctor') {
+        // Rol 'doctor' ise doktor dashboard'una yönlendir
+        Navigator.pushReplacementNamed(context, '/doctorDashboard');
+      } else {
+        // Eğer rol uyumsuzsa, kullanıcıyı çıkış yapıp hata mesajı göster
+        await FirebaseAuth.instance.signOut();
+        setState(() {
+          _errorMessage = 'Giriş başarısız: Sadece doktorlar giriş yapabilir.';
         });
       }
     } catch (e) {
@@ -59,17 +118,17 @@ class _DoctorLoginScreenState extends State<DoctorLoginScreen> {
         ),
         title: Text("Doktor Giriş", style: GoogleFonts.poppins(color: Colors.white)),
         backgroundColor: Color.fromARGB(255, 60, 145, 230),
-        centerTitle: true,  // Centered title
+        centerTitle: true,
       ),
       body: Container(
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage('assets/images/background.png'), // PNG görseli buraya ekliyoruz
-            fit: BoxFit.cover, // Görselin ekranı kaplamasını sağlıyoruz
+            image: AssetImage('assets/images/background.png'),
+            fit: BoxFit.cover,
           ),
         ),
         padding: const EdgeInsets.all(20.0),
-        child: Center(  // Center the login form content
+        child: Center(
           child: SingleChildScrollView(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -111,13 +170,27 @@ class _DoctorLoginScreenState extends State<DoctorLoginScreen> {
                     style: TextStyle(color: Colors.red, fontSize: 14),
                   ),
                 SizedBox(height: 20),
-                // Login Button
+                // Email Login Button
                 ElevatedButton(
                   onPressed: _login,
                   child: Text('Giriş Yap', style: GoogleFonts.poppins(color: Colors.white)),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Color.fromARGB(255, 60, 145, 230),
                     padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 20),
+                // Google Login Button
+                ElevatedButton.icon(
+                  onPressed: () => _googleLogin(context), // Burada lambda fonksiyonu kullanıldı
+                  icon: Icon(Icons.login, color: Colors.white),
+                  label: Text('Google ile Giriş Yap', style: GoogleFonts.poppins(color: Colors.white)),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red,
+                    padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),

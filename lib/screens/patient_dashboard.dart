@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class PatientDashboard extends StatelessWidget {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
 
   // Hasta bilgisini Firebase'den alacak fonksiyon
   Future<DocumentSnapshot> _getPatientInfo() async {
@@ -15,6 +17,10 @@ class PatientDashboard extends StatelessWidget {
 
 Future<void> _signOut(BuildContext context) async {
   try {
+    // Google Sign-In'dan çıkış yap
+    await _googleSignIn.signOut();
+    
+    // Firebase Authentication'dan çıkış yap
     await _auth.signOut();
     
     // Kullanıcı çıkış yaptıktan sonra, geçmişi temizlemek için:

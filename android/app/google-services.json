@@ -12,7 +12,20 @@
           "package_name": "com.example.emotionmobilversion"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "414971735571-slohlf6dn4nri133l2l5lsijqa4afv4u.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.emotionmobilversion",
+            "certificate_hash": "119659eb2fa8f285bc9e6a65e02763b70b270290"
+          }
+        },
+        {
+          "client_id": "414971735571-kvekugl4fehishn85ad9fplnljc6u27j.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyC2fEFqf1pJKoIGVynz4Rbzc04OKxjPXqE"
@@ -20,26 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:414971735571:android:dbac300b76a72cbf1499e6",
-        "android_client_info": {
-          "package_name": "com.soundpath.emotionrec"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "AIzaSyC2fEFqf1pJKoIGVynz4Rbzc04OKxjPXqE"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "414971735571-kvekugl4fehishn85ad9fplnljc6u27j.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "414971735571-0ioanpm28avar7kf38gqmmt0mc5brqtq.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.emotionmobilversion"
+              }
+            }
+          ]
         }
       }
     }
