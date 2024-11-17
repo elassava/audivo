@@ -13,7 +13,7 @@ class PPatientTestsScreen extends StatelessWidget {
         iconTheme: IconThemeData(
           color: Colors.white,
         ),
-        title: Text('Testlerim', style: GoogleFonts.poppins(color: Colors.white)),
+        title: Text('My Tests', style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.bold)),
         backgroundColor: Color.fromARGB(255, 60, 145, 230), // Mavi
       ),
       body: Stack(
@@ -56,10 +56,10 @@ class PPatientTestsScreen extends StatelessWidget {
                     child: InkWell(
                       onTap: () {
                         // Görüntülü Test işlemi
-                        _showTestDetails(context, "Görüntülü Test");
+                        _showTestDetails(context, "Masked Video Test");
                       },
                       child: Center(
-                        child: Text("Görüntülü Test", style: GoogleFonts.poppins(fontSize: 20)),
+                        child: Text("Masked Video Test", style: GoogleFonts.poppins(fontSize: 20)),
                       ),
                     ),
                   ),
@@ -73,10 +73,10 @@ class PPatientTestsScreen extends StatelessWidget {
                     child: InkWell(
                       onTap: () {
                         // Maskeli Görüntü Testi işlemi
-                        _showTestDetails(context, "Maskeli Görüntü Test");
+                        _showTestDetails(context, "Audio Test");
                       },
                       child: Center(
-                        child: Text("Maskeli Görüntü Test", style: GoogleFonts.poppins(fontSize: 20)),
+                        child: Text("Audio Test", style: GoogleFonts.poppins(fontSize: 20)),
                       ),
                     ),
                   ),
@@ -95,13 +95,13 @@ class PPatientTestsScreen extends StatelessWidget {
       context: context,
       builder: (context) => AlertDialog(
         title: Text(testType, style: GoogleFonts.poppins()),
-        content: Text('Seçilen test türü: $testType', style: GoogleFonts.poppins()),
+        content: Text('Test type: $testType', style: GoogleFonts.poppins()),
         actions: [
           TextButton(
             onPressed: () {
               Navigator.pop(context); // Test detayını kapatma
             },
-            child: Text('Kapat', style: GoogleFonts.poppins()),
+            child: Text('Close', style: GoogleFonts.poppins()),
           ),
         ],
       ),

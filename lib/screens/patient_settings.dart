@@ -21,7 +21,7 @@ class PSettingsScreen extends StatelessWidget {
         ),
         title: Text(
           'Settings',
-          style: GoogleFonts.poppins(color: Colors.white),
+          style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         backgroundColor: Color.fromARGB(255, 60, 145, 230), // Blue color
       ),

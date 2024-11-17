@@ -1,5 +1,4 @@
-import 'dart:ffi';
-
+import 'package:emotionmobileversion/screens/forgot_pwd_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -28,7 +27,7 @@ class _PatientLoginScreenState extends State<PatientLoginScreen> {
       await _checkUserRole(userCredential.user!.uid);
     } catch (e) {
       setState(() {
-        _errorMessage = 'Giriş başarısız: $e';
+        _errorMessage = 'Error logging in: $e';
       });
     }
   }
@@ -61,7 +60,7 @@ Future<void> _googleLogin() async {
 
   } catch (e) {
     setState(() {
-      _errorMessage = 'Google ile giriş başarısız: $e';
+      _errorMessage = 'Google Authentication failed: $e';
     });
   }
 }
@@ -77,7 +76,7 @@ Future<void> _googleLogin() async {
         Navigator.pushReplacementNamed(context, '/patientDashboard');
       } else {
         setState(() {
-          _errorMessage = 'Giriş başarısız: Sadece hastalar giriş yapabilir.';
+          _errorMessage = 'Login failed: Only patients can log in.';
         });
         await FirebaseAuth.instance.signOut();
       }
@@ -106,7 +105,7 @@ Future<void> _googleLogin() async {
         iconTheme: IconThemeData(
           color: Colors.white,
         ),
-        title: Text("Hasta Giriş", style: GoogleFonts.poppins(color: Colors.white)),
+        title: Text("Patient Login", style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.bold)),
         backgroundColor: Color.fromARGB(255, 60, 145, 230),
         centerTitle: true,
       ),
@@ -129,7 +128,7 @@ Future<void> _googleLogin() async {
                     TextField(
                       controller: _emailController,
                       decoration: InputDecoration(
-                        labelText: 'E-posta',
+                        labelText: 'E-mail',
                         labelStyle: GoogleFonts.poppins(color: Colors.black),
                         filled: true,
                         fillColor: Color.fromARGB(255, 230, 243, 255),
@@ -145,7 +144,7 @@ Future<void> _googleLogin() async {
                     TextField(
                       controller: _passwordController,
                       decoration: InputDecoration(
-                        labelText: 'Şifre',
+                        labelText: 'Password',
                         labelStyle: GoogleFonts.poppins(color: Colors.black),
                         filled: true,
                         fillColor: Color.fromARGB(255, 230, 243, 255),
@@ -166,7 +165,7 @@ Future<void> _googleLogin() async {
                     // Login Button
                     ElevatedButton(
                       onPressed: _login,
-                      child: Text('Giriş Yap', style: GoogleFonts.poppins(color: Colors.white)),
+                      child: Text('Login', style: GoogleFonts.poppins(color: Colors.white)),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Color.fromARGB(255, 60, 145, 230),
                         padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
@@ -183,26 +182,37 @@ Future<void> _googleLogin() async {
                       padding: const EdgeInsets.only(right: 0.0), // Reduces space between icon and text
                       child: Image.asset('assets/images/google_icon.png', height: 24, width: 25),
                      ),
-                    label: Text('Google ile Giriş Yap',style: GoogleFonts.poppins(color: const Color.fromARGB(255, 8, 8, 8), fontSize: 12),
-  ),
-  onPressed: _googleLogin,
-  style: ElevatedButton.styleFrom(
-    backgroundColor: const Color.fromARGB(255, 255, 255, 255),  // White background
-    padding: EdgeInsets.symmetric(horizontal: 6, vertical: 14),  // Adjust padding for button
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(8),
-    ),
-  ),
-),
-
+                    label: Text('Login with Google',style: GoogleFonts.poppins(color: const Color.fromARGB(255, 8, 8, 8), fontSize: 12),
+                    ),
+                    onPressed: _googleLogin,
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color.fromARGB(255, 255, 255, 255),  // White background
+                        padding: EdgeInsets.symmetric(horizontal: 6, vertical: 14),  // Adjust padding for button
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                    ),
                     SizedBox(height: 10),
+                    TextButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => ForgotPasswordScreen()),
+                      );
+                    },
+                    child: Text(
+                      "Forgot my Password",
+                      style: GoogleFonts.poppins(color: Color.fromARGB(255, 60, 145, 230)),
+                    ),
+                  ),
                     // Register Button
                     TextButton(
                       onPressed: () {
                         Navigator.pushNamed(context, '/patientRegister');
                       },
                       child: Text(
-                        "Kayıt Ol",
+                        "Register",
                         style: GoogleFonts.poppins(color: Color.fromARGB(255, 60, 145, 230)),
                       ),
                     ),

@@ -1,3 +1,4 @@
+import 'package:emotionmobileversion/screens/forgot_pwd_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -34,18 +35,18 @@ class _DoctorLoginScreenState extends State<DoctorLoginScreen> {
           Navigator.pushReplacementNamed(context, '/doctorDashboard');
         } else {
           setState(() {
-            _errorMessage = 'Giriş başarısız: Sadece doktorlar giriş yapabilir.';
+            _errorMessage = 'Login failed: Only doctors can log in.';
           });
           await FirebaseAuth.instance.signOut();  // Kullanıcıyı çıkış yap
         }
       } else {
         setState(() {
-          _errorMessage = 'Kullanıcı rolü bulunamadı.';
+          _errorMessage = 'No user role found.';
         });
       }
     } catch (e) {
       setState(() {
-        _errorMessage = 'Giriş başarısız: $e';
+        _errorMessage = 'Login failed: $e';
       });
     }
   }
@@ -112,12 +113,12 @@ Future<void> _googleLogin(BuildContext context) async {
       // Eğer rol uyumsuzsa, kullanıcıyı çıkış yapıp hata mesajı göster
       await FirebaseAuth.instance.signOut();
       setState(() {
-        _errorMessage = 'Giriş başarısız: Sadece doktorlar giriş yapabilir.';
+        _errorMessage = 'Login failed: Only doctors can log in.';
       });
     }
   } catch (e) {
     setState(() {
-      _errorMessage = 'Giriş başarısız: $e';
+      _errorMessage = 'Login failed: $e';
     });
   }
 }
@@ -130,7 +131,7 @@ Future<void> _googleLogin(BuildContext context) async {
         iconTheme: IconThemeData(
           color: Colors.white,
         ),
-        title: Text("Doktor Giriş", style: GoogleFonts.poppins(color: Colors.white)),
+        title: Text("Doctor Login", style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.bold)),
         backgroundColor: Color.fromARGB(255, 60, 145, 230),
         centerTitle: true,
       ),
@@ -151,7 +152,7 @@ Future<void> _googleLogin(BuildContext context) async {
                 TextField(
                   controller: _emailController,
                   decoration: InputDecoration(
-                    labelText: 'E-posta',
+                    labelText: 'E-mail',
                     labelStyle: GoogleFonts.poppins(),
                     filled: true,
                     fillColor: Colors.blue[50],
@@ -166,7 +167,7 @@ Future<void> _googleLogin(BuildContext context) async {
                 TextField(
                   controller: _passwordController,
                   decoration: InputDecoration(
-                    labelText: 'Şifre',
+                    labelText: 'Password',
                     labelStyle: GoogleFonts.poppins(),
                     filled: true,
                     fillColor: Colors.blue[50],
@@ -187,7 +188,7 @@ Future<void> _googleLogin(BuildContext context) async {
                 // Email Login Button
                 ElevatedButton(
                   onPressed: _login,
-                  child: Text('Giriş Yap', style: GoogleFonts.poppins(color: Colors.white)),
+                  child: Text('Login', style: GoogleFonts.poppins(color: Colors.white)),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Color.fromARGB(255, 60, 145, 230),
                     padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
@@ -199,33 +200,44 @@ Future<void> _googleLogin(BuildContext context) async {
                 SizedBox(height: 20),
                 // Google Login Button
              ElevatedButton.icon(
-  onPressed: () => _googleLogin(context),
-  icon: Padding(
-    padding: const EdgeInsets.only(right: 0.0),
-    child: Image.asset(
-      'assets/images/google_icon.png', // This loads the image from assets
-      height: 24, width: 25  // Adjust the size of the icon
-    ),
-  ),
-  label: Text('Google ile Giriş Yap',style: GoogleFonts.poppins(color: const Color.fromARGB(255, 8, 8, 8), fontSize: 12),
-  ),
-  style: ElevatedButton.styleFrom(
-    backgroundColor: const Color.fromARGB(255, 255, 255, 255),
-    padding: EdgeInsets.symmetric(horizontal: 6, vertical: 14),
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(8),
-    ),
-  ),
-),
-
+              onPressed: () => _googleLogin(context),
+              icon: Padding(
+                padding: const EdgeInsets.only(right: 0.0),
+                child: Image.asset(
+                  'assets/images/google_icon.png', // This loads the image from assets
+                  height: 24, width: 25  // Adjust the size of the icon
+                ),
+              ),
+              label: Text('Login with Google',style: GoogleFonts.poppins(color: const Color.fromARGB(255, 8, 8, 8), fontSize: 12),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+                padding: EdgeInsets.symmetric(horizontal: 6, vertical: 14),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+            ),
                 SizedBox(height: 10),
+                TextButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => ForgotPasswordScreen()),
+                      );
+                    },
+                    child: Text(
+                      "Forgot my Password",
+                      style: GoogleFonts.poppins(color: Color.fromARGB(255, 60, 145, 230)),
+                    ),
+                  ),
                 // Register Button
                 TextButton(
                   onPressed: () {
                     Navigator.pushNamed(context, '/doctorRegister');
                   },
                   child: Text(
-                    "Kayıt Ol",
+                    "Register",
                     style: GoogleFonts.poppins(color: Color.fromARGB(255, 60, 145, 230)),
                   ),
                 ),

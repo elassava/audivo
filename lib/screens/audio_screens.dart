@@ -15,23 +15,35 @@ class AudioScreen extends StatefulWidget {
 class _AudioScreenState extends State<AudioScreen> {
   late AudioPlayer _audioPlayer;
   String? _audioUrl;
-  int? _correctOption; // _correctOption as int (1-6 range)
-  List<String> _options = ['Mutlu', 'Üzgün', 'Kızgın', 'Korkmuş', 'Şaşırmış', 'İğrenmiş'];
+  int? _correctOption;
+  List<String> _options = ['Happy', 'Sad', 'Angry', 'Terrified', 'Surprised', 'Disgusted'];
   bool _isLoading = true;
   bool _isAnswered = false;
-  int _questionNumber = 0; // Track question number
-  String _questionId = ''; // Track question ID
-  List<DocumentSnapshot> _allQuestions = []; // List of all questions
-  List<DocumentSnapshot> _remainingQuestions = []; // Remaining questions to show
+  int _questionNumber = 0; 
+  String _questionId = '';
+  List<DocumentSnapshot> _allQuestions = []; 
+  List<DocumentSnapshot> _remainingQuestions = []; 
+
+  Duration _audioDuration = Duration.zero; // Total audio duration
+  Duration _audioPosition = Duration.zero; // Current position of the audio
 
   @override
   void initState() {
     super.initState();
     _audioPlayer = AudioPlayer();
-    _fetchAllQuestions(); // Fetch all 20 questions at the start
+    _fetchAllQuestions();
+    _audioPlayer.onPositionChanged.listen((Duration duration) {
+      setState(() {
+        _audioPosition = duration;
+      });
+    });
+    _audioPlayer.onDurationChanged.listen((Duration duration) {
+      setState(() {
+        _audioDuration = duration;
+      });
+    });
   }
 
-  // Fetch all audio questions from Firestore
   Future<void> _fetchAllQuestions() async {
     setState(() {
       _isLoading = true;
@@ -45,11 +57,11 @@ class _AudioScreenState extends State<AudioScreen> {
       if (querySnapshot.docs.isNotEmpty) {
         setState(() {
           _allQuestions = querySnapshot.docs;
-          _remainingQuestions = List.from(_allQuestions); // Copy all questions to remaining list
+          _remainingQuestions = List.from(_allQuestions); 
           _isLoading = false;
         });
 
-        _fetchAudioQuestion(); // Load the first question
+        _fetchAudioQuestion(); 
       } else {
         print('No audio questions available in the collection');
         throw Exception('No audio questions found in the collection');
@@ -62,53 +74,37 @@ class _AudioScreenState extends State<AudioScreen> {
     }
   }
 
-  // Fetch a random audio question from the remaining list
-Future<void> _fetchAudioQuestion() async {
-  if (_remainingQuestions.isEmpty) {
-    // If no remaining questions, show "Test Bitti"
-    _showTestFinishedDialog();
-    return;
-  }
-
-  setState(() {
-    _isLoading = true;
-    _isAnswered = false;
-    _questionNumber++;
-  });
-
-  // Get a random question from remaining questions
-  DocumentSnapshot audioQuestionSnapshot = _remainingQuestions.removeAt(0);
-
-  print('Loading question ${_questionNumber}: Question ID - ${audioQuestionSnapshot.id}');
-
-  // Check if the question has all necessary fields
-  try {
-    setState(() {
-      _audioUrl = audioQuestionSnapshot['audioUrl'];
-      _correctOption = audioQuestionSnapshot['correctOption'] as int;
-      _questionId = audioQuestionSnapshot.id; // Get the question ID
-      _isLoading = false;
-    });
-
-    // Ensure that the question URL is valid
-    if (_audioUrl != null) {
-      print('Audio URL for Question ${_questionNumber}: $_audioUrl');
-    } else {
-      print('Error: Audio URL is null for question ID ${audioQuestionSnapshot.id}');
+  Future<void> _fetchAudioQuestion() async {
+    if (_remainingQuestions.isEmpty) {
+      _showTestFinishedDialog();
+      return;
     }
 
-    // Play audio automatically on question load
-    _playAudio();
-  } catch (e) {
-    print('Error fetching audio question: $e');
     setState(() {
-      _isLoading = false;
+      _isLoading = true;
+      _isAnswered = false;
+      _questionNumber++;
     });
+
+    DocumentSnapshot audioQuestionSnapshot = _remainingQuestions.removeAt(0);
+
+    try {
+      setState(() {
+        _audioUrl = audioQuestionSnapshot['audioUrl'];
+        _correctOption = audioQuestionSnapshot['correctOption'] as int;
+        _questionId = audioQuestionSnapshot.id;
+        _isLoading = false;
+      });
+
+      _playAudio();
+    } catch (e) {
+      print('Error fetching audio question: $e');
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
-}
 
-
-  // Play audio
   void _playAudio() {
     if (_audioUrl != null) {
       _audioPlayer.play(UrlSource(_audioUrl!));
@@ -117,29 +113,28 @@ Future<void> _fetchAudioQuestion() async {
     }
   }
 
-  // Save answer to Firebase
   Future<void> _saveAnswer(int selectedEmotionIndex) async {
     if (_correctOption != null) {
       bool isCorrect = selectedEmotionIndex + 1 == _correctOption;
-      // Create the answer data
+
       Map<String, dynamic> answerData = {
         'audioUrl': _audioUrl,
         'correctOption': _correctOption,
         'isCorrect': isCorrect,
         'questionNumber': _questionNumber,
         'selectedOption': _options[selectedEmotionIndex],
-        'timestamp': FieldValue.serverTimestamp(), // Save current time
+        'timestamp': FieldValue.serverTimestamp(),
       };
 
       try {
         await FirebaseFirestore.instance
             .collection('patients')
             .doc(widget.patientId)
-            .collection('audioQuestions') // Or 'videoQuestions' / 'maskedQuestions'
-            .doc(_questionId) // Question ID
+            .collection('audioQuestions')
+            .doc(_questionId)
             .set({
-          _questionNumber.toString(): answerData, // Save based on question number
-        }, SetOptions(merge: true)); // Merge to avoid overwriting other answers
+          _questionNumber.toString(): answerData,
+        }, SetOptions(merge: true));
         print('Answer saved successfully');
       } catch (e) {
         print('Error saving answer: $e');
@@ -147,43 +142,20 @@ Future<void> _fetchAudioQuestion() async {
     }
   }
 
-  // Submit the selected emotion
   void _submitEmotion(int selectedEmotionIndex) {
     if (_correctOption != null) {
-      bool isCorrect = selectedEmotionIndex + 1 == _correctOption;
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text(isCorrect ? 'Correct!' : 'Incorrect'),
-          content: Text(
-            isCorrect
-                ? 'You selected the correct emotion: ${_options[selectedEmotionIndex]}'
-                : 'The correct emotion was: ${_options[_correctOption! - 1]}', // Adjust for 1-6 range
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-                _saveAnswer(selectedEmotionIndex); // Save the answer
-                _goToNextQuestion(); // Go to next question
-              },
-              child: Text('Next Question'),
-            ),
-          ],
-        ),
-      );
+      _saveAnswer(selectedEmotionIndex); 
+      _goToNextQuestion(); 
     }
   }
 
-  // Function to load the next question
   void _goToNextQuestion() {
     setState(() {
       _audioPlayer.stop();
-      _fetchAudioQuestion(); // Load the next question
+      _fetchAudioQuestion(); 
     });
   }
 
-  // Show the "Test Finished" dialog
   void _showTestFinishedDialog() {
     showDialog(
       context: context,
@@ -194,7 +166,7 @@ Future<void> _fetchAudioQuestion() async {
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              Navigator.pop(context); // Go back to the previous screen
+              Navigator.pop(context);
             },
             child: Text('Tamam'),
           ),
@@ -213,42 +185,84 @@ Future<void> _fetchAudioQuestion() async {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Audio Test', style: GoogleFonts.poppins(color: Colors.white)),
+        iconTheme: IconThemeData(
+          color: Colors.white,
+        ),
+        title: Text('Audio Test', style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.bold)),
         backgroundColor: Color.fromARGB(255, 60, 145, 230),
       ),
-      body: _isLoading
-          ? Center(child: CircularProgressIndicator())
-          : Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Text(
-                    'How do you feel after listening?',
-                    style: GoogleFonts.poppins(fontSize: 18),
-                  ),
-                  SizedBox(height: 16),
-                  Wrap(
-                    spacing: 10.0,
-                    runSpacing: 10.0,
-                    children: List.generate(_options.length, (index) {
-                      return ElevatedButton(
-                        onPressed: _isAnswered
-                            ? null
-                            : () {
-                                setState(() {
-                                  _isAnswered = true; // Prevent multiple answers
-                                });
-                                _submitEmotion(index); // Submit the selected emotion
-                              },
-                        child: Text(_options[index], style: GoogleFonts.poppins(fontSize: 16)),
-                      );
-                    }),
-                  ),
-                ],
-              ),
-            ),
+      body: Container(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/images/background.png'),
+            fit: BoxFit.cover, 
+          ),
+        ),
+        child: Center(
+          child: _isLoading
+              ? Center(child: CircularProgressIndicator())
+              : Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // Question Number at the top
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        'Question: $_questionNumber', // Show current question number
+                        style: GoogleFonts.poppins(fontSize: 20, color: Colors.black),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    // Progress Bar
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: LinearProgressIndicator(
+                      value: _audioDuration.inSeconds > 0
+                          ? _audioPosition.inSeconds / _audioDuration.inSeconds
+                          : 0, // Eğer sesin süresi geçerli değilse, 0 olarak ayarlayın
+                      backgroundColor: Colors.grey[300],
+                      color: Color.fromARGB(255, 60, 145, 230),
+                    ),
+                    ),
+                    SizedBox(height: 16),
+                    Text(
+                      'How do you feel after listening?',
+                      style: GoogleFonts.poppins(fontSize: 18, color: Colors.black),
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(height: 16),
+                    Wrap(
+                      alignment: WrapAlignment.center,
+                      spacing: 10.0,
+                      runSpacing: 10.0,
+                      children: List.generate(_options.length, (index) {
+                        return SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.4, 
+                          child: ElevatedButton(
+                            onPressed: _isAnswered
+                                ? null
+                                : () {
+                                    setState(() {
+                                      _isAnswered = true;
+                                    });
+                                    _submitEmotion(index);
+                                  },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Color.fromARGB(255, 60, 145, 230), 
+                            ),
+                            child: Text(
+                              _options[index],
+                              style: GoogleFonts.poppins(fontSize: 14, color: Colors.white),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        );
+                      }),
+                    ),
+                  ],
+                ),
+        ),
+      ),
     );
   }
 }

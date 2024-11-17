@@ -37,7 +37,7 @@ Future<void> _signOut(BuildContext context) async {
       context: context,
       builder: (context) => AlertDialog(
         title: Text(
-          'Emin misiniz?', // "Are you sure?" in Turkish
+          'Are you sure?', 
           style: GoogleFonts.poppins(
             fontSize: 20, // Custom font size
             fontWeight: FontWeight.bold, // Bold text
@@ -45,7 +45,7 @@ Future<void> _signOut(BuildContext context) async {
           ),
         ),
         content: Text(
-          'Çıkış yapmak istediğinizden emin misiniz?', // "Are you sure you want to log out?" in Turkish
+          'Are you sure you want to log out?', // "Are you sure you want to log out?" in Turkish
           style: GoogleFonts.poppins(
             fontSize: 16, // Custom font size
             fontWeight: FontWeight.normal, // Regular text
@@ -56,7 +56,7 @@ Future<void> _signOut(BuildContext context) async {
           TextButton(
             onPressed: () => Navigator.of(context).pop(), // Close the dialog
             child: Text(
-              'Hayır',
+              'No',
               style: GoogleFonts.poppins(
                 fontSize: 16, // Custom font size
                 fontWeight: FontWeight.bold, // Bold text
@@ -70,7 +70,7 @@ Future<void> _signOut(BuildContext context) async {
               _signOut(context); // Proceed with sign out
             },
             child: Text(
-              'Evet',
+              'Yes',
               style: GoogleFonts.poppins(
                 fontSize: 16, // Custom font size
                 fontWeight: FontWeight.bold, // Bold text
@@ -103,7 +103,7 @@ Future<void> _signOut(BuildContext context) async {
         automaticallyImplyLeading: false,
         title: Text(
           'Patient Dashboard',
-          style: GoogleFonts.poppins(color: Colors.white),
+          style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         backgroundColor: Color.fromARGB(255, 60, 145, 230),
       ),

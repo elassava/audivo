@@ -14,7 +14,7 @@ class _PatientRegisterScreenState extends State<PatientRegisterScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _phoneController = TextEditingController();
-  String _gender = 'Erkek';
+  String _gender = 'Male';
   String _dob = '';
   String? _errorMessage;
 
@@ -47,7 +47,7 @@ class _PatientRegisterScreenState extends State<PatientRegisterScreen> {
         _phoneController.text.isEmpty ||
         _dob.isEmpty) {
       setState(() {
-        _errorMessage = 'Lütfen tüm alanları doldurun!';
+        _errorMessage = 'Please fill in all areas!';
       });
       return;
     }
@@ -117,8 +117,8 @@ class _PatientRegisterScreenState extends State<PatientRegisterScreen> {
           color: Colors.white,
         ),
         title: Text(
-          "Hasta Kayıt",
-          style: GoogleFonts.poppins(color: Colors.white),
+          "Patient Register",
+          style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         backgroundColor: Color.fromARGB(255, 60, 145, 230),
       ),
@@ -146,7 +146,7 @@ class _PatientRegisterScreenState extends State<PatientRegisterScreen> {
                     TextField(
                       controller: _firstNameController,
                       decoration: InputDecoration(
-                        labelText: 'Ad',
+                        labelText: 'Name',
                         labelStyle: GoogleFonts.poppins(color: Colors.black, fontWeight: FontWeight.w600),
                         filled: true,
                         fillColor: Colors.white.withOpacity(0.8),
@@ -162,7 +162,7 @@ class _PatientRegisterScreenState extends State<PatientRegisterScreen> {
                     TextField(
                       controller: _lastNameController,
                       decoration: InputDecoration(
-                        labelText: 'Soyad',
+                        labelText: 'Surname',
                         labelStyle: GoogleFonts.poppins(color: Colors.black, fontWeight: FontWeight.w600),
                         filled: true,
                         fillColor: Colors.white.withOpacity(0.8),
@@ -178,7 +178,7 @@ class _PatientRegisterScreenState extends State<PatientRegisterScreen> {
                     TextField(
                       controller: _emailController,
                       decoration: InputDecoration(
-                        labelText: 'E-posta',
+                        labelText: 'E-mail',
                         labelStyle: GoogleFonts.poppins(color: Colors.black, fontWeight: FontWeight.w600),
                         filled: true,
                         fillColor: Colors.white.withOpacity(0.8),
@@ -194,7 +194,7 @@ class _PatientRegisterScreenState extends State<PatientRegisterScreen> {
                     TextField(
                       controller: _passwordController,
                       decoration: InputDecoration(
-                        labelText: 'Şifre',
+                        labelText: 'Password',
                         labelStyle: GoogleFonts.poppins(color: Colors.black, fontWeight: FontWeight.w600),
                         filled: true,
                         fillColor: Colors.white.withOpacity(0.8),
@@ -210,7 +210,7 @@ class _PatientRegisterScreenState extends State<PatientRegisterScreen> {
                     TextField(
                       controller: _phoneController,
                       decoration: InputDecoration(
-                        labelText: 'Telefon Numarası',
+                        labelText: 'Phone Number',
                         labelStyle: GoogleFonts.poppins(color: Colors.black, fontWeight: FontWeight.w600),
                         filled: true,
                         fillColor: Colors.white.withOpacity(0.8),
@@ -229,11 +229,11 @@ class _PatientRegisterScreenState extends State<PatientRegisterScreen> {
                         child: TextField(
                           controller: TextEditingController(text: _dob),
                           decoration: InputDecoration(
-                            labelText: 'Doğum Tarihi (YYYY/AA/GG)',
+                            labelText: 'Date of Birth (YYYY/MM/DD)',
                             labelStyle: GoogleFonts.poppins(color: Colors.black, fontWeight: FontWeight.w600),
                             filled: true,
                             fillColor: Colors.white.withOpacity(0.8),
-                            hintText: _dob.isEmpty ? 'Tarihi Seçin' : _dob,
+                            hintText: _dob.isEmpty ? 'Choose Date' : _dob,
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10),
                             ),
@@ -258,7 +258,7 @@ class _PatientRegisterScreenState extends State<PatientRegisterScreen> {
                             _gender = newValue!;
                           });
                         },
-                        items: <String>['Erkek', 'Kadın', 'Diğer']
+                        items: <String>['Male', 'Female', 'Other']
                             .map<DropdownMenuItem<String>>((String value) {
                           return DropdownMenuItem<String>(
                             value: value,
@@ -283,7 +283,7 @@ class _PatientRegisterScreenState extends State<PatientRegisterScreen> {
                     // Kayıt butonu
                     ElevatedButton(
                       onPressed: _register,
-                      child: Text('Kayıt Ol', style: GoogleFonts.poppins(color: Colors.white)),
+                      child: Text('Register', style: GoogleFonts.poppins(color: Colors.white)),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Color.fromARGB(255, 60, 145, 230),
                         shape: RoundedRectangleBorder(

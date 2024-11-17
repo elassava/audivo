@@ -35,7 +35,6 @@ class MyApp extends StatelessWidget {
         '/patientsScreen': (context) => PatientsScreen(), // PatientsScreen'e rota ekledik
         '/patientSettings': (context) => PSettingsScreen(),
         '/audioScreen': (context) => AudioScreen(patientId: '',),
-
       },
     );
   }

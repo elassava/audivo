@@ -55,7 +55,7 @@ class _PatientsScreenState extends State<PatientsScreen> {
         iconTheme: IconThemeData(
           color: Colors.white,
         ),
-        title: Text('Patients', style: GoogleFonts.poppins(color: Colors.white)),
+        title: Text('Patients', style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.bold)),
         backgroundColor: Color.fromARGB(255, 60, 145, 230), // Mavi
       ),
       body: Container(

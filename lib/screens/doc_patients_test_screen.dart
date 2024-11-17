@@ -14,7 +14,7 @@ class PatientTestsScreen extends StatelessWidget {
         iconTheme: IconThemeData(
           color: Colors.white,
         ),
-        title: Text('Testler', style: GoogleFonts.poppins(color: Colors.white)),
+        title: Text('Tests', style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.bold)),
         backgroundColor: Color.fromARGB(255, 60, 145, 230), // Mavi
       ),
       body: Stack(
@@ -32,22 +32,6 @@ class PatientTestsScreen extends StatelessWidget {
             padding: const EdgeInsets.all(16.0),
             child: Column(
               children: [
-                // Video Test Card
-                SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.15,
-                  child: Card(
-                    color: Colors.white,
-                    child: InkWell(
-                      onTap: () {
-                        // Video Test işlemi
-                        _showTestDetails(context, "Video Test");
-                      },
-                      child: Center(
-                        child: Text("Video Test", style: GoogleFonts.poppins(fontSize: 20)),
-                      ),
-                    ),
-                  ),
-                ),
                 SizedBox(height: 16.0),
                 // Görüntülü Test Card
                 SizedBox(
@@ -57,10 +41,10 @@ class PatientTestsScreen extends StatelessWidget {
                     child: InkWell(
                       onTap: () {
                         // Görüntülü Test işlemi
-                        _showTestDetails(context, "Görüntülü Test");
+                        _showTestDetails(context, "Video Test");
                       },
                       child: Center(
-                        child: Text("Görüntülü Test", style: GoogleFonts.poppins(fontSize: 20)),
+                        child: Text("Video Test", style: GoogleFonts.poppins(fontSize: 20)),
                       ),
                     ),
                   ),
@@ -74,10 +58,10 @@ class PatientTestsScreen extends StatelessWidget {
                     child: InkWell(
                       onTap: () {
                         // Maskeli Görüntü Test işlemi
-                        _showTestDetails(context, "Maskeli Görüntü Test");
+                        _showTestDetails(context, "Masked Video Test");
                       },
                       child: Center(
-                        child: Text("Maskeli Görüntü Test", style: GoogleFonts.poppins(fontSize: 20)),
+                        child: Text("Masked Video Test", style: GoogleFonts.poppins(fontSize: 20)),
                       ),
                     ),
                   ),
@@ -118,13 +102,13 @@ class PatientTestsScreen extends StatelessWidget {
       context: context,
       builder: (context) => AlertDialog(
         title: Text(testType, style: GoogleFonts.poppins()),
-        content: Text('Test türü: $testType seçildi.', style: GoogleFonts.poppins()),
+        content: Text('Test type: $testType chosen.', style: GoogleFonts.poppins()),
         actions: [
           TextButton(
             onPressed: () {
               Navigator.pop(context);
             },
-            child: Text('Kapat', style: GoogleFonts.poppins()),
+            child: Text('Close', style: GoogleFonts.poppins()),
           ),
         ],
       ),
