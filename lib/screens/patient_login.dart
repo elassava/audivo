@@ -25,27 +25,46 @@ class _PatientLoginScreenState extends State<PatientLoginScreen> {
       password: _passwordController.text.trim(),
     );
 
-    // Kullanıcıyı kontrol et ve e-posta doğrulama durumunu kontrol et
     User? user = FirebaseAuth.instance.currentUser;
     if (user != null && !user.emailVerified) {
       setState(() {
         _errorMessage = "Email not verified! Please check your inbox.";
       });
 
-      // Opsiyonel: Kullanıcıya doğrulama e-postası tekrar gönder
+      // Doğrulama e-postası gönder
       await user.sendEmailVerification();
       return;
     }
 
-    // Eğer e-posta doğrulanmışsa rol kontrolüne geç
     await _checkUserRole(userCredential.user!.uid);
+  } on FirebaseAuthException catch (e) {
+    if (e.code == 'user-not-found') {
+      setState(() {
+        _errorMessage = 'No user found for this email.';
+      });
+      } else if (e.code == 'invalid-credential') {
+      setState(() {
+        _errorMessage = 'Incorrect password. Please try again.';
+      });
+    } else if (e.code == 'wrong-password') {
+      setState(() {
+        _errorMessage = 'Incorrect password. Please try again.';
+      });
+    } else if (e.code == 'invalid-email') {
+      setState(() {
+        _errorMessage = 'Invalid email address format.';
+      });
+    } else {
+      setState(() {
+        _errorMessage = 'An unexpected error occurred. Please try again.';
+      });
+    }
   } catch (e) {
     setState(() {
-      _errorMessage = 'Error logging in: $e';
+      _errorMessage = 'Login failed: $e';
     });
   }
 }
-
   // Function for Google sign-in
 // Function for Google sign-in with account selection each time
 Future<void> _googleLogin() async {
@@ -102,8 +121,8 @@ Future<void> _checkUserRole(String uid, {GoogleSignInAccount? googleUser}) async
       String lastName = nameParts.length > 1 ? nameParts.sublist(1).join(' ') : ''; // Soyadını al
 
       await FirebaseFirestore.instance.collection('users').doc(uid).set({
-        'firstName': firstName,  // Ad
-        'lastName': lastName,    // Soyad
+        'name': firstName,  // Ad
+        'surname': lastName,    // Soyad
         'email': googleUser.email,
         'role': 'patient',       // Varsayılan olarak 'patient' rolü atanıyor
         'createdAt': FieldValue.serverTimestamp(),
@@ -111,8 +130,8 @@ Future<void> _checkUserRole(String uid, {GoogleSignInAccount? googleUser}) async
 
       // Aynı veriyi 'patients' koleksiyonuna da kaydedelim
       await FirebaseFirestore.instance.collection('patients').doc(uid).set({
-        'firstName': firstName,
-        'lastName': lastName,
+        'name': firstName,
+        'surname': lastName,
         'email': googleUser.email,
         'role': 'patient', // Varsayılan hasta rolü
         'createdAt': FieldValue.serverTimestamp(),
@@ -192,7 +211,7 @@ Future<void> _checkUserRole(String uid, {GoogleSignInAccount? googleUser}) async
                     if (_errorMessage != null)
                       Text(
                         _errorMessage!,
-                        style: TextStyle(color: Colors.red, fontSize: 14),
+                        style: TextStyle(color: Colors.red, fontSize: 14, fontWeight: FontWeight.bold),
                       ),
                     SizedBox(height: 20),
                     // Login Button

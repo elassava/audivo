@@ -15,7 +15,7 @@ class _DoctorLoginScreenState extends State<DoctorLoginScreen> {
   final _passwordController = TextEditingController();
   String? _errorMessage;
 
-  Future<void> _login() async {
+Future<void> _login() async {
   try {
     // Email ve şifre ile giriş yap
     UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
@@ -53,6 +53,29 @@ class _DoctorLoginScreenState extends State<DoctorLoginScreen> {
         _errorMessage = 'No user role found.';
       });
     }
+  } on FirebaseAuthException catch (e) {
+    // Firebase hata kodlarını kontrol et
+    setState(() {
+      switch (e.code) {
+        case 'user-not-found':
+          _errorMessage = 'No account found with this email.';
+          break;
+        case 'invalid-credential':
+          _errorMessage = 'No account found with this email.';
+          break;
+        case 'wrong-password':
+          _errorMessage = 'Incorrect password. Please try again.';
+          break;
+        case 'invalid-email':
+          _errorMessage = 'The email address is not valid.';
+          break;
+        case 'user-disabled':
+          _errorMessage = 'This account has been disabled. Contact support.';
+          break;
+        default:
+          _errorMessage = e.code;
+      }
+    });
   } catch (e) {
     setState(() {
       _errorMessage = 'Login failed: $e';
@@ -200,7 +223,7 @@ Future<void> _googleLogin(BuildContext context) async {
                 if (_errorMessage != null)
                   Text(
                     _errorMessage!,
-                    style: TextStyle(color: Colors.red, fontSize: 14),
+                    style: TextStyle(color: Colors.red, fontSize: 14, fontWeight: FontWeight.bold),
                   ),
                 SizedBox(height: 20),
                 // Email Login Button

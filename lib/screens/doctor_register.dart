@@ -239,6 +239,7 @@ Future<void> _register() async {
                       ),
                     ),
                     SizedBox(height: 20),
+                    // Cinsiyet seçim alanı
                     Container(
                       padding: EdgeInsets.symmetric(horizontal: 10),
                       decoration: BoxDecoration(
@@ -257,9 +258,13 @@ Future<void> _register() async {
                             .map<DropdownMenuItem<String>>((String value) {
                           return DropdownMenuItem<String>(
                             value: value,
-                            child: Text(value, style: GoogleFonts.poppins(color: Colors.black)),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                              child: Text(value, style: GoogleFonts.poppins()),
+                            ),
                           );
                         }).toList(),
+                        isExpanded: true,
                         underline: SizedBox(),
                       ),
                     ),

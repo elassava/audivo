@@ -302,7 +302,7 @@ class _PatientRegisterScreenState extends State<PatientRegisterScreen> {
                     if (_errorMessage != null)
                       Text(
                         _errorMessage!,
-                        style: GoogleFonts.poppins(color: Colors.red),
+                        style: GoogleFonts.poppins(color: Colors.red, fontWeight: FontWeight.bold),
                       ),
                     SizedBox(height: 20),
                     // Kayıt butonu
