@@ -15,21 +15,21 @@ class PatientDashboard extends StatelessWidget {
     return await FirebaseFirestore.instance.collection('users').doc(userId).get();
   }
 
-Future<void> _signOut(BuildContext context) async {
-  try {
-    // Google Sign-In'dan çıkış yap
-    await _googleSignIn.signOut();
-    
-    // Firebase Authentication'dan çıkış yap
-    await _auth.signOut();
-    
-    // Kullanıcı çıkış yaptıktan sonra, geçmişi temizlemek için:
-    Navigator.popUntil(context, (route) => false);
-    Navigator.pushNamed(context, '/');
-  } catch (e) {
-    print('Error signing out: $e');
+  Future<void> _signOut(BuildContext context) async {
+    try {
+      // Google Sign-In'dan çıkış yap
+      await _googleSignIn.signOut();
+      
+      // Firebase Authentication'dan çıkış yap
+      await _auth.signOut();
+      
+      // Kullanıcı çıkış yaptıktan sonra, geçmişi temizlemek için:
+      Navigator.popUntil(context, (route) => false);
+      Navigator.pushNamed(context, '/');
+    } catch (e) {
+      print('Error signing out: $e');
+    }
   }
-}
 
   // Show logout confirmation dialog
   Future<void> _showLogoutConfirmation(BuildContext context) async {
@@ -108,7 +108,13 @@ Future<void> _signOut(BuildContext context) async {
         backgroundColor: Color.fromARGB(255, 60, 145, 230),
       ),
       body: Container(
-        color: Color.fromARGB(255, 230, 243, 255),
+        // Arka plan resmi ve diğer dekorasyonlar burada tanımlanıyor
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/images/background.png'), // Arka plan resmi yolu
+            fit: BoxFit.cover, // Resmin tüm ekrana yayılması
+          ),
+        ),
         padding: const EdgeInsets.all(16.0),
         child: FutureBuilder<DocumentSnapshot>(
           future: _getPatientInfo(),
@@ -160,7 +166,6 @@ Future<void> _signOut(BuildContext context) async {
                   ),
                 ),
                 SizedBox(height: 20),
-                // Other cards and functionality can go here...
                 Card(
                   color: Colors.white,
                   elevation: 4,

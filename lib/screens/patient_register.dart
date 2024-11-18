@@ -12,6 +12,7 @@ class _PatientRegisterScreenState extends State<PatientRegisterScreen> {
   final _firstNameController = TextEditingController();
   final _lastNameController = TextEditingController();
   final _emailController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
   final _passwordController = TextEditingController();
   final _phoneController = TextEditingController();
   String _gender = 'Male';
@@ -38,6 +39,13 @@ class _PatientRegisterScreenState extends State<PatientRegisterScreen> {
     setState(() {
       _errorMessage = null; // Hata mesajını sıfırlama
     });
+
+    if (_passwordController.text.trim() != _confirmPasswordController.text.trim()) {
+    setState(() {
+      _errorMessage = "Passwords do not match!";
+    });
+    return;
+  }
 
     // Alanların boş olup olmadığını kontrol et
     if (_firstNameController.text.isEmpty ||
@@ -87,6 +95,8 @@ class _PatientRegisterScreenState extends State<PatientRegisterScreen> {
         'birthDate': _dob,
         'gender': _gender,
       });
+
+      await userCredential.user!.sendEmailVerification();
 
       // Başarılı kayıt sonrası giriş ekranına yönlendirme
       Navigator.pushReplacementNamed(context, '/patientLogin');
@@ -195,6 +205,21 @@ class _PatientRegisterScreenState extends State<PatientRegisterScreen> {
                       controller: _passwordController,
                       decoration: InputDecoration(
                         labelText: 'Password',
+                        labelStyle: GoogleFonts.poppins(color: Colors.black, fontWeight: FontWeight.w600),
+                        filled: true,
+                        fillColor: Colors.white.withOpacity(0.8),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      obscureText: true,
+                      style: GoogleFonts.poppins(),
+                    ),
+                    SizedBox(height: 20),
+                    TextField(
+                      controller: _confirmPasswordController,
+                      decoration: InputDecoration(
+                        labelText: 'Confirm Password',
                         labelStyle: GoogleFonts.poppins(color: Colors.black, fontWeight: FontWeight.w600),
                         filled: true,
                         fillColor: Colors.white.withOpacity(0.8),

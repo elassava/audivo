@@ -19,43 +19,57 @@ class _PatientLoginScreenState extends State<PatientLoginScreen> {
   final GoogleSignIn _googleSignIn = GoogleSignIn();
 
   Future<void> _login() async {
-    try {
-      UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: _emailController.text.trim(),
-        password: _passwordController.text.trim(),
-      );
-      await _checkUserRole(userCredential.user!.uid);
-    } catch (e) {
+  try {
+    UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+      email: _emailController.text.trim(),
+      password: _passwordController.text.trim(),
+    );
+
+    // Kullanıcıyı kontrol et ve e-posta doğrulama durumunu kontrol et
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null && !user.emailVerified) {
       setState(() {
-        _errorMessage = 'Error logging in: $e';
+        _errorMessage = "Email not verified! Please check your inbox.";
       });
+
+      // Opsiyonel: Kullanıcıya doğrulama e-postası tekrar gönder
+      await user.sendEmailVerification();
+      return;
     }
+
+    // Eğer e-posta doğrulanmışsa rol kontrolüne geç
+    await _checkUserRole(userCredential.user!.uid);
+  } catch (e) {
+    setState(() {
+      _errorMessage = 'Error logging in: $e';
+    });
   }
+}
 
   // Function for Google sign-in
 // Function for Google sign-in with account selection each time
 Future<void> _googleLogin() async {
   try {
-    // Sign out from Google to ensure account picker appears
+    // Google'dan çıkış yaparak hesap seçici ekranını göster
     await _googleSignIn.signOut();
 
-    // Attempt Google sign-in
+    // Google ile giriş yapmayı dene
     final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
-    if (googleUser == null) return; // User canceled sign-in
+    if (googleUser == null) return; // Kullanıcı girişini iptal etti
 
-    // Obtain the auth details from the request
+    // Google'dan kimlik bilgilerini al
     final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
 
-    // Create a new credential
+    // Kimlik bilgilerini kullanarak yeni bir OAuthCredential oluştur
     final OAuthCredential credential = GoogleAuthProvider.credential(
       accessToken: googleAuth.accessToken,
       idToken: googleAuth.idToken,
     );
 
-    // Sign in to Firebase with the Google credentials
+    // Firebase ile giriş yap
     UserCredential userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
 
-    // Check if the user already exists, or add them if they don't
+    // Kullanıcı rolünü kontrol et
     await _checkUserRole(userCredential.user!.uid, googleUser: googleUser);
 
   } catch (e) {
@@ -65,38 +79,57 @@ Future<void> _googleLogin() async {
   }
 }
 
+// Kullanıcı rolünü kontrol et, eğer yoksa yeni kullanıcı oluştur
+Future<void> _checkUserRole(String uid, {GoogleSignInAccount? googleUser}) async {
+  DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
 
-  // Check user role in Firestore, create user if not exists
-  Future<void> _checkUserRole(String uid, {GoogleSignInAccount? googleUser}) async {
-    DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
-
-    if (userDoc.exists) {
-      String role = userDoc['role'] ?? '';
-      if (role == 'patient') {
-        Navigator.pushReplacementNamed(context, '/patientDashboard');
-      } else {
-        setState(() {
-          _errorMessage = 'Login failed: Only patients can log in.';
-        });
-        await FirebaseAuth.instance.signOut();
-      }
+  if (userDoc.exists) {
+    String role = userDoc['role'] ?? '';
+    if (role == 'patient') {
+      Navigator.pushReplacementNamed(context, '/patientDashboard');
     } else {
-      // If user doesn't exist, create a new record with 'patient' role
-      if (googleUser != null) {
-        await FirebaseFirestore.instance.collection('users').doc(uid).set({
-          'email': googleUser.email,
-          'name': googleUser.displayName,
-          'role': 'patient',
-        });
-      } else {
-        await FirebaseFirestore.instance.collection('patients').doc(uid).set({
-          'email': _emailController.text.trim(),
-          'role': 'patient',
-        });
-      }
+      setState(() {
+        _errorMessage = 'Login failed: Only patients can log in.';
+      });
+      await FirebaseAuth.instance.signOut();
+    }
+  } else {
+    // Eğer kullanıcı mevcut değilse, yeni kullanıcıyı oluştur
+    if (googleUser != null) {
+      String fullName = googleUser.displayName ?? '';
+      List<String> nameParts = fullName.split(' '); // Ad ve soyadı ayırmak için boşlukla bölelim
+      String firstName = nameParts.isNotEmpty ? nameParts[0] : '';
+      String lastName = nameParts.length > 1 ? nameParts.sublist(1).join(' ') : ''; // Soyadını al
+
+      await FirebaseFirestore.instance.collection('users').doc(uid).set({
+        'firstName': firstName,  // Ad
+        'lastName': lastName,    // Soyad
+        'email': googleUser.email,
+        'role': 'patient',       // Varsayılan olarak 'patient' rolü atanıyor
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+
+      // Aynı veriyi 'patients' koleksiyonuna da kaydedelim
+      await FirebaseFirestore.instance.collection('patients').doc(uid).set({
+        'firstName': firstName,
+        'lastName': lastName,
+        'email': googleUser.email,
+        'role': 'patient', // Varsayılan hasta rolü
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+
+      // Yeni kullanıcı kaydedildikten sonra, hastanın dashboard'una yönlendir
+      Navigator.pushReplacementNamed(context, '/patientDashboard');
+    } else {
+      await FirebaseFirestore.instance.collection('patients').doc(uid).set({
+        'email': _emailController.text.trim(),
+        'role': 'patient',
+      });
       Navigator.pushReplacementNamed(context, '/patientDashboard');
     }
   }
+}
+
 
   @override
   Widget build(BuildContext context) {

@@ -13,6 +13,7 @@ class _DoctorRegisterScreenState extends State<DoctorRegisterScreen> {
   final _lastNameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
   final _phoneController = TextEditingController();
   String _gender = 'Male';
   String _dob = '';
@@ -34,70 +35,63 @@ class _DoctorRegisterScreenState extends State<DoctorRegisterScreen> {
   }
 
   // Kayıt fonksiyonu
-  Future<void> _register() async {
-    // Boş alan kontrolü
-    if (_firstNameController.text.trim().isEmpty ||
-        _lastNameController.text.trim().isEmpty ||
-        _emailController.text.trim().isEmpty ||
-        _passwordController.text.trim().isEmpty ||
-        _phoneController.text.trim().isEmpty ||
-        _dob.isEmpty) {
-      setState(() {
-        _errorMessage = "Please fill in all areas!";
-      });
-      return;
-    }
-
-    try {
-      UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: _emailController.text.trim(),
-        password: _passwordController.text.trim(),
-      );
-
-      // İsimlerin ilk harflerini büyük yapmak
-      String firstName = _firstNameController.text.trim();
-      String lastName = _lastNameController.text.trim();
-
-      // İlk harfleri büyük yapma
-      firstName = _capitalizeWords(firstName);
-      lastName = _capitalizeWords(lastName);
-
-      // Kullanıcı verisini users koleksiyonuna kaydet
-      await FirebaseFirestore.instance.collection('users').doc(userCredential.user!.uid).set({
-        'name': firstName,
-        'surname': lastName,
-        'email': _emailController.text.trim(),
-        'phone': _phoneController.text.trim(),
-        'birthDate': _dob,
-        'gender': _gender,
-        'role': 'doctor',
-      });
-
-      // Doktor verisini doctors koleksiyonuna kaydet
-      await FirebaseFirestore.instance.collection('doctors').doc(userCredential.user!.uid).set({
-        'name': firstName,
-        'surname': lastName,
-        'email': _emailController.text.trim(),
-        'phone': _phoneController.text.trim(),
-        'birthDate': _dob,
-        'gender': _gender,
-      });
-
-      // Başarılı kayıt sonrası giriş ekranına yönlendirme
-      Navigator.pushReplacementNamed(context, '/doctorLogin');
-    } catch (e) {
-      setState(() {
-        _errorMessage = e.toString();
-      });
-    }
+Future<void> _register() async {
+  // Şifre eşleşme kontrolü
+  if (_passwordController.text.trim() != _confirmPasswordController.text.trim()) {
+    setState(() {
+      _errorMessage = "Passwords do not match!";
+    });
+    return;
   }
+
+  try {
+    UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      email: _emailController.text.trim(),
+      password: _passwordController.text.trim(),
+    );
+
+    // Kullanıcı bilgilerini veritabanına kaydet
+    await FirebaseFirestore.instance.collection('users').doc(userCredential.user!.uid).set({
+      'name': _capitalizeWords(_firstNameController.text.trim()),
+      'surname': _capitalizeWords(_lastNameController.text.trim()),
+      'email': _emailController.text.trim(),
+      'phone': _phoneController.text.trim(),
+      'birthDate': _dob,
+      'gender': _gender,
+      'role': 'doctor',
+    });
+    
+    await FirebaseFirestore.instance.collection('doctors').doc(userCredential.user!.uid).set({
+      'name': _capitalizeWords(_firstNameController.text.trim()),
+      'surname': _capitalizeWords(_lastNameController.text.trim()),
+      'email': _emailController.text.trim(),
+      'phone': _phoneController.text.trim(),
+      'birthDate': _dob,
+      'gender': _gender,
+    });
+
+    // Doğrulama e-postası gönder
+    await userCredential.user!.sendEmailVerification();
+
+    // Başarılı kayıt sonrası bilgi mesajı göster ve giriş ekranına yönlendir
+    setState(() {
+      _errorMessage = "Registration successful! Please verify your email to log in.";
+    });
+
+    Navigator.pushReplacementNamed(context, '/doctorLogin');
+  } catch (e) {
+    setState(() {
+      _errorMessage = e.toString();
+    });
+  }
+}
+
 
   // İsimlerdeki her kelimenin ilk harfini büyük yapacak fonksiyon
   String _capitalizeWords(String input) {
     if (input.isEmpty) return input;
 
     return input.split(' ').map((word) {
-      // Her kelimenin ilk harfini büyük yapalım
       return word.isNotEmpty
           ? word[0].toUpperCase() + word.substring(1).toLowerCase()
           : '';
@@ -117,7 +111,7 @@ class _DoctorRegisterScreenState extends State<DoctorRegisterScreen> {
       ),
       body: Container(
         width: double.infinity,
-        height: MediaQuery.of(context).size.height, // Full screen height
+        height: MediaQuery.of(context).size.height,
         decoration: BoxDecoration(
           image: DecorationImage(
             image: AssetImage("assets/images/background.png"),
@@ -135,7 +129,6 @@ class _DoctorRegisterScreenState extends State<DoctorRegisterScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    // Ad alanı
                     TextField(
                       controller: _firstNameController,
                       decoration: InputDecoration(
@@ -148,10 +141,9 @@ class _DoctorRegisterScreenState extends State<DoctorRegisterScreen> {
                         ),
                       ),
                       style: GoogleFonts.poppins(),
-                      textCapitalization: TextCapitalization.words, // Her kelimenin ilk harfini büyük yapar
+                      textCapitalization: TextCapitalization.words,
                     ),
                     SizedBox(height: 20),
-                    // Soyad alanı
                     TextField(
                       controller: _lastNameController,
                       decoration: InputDecoration(
@@ -164,10 +156,9 @@ class _DoctorRegisterScreenState extends State<DoctorRegisterScreen> {
                         ),
                       ),
                       style: GoogleFonts.poppins(),
-                      textCapitalization: TextCapitalization.words, // Her kelimenin ilk harfini büyük yapar
+                      textCapitalization: TextCapitalization.words,
                     ),
                     SizedBox(height: 20),
-                    // E-posta alanı
                     TextField(
                       controller: _emailController,
                       decoration: InputDecoration(
@@ -183,7 +174,6 @@ class _DoctorRegisterScreenState extends State<DoctorRegisterScreen> {
                       style: GoogleFonts.poppins(),
                     ),
                     SizedBox(height: 20),
-                    // Şifre alanı
                     TextField(
                       controller: _passwordController,
                       decoration: InputDecoration(
@@ -199,7 +189,21 @@ class _DoctorRegisterScreenState extends State<DoctorRegisterScreen> {
                       style: GoogleFonts.poppins(),
                     ),
                     SizedBox(height: 20),
-                    // Telefon numarası alanı
+                    TextField(
+                      controller: _confirmPasswordController,
+                      decoration: InputDecoration(
+                        labelText: 'Confirm Password',
+                        labelStyle: GoogleFonts.poppins(color: Colors.black, fontWeight: FontWeight.w600),
+                        filled: true,
+                        fillColor: Colors.white.withOpacity(0.8),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      obscureText: true,
+                      style: GoogleFonts.poppins(),
+                    ),
+                    SizedBox(height: 20),
                     TextField(
                       controller: _phoneController,
                       decoration: InputDecoration(
@@ -215,7 +219,6 @@ class _DoctorRegisterScreenState extends State<DoctorRegisterScreen> {
                       style: GoogleFonts.poppins(),
                     ),
                     SizedBox(height: 20),
-                    // Doğum tarihi seçimi
                     GestureDetector(
                       onTap: () => _selectDate(context),
                       child: AbsorbPointer(
@@ -236,7 +239,6 @@ class _DoctorRegisterScreenState extends State<DoctorRegisterScreen> {
                       ),
                     ),
                     SizedBox(height: 20),
-                    // Cinsiyet seçim alanı
                     Container(
                       padding: EdgeInsets.symmetric(horizontal: 10),
                       decoration: BoxDecoration(
@@ -255,36 +257,31 @@ class _DoctorRegisterScreenState extends State<DoctorRegisterScreen> {
                             .map<DropdownMenuItem<String>>((String value) {
                           return DropdownMenuItem<String>(
                             value: value,
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                              child: Text(value, style: GoogleFonts.poppins()),
-                            ),
+                            child: Text(value, style: GoogleFonts.poppins(color: Colors.black)),
                           );
                         }).toList(),
-                        isExpanded: true,
                         underline: SizedBox(),
                       ),
                     ),
+                    SizedBox(height: 30),
+                    ElevatedButton(
+                      onPressed: _register,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color.fromARGB(255, 60, 145, 230),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        padding: EdgeInsets.symmetric(vertical: 15, horizontal: 80),
+                      ),
+                      child: Text(
+                        'Register',
+                        style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.bold),
+                      ),
+                    ),
                     SizedBox(height: 20),
-                    // Hata mesajı
                     if (_errorMessage != null)
                       Text(
                         _errorMessage!,
-                        style: GoogleFonts.poppins(color: Colors.red),
+                        style: GoogleFonts.poppins(color: Colors.red, fontWeight: FontWeight.bold),
                       ),
-                    SizedBox(height: 20),
-                    // Kayıt butonu
-                    ElevatedButton(
-                      onPressed: _register,
-                      child: Text('Register', style: GoogleFonts.poppins(color: Colors.white)),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Color.fromARGB(255, 60, 145, 230),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        padding: EdgeInsets.symmetric(vertical: 15, horizontal: 40),
-                      ),
-                    ),
                   ],
                 ),
               ),

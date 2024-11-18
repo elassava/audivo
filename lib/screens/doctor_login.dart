@@ -16,46 +16,56 @@ class _DoctorLoginScreenState extends State<DoctorLoginScreen> {
   String? _errorMessage;
 
   Future<void> _login() async {
-    try {
-      // Email ve şifre ile giriş yap
-      UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: _emailController.text.trim(),
-        password: _passwordController.text.trim(),
-      );
+  try {
+    // Email ve şifre ile giriş yap
+    UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+      email: _emailController.text.trim(),
+      password: _passwordController.text.trim(),
+    );
 
-      // Kullanıcı rolünü Firestore'dan al
-      String uid = userCredential.user!.uid;
-      DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
+    // Kullanıcı doğrulama durumunu kontrol et
+    if (!userCredential.user!.emailVerified) {
+      setState(() {
+        _errorMessage = "Email not verified. Please verify your email.";
+      });
+      await FirebaseAuth.instance.signOut();
+      return;
+    }
 
-      if (userDoc.exists) {
-        String role = userDoc['role'] ?? '';
+    // Kullanıcı rolünü Firestore'dan al
+    String uid = userCredential.user!.uid;
+    DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
 
-        // Kullanıcı rolünü kontrol et
-        if (role == 'doctor') {
-          Navigator.pushReplacementNamed(context, '/doctorDashboard');
-        } else {
-          setState(() {
-            _errorMessage = 'Login failed: Only doctors can log in.';
-          });
-          await FirebaseAuth.instance.signOut();  // Kullanıcıyı çıkış yap
-        }
+    if (userDoc.exists) {
+      String role = userDoc['role'] ?? '';
+
+      // Kullanıcı rolünü kontrol et
+      if (role == 'doctor') {
+        Navigator.pushReplacementNamed(context, '/doctorDashboard');
       } else {
         setState(() {
-          _errorMessage = 'No user role found.';
+          _errorMessage = 'Login failed: Only doctors can log in.';
         });
+        await FirebaseAuth.instance.signOut();
       }
-    } catch (e) {
+    } else {
       setState(() {
-        _errorMessage = 'Login failed: $e';
+        _errorMessage = 'No user role found.';
       });
     }
+  } catch (e) {
+    setState(() {
+      _errorMessage = 'Login failed: $e';
+    });
   }
+}
+
 
 Future<void> _googleLogin(BuildContext context) async {
   try {
     // Google ile giriş yap
     final GoogleSignIn googleSignIn = GoogleSignIn();
-    
+
     // Silently login'ı devre dışı bırak
     await googleSignIn.signOut(); // Eğer daha önce giriş yapılmışsa oturumu kapat
 
@@ -84,8 +94,14 @@ Future<void> _googleLogin(BuildContext context) async {
 
     if (!userDoc.exists) {
       // Firebase'de kayıtlı değilse, yeni kullanıcıyı kaydet
+      String fullName = userCredential.user!.displayName ?? '';
+      List<String> nameParts = fullName.split(' '); // Ad ve soyadı ayırmak için boşlukla bölelim
+      String firstName = nameParts.isNotEmpty ? nameParts[0] : '';
+      String lastName = nameParts.length > 1 ? nameParts.sublist(1).join(' ') : ''; // Soyadını al
+
       await FirebaseFirestore.instance.collection('users').doc(uid).set({
-        'name': userCredential.user!.displayName,
+        'name': firstName,  // Ad
+        'surname': lastName,    // Soyad
         'email': userCredential.user!.email,
         'role': 'doctor', // Varsayılan olarak 'doctor' rolü atanıyor
         'createdAt': FieldValue.serverTimestamp(),
@@ -93,7 +109,8 @@ Future<void> _googleLogin(BuildContext context) async {
 
       // Aynı veriyi doctor koleksiyonuna da kaydedelim
       await FirebaseFirestore.instance.collection('doctors').doc(uid).set({
-        'name': userCredential.user!.displayName,
+        'name': firstName,
+        'surname': lastName,
         'email': userCredential.user!.email,
         'role': 'doctor', // Varsayılan uzmanlık atanabilir
         'createdAt': FieldValue.serverTimestamp(),
@@ -122,6 +139,7 @@ Future<void> _googleLogin(BuildContext context) async {
     });
   }
 }
+
 
 
   @override
