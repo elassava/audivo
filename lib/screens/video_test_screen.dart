@@ -107,18 +107,18 @@ class _VideoScreenState extends State<VideoScreen> {
   }
 
   Future<void> _saveAnswer(int selectedEmotionIndex) async {
-    if (_correctOption != null) {
-      bool isCorrect = selectedEmotionIndex + 1 == _correctOption;
+  bool isCorrect = _correctOption != null && selectedEmotionIndex == _correctOption;
+    
     Map<String, dynamic> answerData = {
       'videoUrl': _videoUrl,
-      'correctOption': _correctOption,
       'isCorrect': isCorrect,
+      'correctOption': _correctOption,
       'questionNumber': _questionNumber,
       'selectedOption': _options[selectedEmotionIndex],
       'timestamp': FieldValue.serverTimestamp(),
     };
 
-    try {
+  try {
       await FirebaseFirestore.instance
           .collection('patients')
           .doc(widget.patientId)

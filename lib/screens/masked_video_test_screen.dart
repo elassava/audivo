@@ -17,6 +17,7 @@ class _MaskedVideoScreenState extends State<MaskedVideoScreen> {
   List<DocumentSnapshot> _allQuestions = [];
   List<DocumentSnapshot> _remainingQuestions = [];
   String? _videoUrl;
+  int? _correctOption;
   int _questionNumber = 0;
   String _questionId = '';
   bool _isLoading = true;
@@ -105,8 +106,10 @@ class _MaskedVideoScreenState extends State<MaskedVideoScreen> {
   }
 
   Future<void> _saveAnswer(int selectedEmotionIndex) async {
+    bool isCorrect = _correctOption != null && selectedEmotionIndex == _correctOption;
     Map<String, dynamic> answerData = {
       'videoUrl': _videoUrl,
+      'isCorrect': isCorrect,
       'questionNumber': _questionNumber,
       'selectedOption': _options[selectedEmotionIndex],
       'timestamp': FieldValue.serverTimestamp(),
