@@ -58,12 +58,10 @@ class _AudioScreenState extends State<AudioScreen> {
     DocumentSnapshot testStatusSnapshot = await FirebaseFirestore.instance
         .collection('patients')
         .doc(widget.patientId)
-        .collection('audioQuestions')
-        .doc('testStatus')
         .get();
   String testType = 'audioQuestions'; 
     if (testStatusSnapshot.exists &&
-        testStatusSnapshot['isCompleted'] == true) {
+        testStatusSnapshot['AudioIsCompleted'] == true) {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
@@ -176,9 +174,7 @@ class _AudioScreenState extends State<AudioScreen> {
         await FirebaseFirestore.instance
             .collection('patients')
             .doc(widget.patientId)
-            .collection('audioQuestions')
-            .doc('testStatus')
-            .set({'isCompleted': true}, SetOptions(merge: true));
+            .set({'AudioIsCompleted': true}, SetOptions(merge: true));
         print('Test completed and marked as isCompleted: true');
       }
     } catch (e) {
