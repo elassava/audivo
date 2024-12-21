@@ -36,6 +36,20 @@ class _DoctorRegisterScreenState extends State<DoctorRegisterScreen> {
 
   // Kayıt fonksiyonu
 Future<void> _register() async {
+  // Alanların boş olup olmadığını kontrol et
+  if (_firstNameController.text.trim().isEmpty ||
+      _lastNameController.text.trim().isEmpty ||
+      _emailController.text.trim().isEmpty ||
+      _passwordController.text.trim().isEmpty ||
+      _confirmPasswordController.text.trim().isEmpty ||
+      _phoneController.text.trim().isEmpty ||
+      _dob.isEmpty) {
+    setState(() {
+      _errorMessage = "All fields are required!";
+    });
+    return;
+  }
+
   // Şifre eşleşme kontrolü
   if (_passwordController.text.trim() != _confirmPasswordController.text.trim()) {
     setState(() {
@@ -60,7 +74,7 @@ Future<void> _register() async {
       'gender': _gender,
       'role': 'doctor',
     });
-    
+
     await FirebaseFirestore.instance.collection('doctors').doc(userCredential.user!.uid).set({
       'name': _capitalizeWords(_firstNameController.text.trim()),
       'surname': _capitalizeWords(_lastNameController.text.trim()),
@@ -85,7 +99,6 @@ Future<void> _register() async {
     });
   }
 }
-
 
   // İsimlerdeki her kelimenin ilk harfini büyük yapacak fonksiyon
   String _capitalizeWords(String input) {

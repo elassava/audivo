@@ -13,19 +13,16 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
   String name = '';
   String surname = '';
   String birthDate = '';
-  String gender = 'Kadın'; // Default "Kadın"
+  String gender = 'Male';
   String email = '';
   String phone = '';
   final _auth = FirebaseAuth.instance;
 
-  // Function to save data to Firebase
   void _addPatient() async {
     if (_formKey.currentState!.validate()) {
       try {
-        // Authenticated doctor ID
         final doctorId = _auth.currentUser!.uid;
 
-        // Add to users collection
         await FirebaseFirestore.instance.collection('users').add({
           'name': name,
           'surname': surname,
@@ -36,7 +33,6 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
           'role': "patient"
         });
 
-        // Add to patients collection
         await FirebaseFirestore.instance.collection('patients').add({
           'doctorId': doctorId,
           'name': name,
@@ -48,18 +44,17 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
         });
 
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Patient added successfully'))
+          SnackBar(content: Text('Patient added successfully')),
         );
-        Navigator.pop(context); // Close screen
+        Navigator.pop(context);
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to add patient: $e'))
+          SnackBar(content: Text('Failed to add patient: $e')),
         );
       }
     }
   }
 
-  // Calendar for selecting birth date
   Future<void> _selectBirthDate(BuildContext context) async {
     final DateTime? selectedDate = await showDatePicker(
       context: context,
@@ -68,30 +63,46 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
       lastDate: DateTime.now(),
     );
 
-    if (selectedDate != null && selectedDate != DateTime.now()) {
+    if (selectedDate != null) {
       setState(() {
-        birthDate = '${selectedDate.toLocal()}'.split(' ')[0]; // Format as Year-Month-Day
+        birthDate = '${selectedDate.toLocal()}'.split(' ')[0];
       });
     }
+  }
+
+  InputDecoration _inputDecoration(String label) {
+    return InputDecoration(
+      labelText: label,
+      labelStyle: GoogleFonts.poppins(fontWeight: FontWeight.bold, color: Colors.black),
+      filled: true,
+      fillColor: Color.fromARGB(255, 230, 243, 255),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        iconTheme: IconThemeData(
-          color: Colors.white,
+        iconTheme: IconThemeData(color: Colors.white),
+        title: Text(
+          'Add Patient',
+          style: GoogleFonts.poppins(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
         ),
-        title: Text('Add Patient', style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.bold)),
-        backgroundColor: Color.fromARGB(255, 60, 145, 230), // Blue color
+        backgroundColor: Color.fromARGB(255, 60, 145, 230),
       ),
       body: Container(
-        height: MediaQuery.of(context).size.height, // Full screen height
+        height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage('assets/images/background.png'), // Background image
-            fit: BoxFit.cover, // Ensures the image covers the entire screen
+            image: AssetImage('assets/images/background.png'),
+            fit: BoxFit.cover,
           ),
         ),
         child: SingleChildScrollView(
@@ -100,179 +111,72 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
             child: Form(
               key: _formKey,
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  // Name Field
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 16.0),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(8.0),
-                        border: Border.all(color: Color.fromARGB(255, 60, 145, 230)),
-                      ),
+                  SizedBox(height: 20),
+                  TextFormField(
+                    decoration: _inputDecoration('Name'),
+                    onChanged: (value) => setState(() => name = value),
+                    validator: (value) =>
+                        value!.isEmpty ? 'Please enter the name' : null,
+                  ),
+                  SizedBox(height: 20),
+                  TextFormField(
+                    decoration: _inputDecoration('Surname'),
+                    onChanged: (value) => setState(() => surname = value),
+                    validator: (value) =>
+                        value!.isEmpty ? 'Please enter the surname' : null,
+                  ),
+                  SizedBox(height: 20),
+                  GestureDetector(
+                    onTap: () => _selectBirthDate(context),
+                    child: AbsorbPointer(
                       child: TextFormField(
-                        decoration: InputDecoration(
-                          labelText: 'Name',
-                          border: InputBorder.none,
-                          contentPadding: EdgeInsets.all(16.0),
-                        ),
-                        onChanged: (value) => setState(() => name = value),
-                        validator: (value) {
-                          if (value!.isEmpty) {
-                            return 'Please enter the name';
-                          }
-                          return null;
-                        },
-                      ),
-                    ),
-                  ),
-                  // Surname Field
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 16.0),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(8.0),
-                        border: Border.all(color: Color.fromARGB(255, 60, 145, 230)),
-                      ),
-                      child: TextFormField(
-                        decoration: InputDecoration(
-                          labelText: 'Surname',
-                          border: InputBorder.none,
-                          contentPadding: EdgeInsets.all(16.0),
-                        ),
-                        onChanged: (value) => setState(() => surname = value),
-                        validator: (value) {
-                          if (value!.isEmpty) {
-                            return 'Please enter the surname';
-                          }
-                          return null;
-                        },
-                      ),
-                    ),
-                  ),
-                  // Birth Date Field
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 16.0),
-                    child: GestureDetector(
-                      onTap: () => _selectBirthDate(context),
-                      child: AbsorbPointer(
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(8.0),
-                            border: Border.all(color: Color.fromARGB(255, 60, 145, 230)),
-                          ),
-                          child: TextFormField(
-                            decoration: InputDecoration(
-                              labelText: 'Birth Date',
-                              hintText: birthDate.isEmpty ? 'Select Birth Date' : birthDate,
-                              border: InputBorder.none,
-                              contentPadding: EdgeInsets.all(16.0),
-                            ),
-                            validator: (value) {
-                              if (birthDate.isEmpty) {
-                                return 'Please select the birth date';
-                              }
-                              return null;
-                            },
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  // Gender Field
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 16.0),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(8.0),
-                        border: Border.all(color: Color.fromARGB(255, 60, 145, 230)),
-                      ),
-                      child: DropdownButtonFormField<String>(
-                        value: gender,
-                        onChanged: (value) {
-                          setState(() {
-                            gender = value!;
-                          });
-                        },
-                        items: ['Kadın', 'Erkek']
-                            .map((label) => DropdownMenuItem(
-                                  value: label,
-                                  child: Text(label),
-                                ))
-                            .toList(),
-                        decoration: InputDecoration(
-                          labelText: 'Gender',
-                          border: InputBorder.none,
-                          contentPadding: EdgeInsets.all(16.0),
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please select the gender';
-                          }
-                          return null;
-                        },
-                      ),
-                    ),
-                  ),
-                  // Email Field
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 16.0),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(8.0),
-                        border: Border.all(color: Color.fromARGB(255, 60, 145, 230)),
-                      ),
-                      child: TextFormField(
-                        decoration: InputDecoration(
-                          labelText: 'Email',
-                          border: InputBorder.none,
-                          contentPadding: EdgeInsets.all(16.0),
-                        ),
-                        onChanged: (value) => setState(() => email = value),
-                        validator: (value) {
-                          if (value!.isEmpty) {
-                            return 'Please enter the email';
-                          }
-                          return null;
-                        },
-                      ),
-                    ),
-                  ),
-                  // Phone Field
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 16.0),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(8.0),
-                        border: Border.all(color: Color.fromARGB(255, 60, 145, 230)),
-                      ),
-                      child: TextFormField(
-                        decoration: InputDecoration(
-                          labelText: 'Phone',
-                          border: InputBorder.none,
-                          contentPadding: EdgeInsets.all(16.0),
-                        ),
-                        onChanged: (value) => setState(() => phone = value),
-                        validator: (value) {
-                          if (value!.isEmpty) {
-                            return 'Please enter the phone';
-                          }
-                          return null;
-                        },
+                        decoration: _inputDecoration(
+                            birthDate.isEmpty ? 'Select Birth Date' : birthDate),
+                        validator: (value) =>
+                            birthDate.isEmpty ? 'Please select the birth date(YYYY/DD/MM)' : null,
                       ),
                     ),
                   ),
                   SizedBox(height: 20),
+                  DropdownButtonFormField<String>(
+                    value: gender,
+                    items: ['Female', 'Male']
+                        .map((label) => DropdownMenuItem(
+                              value: label,
+                              child: Text(label),
+                            ))
+                        .toList(),
+                    onChanged: (value) => setState(() => gender = value!),
+                    decoration: _inputDecoration('Gender'),
+                    validator: (value) =>
+                        value == null || value.isEmpty ? 'Please select the gender' : null,
+                  ),
+                  SizedBox(height: 20),
+                  TextFormField(
+                    decoration: _inputDecoration('Email'),
+                    onChanged: (value) => setState(() => email = value),
+                    validator: (value) =>
+                        value!.isEmpty ? 'Please enter the email' : null,
+                  ),
+                  SizedBox(height: 20),
+                  TextFormField(
+                    decoration: _inputDecoration('Phone'),
+                    onChanged: (value) => setState(() => phone = value),
+                    validator: (value) =>
+                        value!.isEmpty ? 'Please enter the phone' : null,
+                  ),
+                  SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: _addPatient,
-                    child: Text('Add Patient', style: GoogleFonts.poppins(color: Colors.white)),
+                    child: Text('Add Patient', style: GoogleFonts.poppins(fontWeight: FontWeight.bold, color: Colors.white)),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Color.fromARGB(255, 60, 145, 230), // Blue
+                      backgroundColor: Color.fromARGB(255, 60, 145, 230),
+                      padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
                     ),
                   ),
                 ],

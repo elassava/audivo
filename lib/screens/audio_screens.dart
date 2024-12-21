@@ -157,23 +157,57 @@ class _AudioScreenState extends State<AudioScreen> {
   }
 
   void _showTestFinishedDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Test Bitti'),
-        content: Text('Tebrikler, testi tamamladınız!'),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              Navigator.pop(context);
-            },
-            child: Text('Tamam'),
-          ),
-        ],
+  showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15), // Köşeleri yuvarlat
       ),
-    );
-  }
+      backgroundColor: Colors.white,
+      title: Text(
+        'Test Completed',
+        style: GoogleFonts.poppins(
+          color: Colors.black,
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+        ),
+        textAlign: TextAlign.center,
+      ),
+      content: Text(
+        'Congratulations! You have successfully completed the test.',
+        style: GoogleFonts.poppins(
+          color: Colors.black,
+          fontSize: 16,
+        ),
+        textAlign: TextAlign.center,
+      ),
+      actions: [
+        Center(
+          child: ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context); // Dialog'u kapat
+              Navigator.pop(context); // Sayfayı kapat
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Color.fromARGB(255, 60, 145, 230), // Mavi ton
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10), // Buton köşeleri
+              ),
+            ),
+            child: Text(
+              'Okay',
+              style: GoogleFonts.poppins(
+                fontSize: 14,
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
+}
 
   @override
   void dispose() {

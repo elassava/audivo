@@ -54,11 +54,7 @@ class _PatientLoginScreenState extends State<PatientLoginScreen> {
       setState(() {
         _errorMessage = 'Invalid email address format.';
       });
-    } else {
-      setState(() {
-        _errorMessage = 'An unexpected error occurred. Please try again.';
-      });
-    }
+    } 
   } catch (e) {
     setState(() {
       _errorMessage = 'Login failed: $e';
