@@ -1,4 +1,7 @@
 import 'package:emotionmobileversion/screens/audio_screens.dart';
+import 'package:emotionmobileversion/screens/video_test_screen.dart';
+import 'package:emotionmobileversion/screens/masked_video_test_screen.dart'; // Import the VideoScreen
+ // Import the VideoScreen
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -15,7 +18,7 @@ class PatientTestsScreen extends StatelessWidget {
           color: Colors.white,
         ),
         title: Text('Tests', style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.bold)),
-        backgroundColor: Color.fromARGB(255, 60, 145, 230), // Mavi
+        backgroundColor: Color.fromARGB(255, 60, 145, 230), // Blue
       ),
       body: Stack(
         children: [
@@ -33,15 +36,20 @@ class PatientTestsScreen extends StatelessWidget {
             child: Column(
               children: [
                 SizedBox(height: 16.0),
-                // Görüntülü Test Card
+                // Video Test Card
                 SizedBox(
                   height: MediaQuery.of(context).size.height * 0.15,
                   child: Card(
                     color: Colors.white,
                     child: InkWell(
                       onTap: () {
-                        // Görüntülü Test işlemi
-                        _showTestDetails(context, "Video Test");
+                        // Navigate to Video Test page
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => VideoScreen(patientId: patientId),
+                          ),
+                        );
                       },
                       child: Center(
                         child: Text("Video Test", style: GoogleFonts.poppins(fontSize: 20)),
@@ -50,15 +58,20 @@ class PatientTestsScreen extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 16.0),
-                // Maskeli Görüntü Test Card
-                SizedBox(
+                // Masked Video Test Card
+                             SizedBox(
                   height: MediaQuery.of(context).size.height * 0.15,
                   child: Card(
                     color: Colors.white,
                     child: InkWell(
                       onTap: () {
-                        // Maskeli Görüntü Test işlemi
-                        _showTestDetails(context, "Masked Video Test");
+                        // Navigate to Video Test page
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => MaskedVideoScreen(patientId: patientId),
+                          ),
+                        );
                       },
                       child: Center(
                         child: Text("Masked Video Test", style: GoogleFonts.poppins(fontSize: 20)),
