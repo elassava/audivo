@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:video_player/video_player.dart';
+import 'package:emotionmobileversion/screens/result_screen.dart';
 
 class MaskedVideoScreen extends StatefulWidget {
   final String patientId;
@@ -22,12 +23,42 @@ class _MaskedVideoScreenState extends State<MaskedVideoScreen> {
   String _questionId = '';
   bool _isLoading = true;
   bool _isAnswered = false;
-  List<String> _options = ['Happy', 'Sad', 'Angry', 'Terrified', 'Surprised', 'Disgusted'];
+  List<String> _options = [
+    'Happy',
+    'Sad',
+    'Angry',
+    'Terrified',
+    'Surprised',
+    'Disgusted'
+  ];
 
   @override
   void initState() {
     super.initState();
+    _checkIfTestCompleted();
     _fetchAllQuestions();
+  }
+
+  Future<void> _checkIfTestCompleted() async {
+    DocumentSnapshot testStatusSnapshot = await FirebaseFirestore.instance
+        .collection('patients')
+        .doc(widget.patientId)
+        .get();
+    String testType = 'maskedQuestions';
+    if (testStatusSnapshot.exists &&
+        testStatusSnapshot['MaskedVideoIsCompleted'] == true) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ResultScreen(
+            patientId: widget.patientId, // patientId parametresini gönderiyoruz
+            options: _options,
+            testType:
+                testType, // _options listesini de parametre olarak gönderiyoruz
+          ),
+        ),
+      );
+    }
   }
 
   Future<void> _fetchAllQuestions() async {
@@ -36,7 +67,8 @@ class _MaskedVideoScreenState extends State<MaskedVideoScreen> {
     });
 
     try {
-      QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('maskedQuestions').get();
+      QuerySnapshot querySnapshot =
+          await FirebaseFirestore.instance.collection('maskedQuestions').get();
 
       if (querySnapshot.docs.isNotEmpty) {
         setState(() {
@@ -89,7 +121,8 @@ class _MaskedVideoScreenState extends State<MaskedVideoScreen> {
   }
 
   Future<void> _initializeVideoPlayer(String url) async {
-    _videoPlayerController?.dispose(); // Dispose the previous controller if it exists
+    _videoPlayerController
+        ?.dispose(); // Dispose the previous controller if it exists
     _videoPlayerController = VideoPlayerController.network(url);
 
     try {
@@ -107,7 +140,8 @@ class _MaskedVideoScreenState extends State<MaskedVideoScreen> {
   }
 
   Future<void> _saveAnswer(int selectedEmotionIndex) async {
-    bool isCorrect = _correctOption != null && selectedEmotionIndex + 1 == _correctOption;
+    bool isCorrect =
+        _correctOption != null && selectedEmotionIndex + 1 == _correctOption;
 
     Map<String, dynamic> answerData = {
       'audioUrl': _videoUrl,
@@ -161,20 +195,70 @@ class _MaskedVideoScreenState extends State<MaskedVideoScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Test Finished'),
-        content: Text('Congratulations, you have completed the test!'),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15),
+        ),
+        backgroundColor: Colors.white,
+        title: Text(
+          'Test Completed',
+          style: GoogleFonts.poppins(
+            color: Colors.black,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+          textAlign: TextAlign.center,
+        ),
+        content: Text(
+          'Congratulations! You have successfully completed the test.',
+          style: GoogleFonts.poppins(
+            color: Colors.black,
+            fontSize: 16,
+          ),
+          textAlign: TextAlign.center,
+        ),
         actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              Navigator.pop(context); // Close the current screen
-            },
-            child: Text('OK'),
+          Center(
+            child: ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => ResultScreen(
+                            patientId: widget.patientId,
+                            options: [
+                              'Happy',
+                              'Sad',
+                              'Angry',
+                              'Terrified',
+                              'Surprised',
+                              'Disgusted'
+                            ],
+                            testType: 'maskedQuestions',
+                          )),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Color.fromARGB(255, 60, 145, 230),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              child: Text(
+                'Okay',
+                style: GoogleFonts.poppins(
+                  fontSize: 14,
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
           ),
         ],
       ),
     );
   }
+
 
   @override
   void dispose() {
@@ -189,12 +273,15 @@ class _MaskedVideoScreenState extends State<MaskedVideoScreen> {
         iconTheme: IconThemeData(
           color: Colors.white,
         ),
-        title: Text('Masked Video Test', style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.bold)),
+        title: Text('Masked Video Test',
+            style: GoogleFonts.poppins(
+                color: Colors.white, fontWeight: FontWeight.bold)),
         backgroundColor: Color.fromARGB(255, 60, 145, 230),
       ),
       body: _isLoading
           ? Center(child: CircularProgressIndicator())
-          : _videoPlayerController != null && _videoPlayerController!.value.isInitialized
+          : _videoPlayerController != null &&
+                  _videoPlayerController!.value.isInitialized
               ? Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -202,7 +289,8 @@ class _MaskedVideoScreenState extends State<MaskedVideoScreen> {
                       padding: const EdgeInsets.all(8.0),
                       child: Text(
                         'Question: $_questionNumber',
-                        style: GoogleFonts.poppins(fontSize: 20, color: Colors.black),
+                        style: GoogleFonts.poppins(
+                            fontSize: 20, color: Colors.black),
                       ),
                     ),
                     AspectRatio(
@@ -212,7 +300,8 @@ class _MaskedVideoScreenState extends State<MaskedVideoScreen> {
                     SizedBox(height: 16),
                     Text(
                       'How do you feel after watching?',
-                      style: GoogleFonts.poppins(fontSize: 18, color: Colors.black),
+                      style: GoogleFonts.poppins(
+                          fontSize: 18, color: Colors.black),
                     ),
                     SizedBox(height: 16),
                     Wrap(
@@ -227,11 +316,13 @@ class _MaskedVideoScreenState extends State<MaskedVideoScreen> {
                                 ? null
                                 : () => _submitEmotion(index),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Color.fromARGB(255, 60, 145, 230),
+                              backgroundColor:
+                                  Color.fromARGB(255, 60, 145, 230),
                             ),
                             child: Text(
                               _options[index],
-                              style: GoogleFonts.poppins(fontSize: 14, color: Colors.white),
+                              style: GoogleFonts.poppins(
+                                  fontSize: 14, color: Colors.white),
                               textAlign: TextAlign.center,
                             ),
                           ),

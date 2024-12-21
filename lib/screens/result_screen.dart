@@ -51,7 +51,7 @@ class _ResultScreenState extends State<ResultScreen> {
         querySnapshot = await FirebaseFirestore.instance
             .collection('patients')
             .doc(widget.patientId)
-            .collection('generalQuestions') // Default test type
+            .collection('maskedQuestions') // Default test type
             .get();
       }
 
