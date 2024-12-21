@@ -1,29 +1,24 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:emotionmobileversion/screens/patient_settings.dart';
 import 'package:emotionmobileversion/screens/patients_test_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class PatientDashboard extends StatelessWidget {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
 
-  // Hasta bilgisini Firebase'den alacak fonksiyon
   Future<DocumentSnapshot> _getPatientInfo() async {
     final userId = _auth.currentUser!.uid;
-    return await FirebaseFirestore.instance.collection('users').doc(userId).get();
+    return await FirebaseFirestore.instance.collection('patients').doc(userId).get();
   }
 
   Future<void> _signOut(BuildContext context) async {
     try {
-      // Google Sign-In'dan çıkış yap
       await _googleSignIn.signOut();
-      
-      // Firebase Authentication'dan çıkış yap
       await _auth.signOut();
-      
-      // Kullanıcı çıkış yaptıktan sonra, geçmişi temizlemek için:
       Navigator.popUntil(context, (route) => false);
       Navigator.pushNamed(context, '/');
     } catch (e) {
@@ -31,50 +26,49 @@ class PatientDashboard extends StatelessWidget {
     }
   }
 
-  // Show logout confirmation dialog
   Future<void> _showLogoutConfirmation(BuildContext context) async {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: Text(
-          'Are you sure?', 
+          'Are you sure?',
           style: GoogleFonts.poppins(
-            fontSize: 20, // Custom font size
-            fontWeight: FontWeight.bold, // Bold text
-            color: Color.fromARGB(255, 60, 145, 230), // Custom color (you can adjust)
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Color.fromARGB(255, 60, 145, 230),
           ),
         ),
         content: Text(
-          'Are you sure you want to log out?', // "Are you sure you want to log out?" in Turkish
+          'Are you sure you want to log out?',
           style: GoogleFonts.poppins(
-            fontSize: 16, // Custom font size
-            fontWeight: FontWeight.normal, // Regular text
-            color: Colors.black, // Color for the content
+            fontSize: 16,
+            fontWeight: FontWeight.normal,
+            color: Colors.black,
           ),
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(), // Close the dialog
+            onPressed: () => Navigator.of(context).pop(),
             child: Text(
               'No',
               style: GoogleFonts.poppins(
-                fontSize: 16, // Custom font size
-                fontWeight: FontWeight.bold, // Bold text
-                color: Colors.blue, // Custom color for "No"
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.blue,
               ),
             ),
           ),
           TextButton(
             onPressed: () {
-              Navigator.of(context).pop(); // Close the dialog
-              _signOut(context); // Proceed with sign out
+              Navigator.of(context).pop();
+              _signOut(context);
             },
             child: Text(
               'Yes',
               style: GoogleFonts.poppins(
-                fontSize: 16, // Custom font size
-                fontWeight: FontWeight.bold, // Bold text
-                color: Colors.blue, // Custom color for "Yes"
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.blue,
               ),
             ),
           ),
@@ -83,116 +77,227 @@ class PatientDashboard extends StatelessWidget {
     );
   }
 
-  // Get patient ID from Firebase and navigate to PatientTestsScreen
-  Future<String> _getPatientId() async {
-    final userId = _auth.currentUser!.uid;
-    final patientDoc = await FirebaseFirestore.instance.collection('users').doc(userId).get();
-    final patientData = patientDoc.data() as Map<String, dynamic>;
-
-    // Firebase'deki doğru anahtarları kullanıyoruz. Bu örnekte 'patientId' kullanılıyor.
-    return patientData['patientId'] ?? ''; // patientId'nin doğru alan olduğuna emin olun
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        iconTheme: IconThemeData(
-          color: Colors.white,
-        ),
-        automaticallyImplyLeading: false,
-        title: Text(
-          'Patient Dashboard',
-          style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.bold),
-        ),
-        backgroundColor: Color.fromARGB(255, 60, 145, 230),
-      ),
-      body: Container(
-        // Arka plan resmi ve diğer dekorasyonlar burada tanımlanıyor
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/images/background.png'), // Arka plan resmi yolu
-            fit: BoxFit.cover, // Resmin tüm ekrana yayılması
-          ),
-        ),
-        padding: const EdgeInsets.all(16.0),
-        child: FutureBuilder<DocumentSnapshot>(
-          future: _getPatientInfo(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(child: CircularProgressIndicator());
-            }
-
-            if (snapshot.hasError) {
-              return Center(child: Text("Error: ${snapshot.error}"));
-            }
-
-            if (!snapshot.hasData || !snapshot.data!.exists) {
-              return Center(child: Text("No patient data found."));
-            }
-
-            var patientData = snapshot.data!.data() as Map<String, dynamic>;
-            String patientName = patientData['name'] ?? 'N/A';
-
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+      body: Stack(
+        children: [
+          // Background image
+          Container(
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage('assets/images/background.png'),
+                fit: BoxFit.cover,
+              ),
+            ),
+            child: Column(
               children: [
-                // Welcome message with patient name
-                Text(
-                  'Welcome, $patientName!',
-                  style: GoogleFonts.poppins(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
+                Container(
+                  padding: EdgeInsets.symmetric(vertical: 50, horizontal: 20),
+                  decoration: BoxDecoration(
+                    color: Color.fromARGB(255, 60, 145, 230),
                   ),
-                ),
-                SizedBox(height: 20),
-                Card(
-                  color: Colors.white,
-                  elevation: 4,
-                  child: ListTile(
-                    leading: Icon(Icons.medical_services, color: Color.fromARGB(255, 60, 145, 230)),
-                    title: Text('My Tests', style: GoogleFonts.poppins()),
-                    subtitle: Text('View your test results and history', style: GoogleFonts.poppins()),
-                    onTap: () async {
-                      String patientId = await _getPatientId();
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => PPatientTestsScreen(patientId: patientId),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Dashboard',
+                              style: GoogleFonts.poppins(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                            SizedBox(height: 10),
+                            FutureBuilder<DocumentSnapshot>( 
+                              future: _getPatientInfo(),
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState == ConnectionState.waiting) {
+                                  return Text(
+                                    'Welcome, ...',
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 18,
+                                      color: Colors.white,
+                                    ),
+                                  );
+                                }
+                                if (snapshot.hasError || !snapshot.hasData || !snapshot.data!.exists) {
+                                  return Text(
+                                    'Welcome, Patient!',
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 18,
+                                      color: Colors.white,
+                                    ),
+                                  );
+                                }
+                                var patientData = snapshot.data!.data() as Map<String, dynamic>;
+                                String patientName = patientData['name'] ?? 'Patient';
+                                return Text(
+                                  'Welcome, $patientName!',
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 18,
+                                    color: Colors.white,
+                                  ),
+                                );
+                              },
+                            ),
+                          ],
                         ),
-                      );
-                    },
-                  ),
-                ),
-                SizedBox(height: 20),
-                Card(
-                  color: Colors.white,
-                  elevation: 4,
-                  child: ListTile(
-                    leading: Icon(Icons.settings, color: Color.fromARGB(255, 60, 145, 230)),
-                    title: Text('Settings', style: GoogleFonts.poppins()),
-                    subtitle: Text('Manage your settings', style: GoogleFonts.poppins()),
-                    onTap: () {
-                      Navigator.pushNamed(context, '/patientSettings');
-                    },
-                  ),
-                ),
-                SizedBox(height: 20),
-                Card(
-                  color: Colors.white,
-                  elevation: 4,
-                  child: ListTile(
-                    leading: Icon(Icons.logout, color: Colors.red),
-                    title: Text('Log Out', style: GoogleFonts.poppins(color: Colors.red)),
-                    onTap: () => _showLogoutConfirmation(context), // Show confirmation on logout
+                      ),
+                      FutureBuilder<DocumentSnapshot>(
+                        future: _getPatientInfo(),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                            return CircleAvatar(
+                              radius: 30,
+                              backgroundColor: Colors.white,
+                              child: CircularProgressIndicator(
+                                  color: Color.fromARGB(255, 60, 145, 230)),
+                            );
+                          }
+                          if (snapshot.hasError || !snapshot.hasData || !snapshot.data!.exists) {
+                            return GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => PSettingsScreen()),
+                                );
+                              },
+                              child: CircleAvatar(
+                                radius: 30,
+                                backgroundColor: Colors.white,
+                                child: Icon(Icons.person,
+                                    size: 30, color: Color.fromARGB(255, 60, 145, 230)),
+                              ),
+                            );
+                          }
+                          var patientData = snapshot.data!.data() as Map<String, dynamic>;
+                          String? profileImg = patientData['profileImg'];
+                          return GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => PSettingsScreen()),
+                              );
+                            },
+                            child: CircleAvatar(
+                              radius: 30,
+                              backgroundColor: Colors.white,
+                              backgroundImage: profileImg != null
+                                  ? NetworkImage(profileImg)
+                                  : null,
+                              child: profileImg == null
+                                  ? Icon(Icons.person, size: 30, color: Color.fromARGB(255, 60, 145, 230))
+                                  : null,
+                            ),
+                          );
+                        },
+                      ),
+                    ],
                   ),
                 ),
               ],
-            );
-          },
+            ),
+          ),
+          // GridView on top of the dashboard
+          Positioned.fill(
+            child: Align(
+              alignment: Alignment.topCenter,
+              child: Container(
+                margin: EdgeInsets.only(top: 150), // Adjust this margin for correct positioning
+                padding: EdgeInsets.all(16.0),
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage('assets/images/background.png'),
+                    fit: BoxFit.cover,
+                  ),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: GridView.count(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 16.0,
+                  mainAxisSpacing: 16.0,
+                  children: [
+                    _buildGlassEffectCard(
+                      context,
+                      icon: Icons.medical_services,
+                      label: 'My Tests',
+                      onTap: () async {
+                        String patientId = await _getPatientId();
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => PPatientTestsScreen(patientId: patientId),
+                          ),
+                        );
+                      },
+                    ),
+                    _buildGlassEffectCard(
+                      context,
+                      icon: Icons.settings,
+                      label: 'Settings',
+                      onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => PSettingsScreen()),
+                              );
+                            },
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildGlassEffectCard(BuildContext context, {
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+    Color iconColor = const Color.fromARGB(255, 60, 145, 230),
+    Color textColor = Colors.black,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.7), // Glass effect opacity
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: Colors.white.withOpacity(0.2)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.09),
+              blurRadius: 5,
+              offset: Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, color: iconColor, size: 50),
+            SizedBox(height: 10),
+            Text(
+              label,
+              style: GoogleFonts.poppins(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: textColor,
+              ),
+            ),
+          ],
         ),
       ),
     );
+  }
+
+  Future<String> _getPatientId() async {
+    return _auth.currentUser!.uid;
   }
 }

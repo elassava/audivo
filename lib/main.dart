@@ -1,4 +1,5 @@
 
+import 'package:emotionmobileversion/screens/doctor_notes_screen.dart';
 import 'package:emotionmobileversion/screens/intro_screen.dart';
 import 'package:emotionmobileversion/screens/patient_settings.dart';
 import 'package:flutter/material.dart';
@@ -35,6 +36,7 @@ class MyApp extends StatelessWidget {
         '/patientsScreen': (context) => PatientsScreen(), // PatientsScreen'e rota ekledik
         '/patientSettings': (context) => PSettingsScreen(),
         '/audioScreen': (context) => AudioScreen(patientId: '',),
+        '/notesScreen': (context) => NotesScreen(),
       },
     );
   }
