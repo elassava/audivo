@@ -23,7 +23,6 @@ class _MaskedVideoScreenState extends State<MaskedVideoScreen> {
   bool _isLoading = true;
   bool _isAnswered = false;
   List<String> _options = ['Happy', 'Sad', 'Angry', 'Terrified', 'Surprised', 'Disgusted'];
-  List<Map<String, dynamic>> _answers = [];
 
   @override
   void initState() {
@@ -60,17 +59,16 @@ class _MaskedVideoScreenState extends State<MaskedVideoScreen> {
   }
 
   Future<void> _fetchVideoQuestion() async {
-    if (_remainingQuestions.isEmpty) {
-      await _saveAllAnswersToFirebase(); // Save all answers when the test is completed
-      _showTestFinishedDialog();
-      return;
-    }
-
     setState(() {
       _isLoading = true;
       _isAnswered = false;
       _questionNumber++;
     });
+
+    if (_remainingQuestions.isEmpty) {
+      _showTestFinishedDialog();
+      return;
+    }
 
     DocumentSnapshot videoQuestionSnapshot = _remainingQuestions.removeAt(0);
 
@@ -108,42 +106,46 @@ class _MaskedVideoScreenState extends State<MaskedVideoScreen> {
     }
   }
 
-  void _saveAnswerLocally(int selectedEmotionIndex) {
-    // Check if the selected answer is correct
-  bool isCorrect = _correctOption != null && selectedEmotionIndex+1 == _correctOption;
+  Future<void> _saveAnswer(int selectedEmotionIndex) async {
+    bool isCorrect = _correctOption != null && selectedEmotionIndex + 1 == _correctOption;
 
-    // Add answer data to the local list
-    _answers.add({
-      'questionId': _questionId, // Store the question ID
-      'videoUrl': _videoUrl,
+    Map<String, dynamic> answerData = {
+      'audioUrl': _videoUrl,
       'correctOption': _correctOption,
-      'selectedOption': _options[selectedEmotionIndex],
-      'questionNumber': _questionNumber,
       'isCorrect': isCorrect,
-      'timestamp': DateTime.now().toIso8601String(), // Add local timestamp
-    });
+      'questionNumber': _questionNumber,
+      'selectedOption': _options[selectedEmotionIndex],
+      'timestamp': FieldValue.serverTimestamp(),
+    };
 
-    print('Answer saved locally: $_answers');
-  }
-
-  Future<void> _saveAllAnswersToFirebase() async {
     try {
-      for (var answer in _answers) {
+      await FirebaseFirestore.instance
+          .collection('patients')
+          .doc(widget.patientId)
+          .collection('maskedQuestions')
+          .doc(_questionId)
+          .set({
+        _questionNumber.toString(): answerData,
+      }, SetOptions(merge: true));
+
+      print('Answer saved successfully');
+
+      // If all questions are answered, mark the test as completed
+      if (_remainingQuestions.isEmpty) {
         await FirebaseFirestore.instance
             .collection('patients')
             .doc(widget.patientId)
-            .collection('maskedQuestions')
-            .doc(answer['questionId'])
-            .set(answer);
+            .set({'MaskedVideoIsCompleted': true}, SetOptions(merge: true));
+        print('Test completed and marked as isCompleted: true');
       }
-      print('All answers saved to Firebase successfully');
     } catch (e) {
-      print('Error saving all answers: $e');
+      print('Error saving answer: $e');
     }
   }
+
   void _submitEmotion(int selectedEmotionIndex) {
     if (_correctOption != null) {
-      _saveAnswerLocally(selectedEmotionIndex); // Save answer locally
+      _saveAnswer(selectedEmotionIndex);
       _goToNextQuestion(); // Go to the next question
     }
   }
@@ -165,7 +167,7 @@ class _MaskedVideoScreenState extends State<MaskedVideoScreen> {
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              Navigator.pop(context);
+              Navigator.pop(context); // Close the current screen
             },
             child: Text('OK'),
           ),

@@ -61,9 +61,9 @@ class _ResultScreenState extends State<ResultScreen> {
         // Loop through the documents and extract relevant data
         for (var doc in querySnapshot.docs) {
           var data = doc.data() as Map<String, dynamic>;
-
           data.forEach((key, value) {
             if (value is Map<String, dynamic>) {
+              print("AAAAAAAA");
               var questionData = value;
               results.add({
                 'questionNumber': questionData['questionNumber'],

@@ -18,7 +18,6 @@ class _VideoScreenState extends State<VideoScreen> {
   VideoPlayerController? _videoPlayerController;
   List<DocumentSnapshot> _allQuestions = [];
   List<DocumentSnapshot> _remainingQuestions = [];
-  List<Map<String, dynamic>> _answers = [];
   String? _videoUrl;
   int? _correctOption;
   int _questionNumber = 0;
@@ -86,12 +85,6 @@ class _VideoScreenState extends State<VideoScreen> {
   }
 
   Future<void> _fetchVideoQuestion() async {
-    if (_remainingQuestions.isEmpty) {
-      await _saveAllAnswersToFirebase(); // Save all answers when the test is completed
-      _showTestFinishedDialog();
-      return;
-    }
-
     setState(() {
       _isLoading = true;
       _isAnswered = false;
@@ -135,60 +128,63 @@ class _VideoScreenState extends State<VideoScreen> {
     }
   }
 
-  void _saveAnswerLocally(int selectedEmotionIndex) {
-    // Check if the selected answer is correct
-    bool isCorrect = _correctOption != null && selectedEmotionIndex+1 == _correctOption;
 
-    // Add answer data to the local list
-    _answers.add({ 
-      'audioUrl': _videoUrl,
-      'correctOption': _correctOption,
-      'isCorrect': isCorrect,
-      'questionNumber': _questionNumber,
-      'selectedOption': _options[selectedEmotionIndex],
-      'timestamp': DateTime.now().toIso8601String(), // Add local timestamp
+
+void _goToNextQuestion() {
+  if (_remainingQuestions.isEmpty) {
+    // If there are no remaining questions, mark the test as completed and navigate to the result screen
+    _showTestFinishedDialog();
+  } else {
+    setState(() {
+      _videoPlayerController?.pause();
+      _fetchVideoQuestion(); // Fetch the next question if available
     });
-
-    print('Answer saved locally: $_answers');
   }
+}
 
-Future<void> _saveAllAnswersToFirebase() async {
+Future<void> _saveAnswer(int selectedEmotionIndex) async {
+  bool isCorrect = _correctOption != null && selectedEmotionIndex + 1 == _correctOption;
+
+  Map<String, dynamic> answerData = {
+    'audioUrl': _videoUrl,
+    'correctOption': _correctOption,
+    'isCorrect': isCorrect,
+    'questionNumber': _questionNumber,
+    'selectedOption': _options[selectedEmotionIndex],
+    'timestamp': FieldValue.serverTimestamp(),
+  };
+
   try {
-    // Save each answer to Firebase
-    for (var answer in _answers) {
-      await FirebaseFirestore.instance
-          .collection('patients')
-          .doc(widget.patientId)
-          .collection('videoQuestions')
-          .doc(answer['questionId'])
-          .set(answer);
-    }
-
-    // After all answers are saved, update isCompleted to true
     await FirebaseFirestore.instance
         .collection('patients')
         .doc(widget.patientId)
-        .update({'VideoIsCompleted': true}); // Update the isCompleted field
+        .collection('videoQuestions')
+        .doc(_questionId)
+        .set({
+      _questionNumber.toString(): answerData,
+    }, SetOptions(merge: true));
 
-    print('All answers saved to Firebase successfully');
+    print('Answer saved successfully');
+
+    // If all questions are answered, mark the test as completed
+    if (_remainingQuestions.isEmpty) {
+      await FirebaseFirestore.instance
+          .collection('patients')
+          .doc(widget.patientId)
+          .set({'VideoIsCompleted': true}, SetOptions(merge: true));
+      print('Test completed and marked as isCompleted: true');
+    }
   } catch (e) {
-    print('Error saving all answers: $e');
+    print('Error saving answer: $e');
   }
 }
 
 
   void _submitEmotion(int selectedEmotionIndex) {
     if (_correctOption != null) {
-      _saveAnswerLocally(selectedEmotionIndex); // Save answer locally
+      _saveAnswer(selectedEmotionIndex);
       _goToNextQuestion(); // Go to the next question
     }
-  }
-
-  void _goToNextQuestion() {
-    setState(() {
-      _videoPlayerController?.pause();
-      _fetchVideoQuestion();
-    });
   }
 
    void _showTestFinishedDialog() {
