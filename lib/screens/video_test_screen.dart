@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:video_player/video_player.dart';
+import 'package:emotionmobileversion/screens/result_screen.dart';
+
 
 class VideoScreen extends StatefulWidget {
   final String patientId;
@@ -16,6 +18,7 @@ class _VideoScreenState extends State<VideoScreen> {
   VideoPlayerController? _videoPlayerController;
   List<DocumentSnapshot> _allQuestions = [];
   List<DocumentSnapshot> _remainingQuestions = [];
+  List<Map<String, dynamic>> _answers = [];
   String? _videoUrl;
   int? _correctOption;
   int _questionNumber = 0;
@@ -27,12 +30,36 @@ class _VideoScreenState extends State<VideoScreen> {
   @override
   void initState() {
     super.initState();
+    _checkIfTestCompleted();
     _fetchAllQuestions();
+  }
+
+    Future<void> _checkIfTestCompleted() async {
+    DocumentSnapshot testStatusSnapshot = await FirebaseFirestore.instance
+        .collection('patients')
+        .doc(widget.patientId)
+        .get();
+
+  String testType = 'videoQuestions'; 
+    if (testStatusSnapshot.exists &&
+        testStatusSnapshot['VideoIsCompleted'] == true) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ResultScreen(
+            patientId: widget.patientId, // patientId parametresini gönderiyoruz
+            options: _options,
+            testType:testType, // _options listesini de parametre olarak gönderiyoruz
+          ),
+        ),
+      );
+    }
   }
 
   Future<void> _fetchAllQuestions() async {
     setState(() {
       _isLoading = true;
+      _questionNumber = 0;
     });
 
     try {
@@ -60,6 +87,7 @@ class _VideoScreenState extends State<VideoScreen> {
 
   Future<void> _fetchVideoQuestion() async {
     if (_remainingQuestions.isEmpty) {
+      await _saveAllAnswersToFirebase(); // Save all answers when the test is completed
       _showTestFinishedDialog();
       return;
     }
@@ -77,6 +105,7 @@ class _VideoScreenState extends State<VideoScreen> {
         _videoUrl = videoQuestionSnapshot['audioUrl'];
         _correctOption = videoQuestionSnapshot['correctOption'] as int;
         _questionId = videoQuestionSnapshot.id;
+        
       });
 
       _initializeVideoPlayer(_videoUrl!);
@@ -106,39 +135,55 @@ class _VideoScreenState extends State<VideoScreen> {
     }
   }
 
-  Future<void> _saveAnswer(int selectedEmotionIndex) async {
-  bool isCorrect = _correctOption != null && selectedEmotionIndex == _correctOption;
-    
-    Map<String, dynamic> answerData = {
-      'videoUrl': _videoUrl,
-      'isCorrect': isCorrect,
+  void _saveAnswerLocally(int selectedEmotionIndex) {
+    // Check if the selected answer is correct
+    bool isCorrect = _correctOption != null && selectedEmotionIndex+1 == _correctOption;
+
+    // Add answer data to the local list
+    _answers.add({ 
+      'audioUrl': _videoUrl,
       'correctOption': _correctOption,
+      'isCorrect': isCorrect,
       'questionNumber': _questionNumber,
       'selectedOption': _options[selectedEmotionIndex],
-      'timestamp': FieldValue.serverTimestamp(),
-    };
+      'timestamp': DateTime.now().toIso8601String(), // Add local timestamp
+    });
 
+    print('Answer saved locally: $_answers');
+  }
+
+Future<void> _saveAllAnswersToFirebase() async {
   try {
+    // Save each answer to Firebase
+    for (var answer in _answers) {
       await FirebaseFirestore.instance
           .collection('patients')
           .doc(widget.patientId)
           .collection('videoQuestions')
-          .doc(_questionId)
-          .set({
-        _questionNumber.toString(): answerData,
-      }, SetOptions(merge: true));
-      print('Answer saved successfully');
-    } catch (e) {
-      print('Error saving answer: $e');
+          .doc(answer['questionId'])
+          .set(answer);
     }
+
+    // After all answers are saved, update isCompleted to true
+    await FirebaseFirestore.instance
+        .collection('patients')
+        .doc(widget.patientId)
+        .update({'VideoIsCompleted': true}); // Update the isCompleted field
+
+    print('All answers saved to Firebase successfully');
+  } catch (e) {
+    print('Error saving all answers: $e');
   }
+}
+
 
   void _submitEmotion(int selectedEmotionIndex) {
     if (_correctOption != null) {
-      _saveAnswer(selectedEmotionIndex); 
-      _goToNextQuestion(); 
+      _saveAnswerLocally(selectedEmotionIndex); // Save answer locally
+      _goToNextQuestion(); // Go to the next question
     }
   }
+
   void _goToNextQuestion() {
     setState(() {
       _videoPlayerController?.pause();
@@ -146,25 +191,73 @@ class _VideoScreenState extends State<VideoScreen> {
     });
   }
 
-  void _showTestFinishedDialog() {
+   void _showTestFinishedDialog() {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Test Finished'),
-        content: Text('Congratulations, you have completed the test!'),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15),
+        ),
+        backgroundColor: Colors.white,
+        title: Text(
+          'Test Completed',
+          style: GoogleFonts.poppins(
+            color: Colors.black,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+          textAlign: TextAlign.center,
+        ),
+        content: Text(
+          'Congratulations! You have successfully completed the test.',
+          style: GoogleFonts.poppins(
+            color: Colors.black,
+            fontSize: 16,
+          ),
+          textAlign: TextAlign.center,
+        ),
         actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              Navigator.pop(context);
-            },
-            child: Text('OK'),
+          Center(
+            child: ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => ResultScreen(
+                            patientId: widget.patientId,
+                            options: [
+                              'Happy',
+                              'Sad',
+                              'Angry',
+                              'Terrified',
+                              'Surprised',
+                              'Disgusted'
+                            ],
+                            testType: 'videoQuestions',
+                          )),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Color.fromARGB(255, 60, 145, 230),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              child: Text(
+                'Okay',
+                style: GoogleFonts.poppins(
+                  fontSize: 14,
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
           ),
         ],
       ),
     );
   }
-
   @override
   void dispose() {
     _videoPlayerController?.dispose();
