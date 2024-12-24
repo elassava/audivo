@@ -258,8 +258,7 @@ class SettingsScreen extends StatelessWidget {
                     onPressed: () => _deleteAccount(context),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.red,
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
                     ),
                     child: Text(
                       'Delete Account',
@@ -271,22 +270,22 @@ class SettingsScreen extends StatelessWidget {
                     ),
                   ),
                   SizedBox(height: 10),
-                  ElevatedButton(
-                    onPressed: () => _resetPassword(context),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-                    ),
-                    child: Text(
-                      'Reset Password',
-                      style: GoogleFonts.poppins(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                  if (!_isGoogleUser())
+                    ElevatedButton(
+                      onPressed: () => _resetPassword(context),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue,
+                        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                      ),
+                      child: Text(
+                        'Reset Password',
+                        style: GoogleFonts.poppins(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
-                  ),
                 ],
               ),
             );
@@ -307,8 +306,7 @@ class SettingsScreen extends StatelessWidget {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: BottomAppBar(
-        color:
-            Color.fromARGB(255, 60, 145, 230), // Blue color for the bottom bar
+        color: Color.fromARGB(255, 60, 145, 230), // Blue color for the bottom bar
         shape: CircularNotchedRectangle(),
         notchMargin: 8.0, // Notch margin for better visibility
         child: SizedBox(height: 10), // Adjust height to match button spacing
@@ -329,8 +327,7 @@ class SettingsScreen extends StatelessWidget {
         Expanded(
           child: Text(
             value,
-            style:
-                GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w400),
+            style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w400),
           ),
         ),
       ],
