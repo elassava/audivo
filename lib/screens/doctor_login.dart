@@ -128,6 +128,11 @@ class _DoctorLoginScreenState extends State<DoctorLoginScreen> {
         String lastName = nameParts.length > 1 ? nameParts.sublist(1).join(' ') : '';
 
         // Ek bilgileri almak için dialog göster
+        String phoneNumber = '';
+        String countryCode = '+90';
+        DateTime? birthDate;
+        String birthDateText = 'Select Birth Date';
+
         final additionalInfo = await showDialog<Map<String, dynamic>>(
           context: context,
           barrierDismissible: false,
@@ -248,56 +253,59 @@ class _DoctorLoginScreenState extends State<DoctorLoginScreen> {
                         ),
                       ),
                     SizedBox(height: 20),
-                    ElevatedButton(
-                      onPressed: () async {
-                        final DateTime? picked = await showDatePicker(
-                          context: context,
-                          initialDate: DateTime(2000),
-                          firstDate: DateTime(1900),
-                          lastDate: DateTime.now(),
-                          builder: (context, child) {
-                            return Theme(
-                              data: Theme.of(context).copyWith(
-                                colorScheme: ColorScheme.light(
-                                  primary: Color.fromARGB(255, 60, 145, 230),
-                                  onPrimary: Colors.white,
-                                ),
-                                textButtonTheme: TextButtonThemeData(
-                                  style: TextButton.styleFrom(
-                                    foregroundColor:
-                                        Color.fromARGB(255, 60, 145, 230),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          final DateTime? picked = await showDatePicker(
+                            context: context,
+                            initialDate: DateTime(2000),
+                            firstDate: DateTime(1900),
+                            lastDate: DateTime.now(),
+                            builder: (context, child) {
+                              return Theme(
+                                data: Theme.of(context).copyWith(
+                                  colorScheme: ColorScheme.light(
+                                    primary: Color.fromARGB(255, 60, 145, 230),
+                                    onPrimary: Colors.white,
+                                  ),
+                                  textButtonTheme: TextButtonThemeData(
+                                    style: TextButton.styleFrom(
+                                      foregroundColor:
+                                          Color.fromARGB(255, 60, 145, 230),
+                                    ),
                                   ),
                                 ),
-                              ),
-                              child: child!,
-                            );
-                          },
-                        );
-                        if (picked != null) {
-                          birthDate = picked;
-                        }
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Color.fromARGB(255, 60, 145, 230),
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.calendar_today,
-                              color: Colors.white, size: 18),
-                          SizedBox(width: 8),
-                          Text(
-                            'Select Birth Date',
-                            style: GoogleFonts.poppins(
-                              color: Colors.white,
-                            ),
+                                child: child!,
+                              );
+                            },
+                          );
+                          if (picked != null) {
+                            birthDate = picked;
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Color.fromARGB(255, 60, 145, 230),
+                          padding:
+                              EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
                           ),
-                        ],
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.calendar_today,
+                                color: Colors.white, size: 18),
+                            SizedBox(width: 8),
+                            Text(
+                              birthDateText,
+                              style: GoogleFonts.poppins(
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ],

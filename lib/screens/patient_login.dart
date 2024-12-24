@@ -124,6 +124,7 @@ class _PatientLoginScreenState extends State<PatientLoginScreen> {
             String phoneNumber = '';
             String countryCode = '+90'; // Default Türkiye
             DateTime? birthDate;
+            String birthDateText = '';
 
             return AlertDialog(
               backgroundColor: Colors.white,
@@ -152,29 +153,38 @@ class _PatientLoginScreenState extends State<PatientLoginScreen> {
                           width: 100,
                           child: DropdownButtonFormField<String>(
                             decoration: InputDecoration(
-                              contentPadding:
-                                  EdgeInsets.symmetric(horizontal: 10),
+                              contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 15),
+                              filled: true,
+                              fillColor: Color.fromARGB(255, 230, 243, 255),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8),
                                 borderSide: BorderSide.none,
                               ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: BorderSide(
+                                  color: Color.fromARGB(255, 60, 145, 230),
+                                ),
+                              ),
                             ),
                             value: countryCode,
                             items: [
-                              DropdownMenuItem(
-                                  value: '+90', child: Text('🇹🇷 +90')),
-                              DropdownMenuItem(
-                                  value: '+1', child: Text('🇺🇸 +1')),
-                              DropdownMenuItem(
-                                  value: '+44', child: Text('🇬🇧 +44')),
-                              DropdownMenuItem(
-                                  value: '+49', child: Text('🇩🇪 +49')),
-                              // Daha fazla ülke kodu eklenebilir
+                              DropdownMenuItem(value: '+90', child: Text('🇹🇷 +90')),
+                              DropdownMenuItem(value: '+1', child: Text('🇺🇸 +1')),
+                              DropdownMenuItem(value: '+44', child: Text('🇬🇧 +44')),
+                              DropdownMenuItem(value: '+49', child: Text('🇩🇪 +49')),
                             ],
                             onChanged: (value) {
                               countryCode = value!;
                             },
-                            style: GoogleFonts.poppins(),
+                            style: GoogleFonts.poppins(
+                              color: Colors.black87,
+                              fontSize: 14,
+                            ),
+                            icon: Icon(
+                              Icons.arrow_drop_down,
+                              color: Color.fromARGB(255, 60, 145, 230),
+                            ),
                           ),
                         ),
                         SizedBox(width: 8),
@@ -198,16 +208,18 @@ class _PatientLoginScreenState extends State<PatientLoginScreen> {
                                   color: Color.fromARGB(255, 60, 145, 230),
                                 ),
                               ),
-                              errorStyle: GoogleFonts.poppins(
-                                color: Colors.red,
-                              ),
+                              counterText: "",
+                              contentPadding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
                             ),
                             keyboardType: TextInputType.number,
                             maxLength: 10,
                             onChanged: (value) {
                               phoneNumber = value;
                             },
-                            style: GoogleFonts.poppins(),
+                            style: GoogleFonts.poppins(
+                              fontSize: 14,
+                              color: Colors.black87,
+                            ),
                           ),
                         ),
                       ],
@@ -218,39 +230,65 @@ class _PatientLoginScreenState extends State<PatientLoginScreen> {
                         child: Text(
                           'Phone number must be 10 digits',
                           style: GoogleFonts.poppins(
-                            color: Colors.red,
+                            color: Color.fromARGB(255, 60, 145, 230),
                             fontSize: 12,
                           ),
                         ),
                       ),
                     SizedBox(height: 20),
-                    // Doğum tarihi seçici butonu...
-                    ElevatedButton(
-                      onPressed: () async {
-                        final DateTime? picked = await showDatePicker(
-                          context: context,
-                          initialDate: DateTime(2000),
-                          firstDate: DateTime(1900),
-                          lastDate: DateTime.now(),
-                        );
-                        if (picked != null) {
-                          birthDate = picked;
-                        }
-                      },
-                      // ... mevcut buton stili ...
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.calendar_today,
-                              color: Colors.white, size: 18),
-                          SizedBox(width: 8),
-                          Text(
-                            'Select Birth Date',
-                            style: GoogleFonts.poppins(
-                              color: Colors.white,
-                            ),
+                    // Birth Date Button
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          final DateTime? picked = await showDatePicker(
+                            context: context,
+                            initialDate: DateTime(2000),
+                            firstDate: DateTime(1900),
+                            lastDate: DateTime.now(),
+                            builder: (context, child) {
+                              return Theme(
+                                data: Theme.of(context).copyWith(
+                                  colorScheme: ColorScheme.light(
+                                    primary: Color.fromARGB(255, 60, 145, 230),
+                                    onPrimary: Colors.white,
+                                  ),
+                                  textButtonTheme: TextButtonThemeData(
+                                    style: TextButton.styleFrom(
+                                      foregroundColor: Color.fromARGB(255, 60, 145, 230),
+                                    ),
+                                  ),
+                                ),
+                                child: child!,
+                              );
+                            },
+                          );
+                          if (picked != null) {
+                            birthDate = picked;
+                            birthDateText = "${picked.day}/${picked.month}/${picked.year}";
+                            (context as Element).markNeedsBuild();
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Color.fromARGB(255, 60, 145, 230),
+                          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
                           ),
-                        ],
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.calendar_today, color: Colors.white, size: 18),
+                            SizedBox(width: 8),
+                            Text(
+                              birthDateText,
+                              style: GoogleFonts.poppins(
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ],
