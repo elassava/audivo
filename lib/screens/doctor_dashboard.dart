@@ -1,14 +1,133 @@
+import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:emotionmobileversion/screens/doctor_notes_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:emotionmobileversion/screens/doctor_notes_screen.dart';
 import 'doc_patients_screen.dart';
 import 'doc_patient_add_screen.dart';
 import 'doc_settings_screen.dart';
 
-class DoctorDashboard extends StatelessWidget {
+class DoctorDashboard extends StatefulWidget {
+  @override
+  _DoctorDashboardState createState() => _DoctorDashboardState();
+}
+
+class _DoctorDashboardState extends State<DoctorDashboard> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseStorage _storage = FirebaseStorage.instance;
+  String? profileImg; // Profil fotoğrafı durumunu burada tutacağız.
+
+  // Updated image upload logic
+  Future<void> _pickAndUploadImage(BuildContext context) async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      // Show confirmation dialog with image preview
+      bool? shouldUpload = await showDialog<bool>(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15),
+            ),
+            title: Text(
+              'Confirm Profile Photo',
+              style: GoogleFonts.poppins(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Color.fromARGB(255, 60, 145, 230),
+              ),
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: Image.file(
+                    File(pickedFile.path),
+                    height: 200,
+                    width: 200,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                SizedBox(height: 16),
+                Text(
+                  'Do you want to use this photo?',
+                  style: GoogleFonts.poppins(
+                    fontSize: 16,
+                    color: Colors.black87,
+                  ),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: Text(
+                  'Cancel',
+                  style: GoogleFonts.poppins(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.grey,
+                  ),
+                ),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                child: Text(
+                  'Confirm',
+                  style: GoogleFonts.poppins(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Color.fromARGB(255, 60, 145, 230),
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
+      );
+
+      if (shouldUpload == true) {
+        File imageFile = File(pickedFile.path);
+        try {
+          String userId = _auth.currentUser!.uid;
+          Reference ref = _storage.ref().child('profile_pictures/$userId.jpg');
+          UploadTask uploadTask = ref.putFile(imageFile);
+
+          TaskSnapshot snapshot = await uploadTask;
+          String imageUrl = await snapshot.ref.getDownloadURL();
+
+          await FirebaseFirestore.instance.collection('doctors').doc(userId).update({
+            'profileImg': imageUrl,
+          });
+
+          setState(() {
+            profileImg = imageUrl;
+          });
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Profile photo updated successfully!'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        } catch (e) {
+          print('Error uploading profile image: $e');
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Failed to update profile photo'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    }
+  }
 
   Future<DocumentSnapshot> _getDoctorInfo() async {
     final userId = _auth.currentUser!.uid;
@@ -88,17 +207,16 @@ class DoctorDashboard extends StatelessWidget {
               return Center(child: CircularProgressIndicator());
             }
 
-            if (snapshot.hasError) {
-              return Center(child: Text("Error: ${snapshot.error}"));
-            }
-
-            if (!snapshot.hasData || !snapshot.data!.exists) {
+            if (snapshot.hasError || !snapshot.hasData || !snapshot.data!.exists) {
               return Center(child: Text("No doctor data found."));
             }
 
             var doctorData = snapshot.data!.data() as Map<String, dynamic>;
             String doctorName = doctorData['name'] ?? 'Doctor';
-            String? profileImg = doctorData['profileImg'];
+            String? storedProfileImg = doctorData['profileImg'];
+
+            // Profil fotoğrafını state'deki profilImg'den kullanacağız
+            profileImg ??= storedProfileImg;
 
             return Stack(
               children: [
@@ -146,60 +264,19 @@ class DoctorDashboard extends StatelessWidget {
                               ],
                             ),
                           ),
-                          FutureBuilder<DocumentSnapshot>(
-                            future: _getDoctorInfo(),
-                            builder: (context, snapshot) {
-                              if (snapshot.connectionState == ConnectionState.waiting) {
-                                return CircleAvatar(
-                                  radius: 30,
-                                  backgroundColor: Colors.white,
-                                  child: CircularProgressIndicator(
-                                      color: Color.fromARGB(255, 60, 145, 230)),
-                                );
-                              }
-
-                              if (snapshot.hasError || !snapshot.hasData || !snapshot.data!.exists) {
-                                return GestureDetector(
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => SettingsScreen()),
-                                    );
-                                  },
-                                  child: CircleAvatar(
-                                    radius: 30,
-                                    backgroundColor: Colors.white,
-                                    child: Icon(Icons.person,
-                                        size: 30, color: Color.fromARGB(255, 60, 145, 230)),
-                                  ),
-                                );
-                              }
-
-                              var doctorData = snapshot.data!.data() as Map<String, dynamic>;
-                              String? profileImg = doctorData['profileImg'];
-
-                              return GestureDetector(
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => SettingsScreen()),
-                                  );
-                                },
-                                child: CircleAvatar(
-                                  radius: 30,
-                                  backgroundColor: Colors.white,
-                                  backgroundImage: profileImg != null
-                                      ? NetworkImage(profileImg)
-                                      : null,
-                                  child: profileImg == null
-                                      ? Icon(Icons.person,
-                                          size: 30, color: Color.fromARGB(255, 60, 145, 230))
-                                      : null,
-                                ),
-                              );
-                            },
+                          GestureDetector(
+                            onTap: () => _editProfileImage(context),
+                            child: CircleAvatar(
+                              radius: 30,
+                              backgroundColor: Colors.white,
+                              backgroundImage: profileImg != null
+                                  ? NetworkImage(profileImg!)
+                                  : null,
+                              child: profileImg == null
+                                  ? Icon(Icons.person,
+                                      size: 30, color: Color.fromARGB(255, 60, 145, 230))
+                                  : null,
+                            ),
                           ),
                         ],
                       ),
@@ -277,10 +354,14 @@ class DoctorDashboard extends StatelessWidget {
               ],
             );
           },
-
         ),
       ),
     );
+  }
+
+  // Profil fotoğrafı düzenlemek için tıklama işlevi
+  void _editProfileImage(BuildContext context) {
+    _pickAndUploadImage(context);
   }
 
   Widget _buildDashboardTile(BuildContext context, {
@@ -298,17 +379,17 @@ class DoctorDashboard extends StatelessWidget {
           border: Border.all(color: Colors.white.withOpacity(0.2)),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.09),
-              blurRadius: 5,
-              offset: Offset(0, 3),
+              color: Colors.black.withOpacity(0.2),
+              blurRadius: 8,
+              spreadRadius: 1,
             ),
           ],
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 50, color: iconColor),
-            SizedBox(height: 10),
+            Icon(icon, size: 40, color: iconColor),
+            SizedBox(height: 8),
             Text(
               title,
               style: GoogleFonts.poppins(

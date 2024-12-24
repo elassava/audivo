@@ -92,132 +92,13 @@ class PatientTestsScreen extends StatelessWidget {
                                 ),
                               ),
                               SizedBox(height: 8.0),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    flex: 2,
-                                    child: Text('Name: ',
-                                        style: GoogleFonts.poppins(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.black)),
-                                  ),
-                                  Expanded(
-                                    flex: 3,
-                                    child: Text('${patientInfo['name']}',
-                                        overflow: TextOverflow.ellipsis,
-                                        style: GoogleFonts.poppins(fontSize: 16)),
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    flex: 2,
-                                    child: Text('Surname: ',
-                                        style: GoogleFonts.poppins(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.black)),
-                                  ),
-                                  Expanded(
-                                    flex: 3,
-                                    child: Text('${patientInfo['surname']}',
-                                        overflow: TextOverflow.ellipsis,
-                                        style: GoogleFonts.poppins(fontSize: 16)),
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    flex: 2,
-                                    child: Text('Age: ',
-                                        style: GoogleFonts.poppins(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.black)),
-                                  ),
-                                  Expanded(
-                                    flex: 3,
-                                    child: Text('$age',
-                                        overflow: TextOverflow.ellipsis,
-                                        style: GoogleFonts.poppins(fontSize: 16)),
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    flex: 2,
-                                    child: Text('DOB: ',
-                                        style: GoogleFonts.poppins(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.black)),
-                                  ),
-                                  Expanded(
-                                    flex: 3,
-                                    child: Text('$birthDate',
-                                        overflow: TextOverflow.ellipsis,
-                                        style: GoogleFonts.poppins(fontSize: 16)),
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    flex: 2,
-                                    child: Text('Gender: ',
-                                        style: GoogleFonts.poppins(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.black)),
-                                  ),
-                                  Expanded(
-                                    flex: 3,
-                                    child: Text('${patientInfo['gender']}',
-                                        overflow: TextOverflow.ellipsis,
-                                        style: GoogleFonts.poppins(fontSize: 16)),
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    flex: 2,
-                                    child: Text('Email: ',
-                                        style: GoogleFonts.poppins(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.black)),
-                                  ),
-                                  Expanded(
-                                    flex: 3,
-                                    child: Text('${patientInfo['email']}',
-                                        overflow: TextOverflow.ellipsis,
-                                        style: GoogleFonts.poppins(fontSize: 16)),
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    flex: 2,
-                                    child: Text('Phone: ',
-                                        style: GoogleFonts.poppins(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.black)),
-                                  ),
-                                  Expanded(
-                                    flex: 3,
-                                    child: Text('${patientInfo['phone']}',
-                                        overflow: TextOverflow.ellipsis,
-                                        style: GoogleFonts.poppins(fontSize: 16)),
-                                  ),
-                                ],
-                              ),
+                              _buildInfoRow('Name', patientInfo['name']),
+                              _buildInfoRow('Surname', patientInfo['surname']),
+                              _buildInfoRow('Age', age.toString()),
+                              _buildInfoRow('DOB', birthDate),
+                              _buildInfoRow('Gender', patientInfo['gender']),
+                              _buildInfoRow('Email', patientInfo['email']),
+                              _buildInfoRow('Phone', patientInfo['phone']),
                             ],
                           ),
                         ),
@@ -235,6 +116,7 @@ class PatientTestsScreen extends StatelessWidget {
                             ),
                           );
                         },
+                        icon: Icons.video_camera_front, // Blue Video Icon
                       ),
                       SizedBox(height: 16.0),
                       // Masked Video Test Card
@@ -249,6 +131,7 @@ class PatientTestsScreen extends StatelessWidget {
                             ),
                           );
                         },
+                        icon: Icons.videocam_off, // Blue Masked Video Icon
                       ),
                       SizedBox(height: 16.0),
                       // Audio Test Card
@@ -263,6 +146,7 @@ class PatientTestsScreen extends StatelessWidget {
                             ),
                           );
                         },
+                        icon: Icons.headset, // Blue Audio Icon
                       ),
                     ],
                   );
@@ -275,8 +159,36 @@ class PatientTestsScreen extends StatelessWidget {
     );
   }
 
+  // Helper method to build info rows
+  Widget _buildInfoRow(String label, String value) {
+    return Row(
+      children: [
+        Expanded(
+          flex: 2,
+          child: Text(
+            '$label: ',
+            style: GoogleFonts.poppins(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
+          ),
+        ),
+        Expanded(
+          flex: 3,
+          child: Text(
+            value,
+            overflow: TextOverflow.ellipsis,
+            style: GoogleFonts.poppins(fontSize: 16),
+          ),
+        ),
+      ],
+    );
+  }
+
+  // Test Card builder with icon on the right side
   Widget _buildTestCard(BuildContext context,
-      {required String title, required VoidCallback onTap}) {
+      {required String title, required VoidCallback onTap, required IconData icon}) {
     return SizedBox(
       height: MediaQuery.of(context).size.height * 0.15,
       child: Card(
@@ -284,11 +196,28 @@ class PatientTestsScreen extends StatelessWidget {
         elevation: 4,
         child: InkWell(
           onTap: onTap,
-          child: Center(
-            child: Text(
-              title,
-              style: GoogleFonts.poppins(fontSize: 20),
-            ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(left: 16.0), // Shift text slightly to the right
+                child: Text(
+                  title,
+                  style: GoogleFonts.poppins(
+                    fontSize: 20,
+                    fontWeight: FontWeight.normal, // No bold here
+                  ),
+                ),
+              ),
+              Spacer(), // Push icon to the right
+              Padding(
+                padding: const EdgeInsets.only(right: 16.0), // Shift icon slightly to the left
+                child: Icon(
+                  icon,
+                  color: Color.fromARGB(255, 60, 145, 230), // Blue Icon
+                ),
+              ),
+            ],
           ),
         ),
       ),
