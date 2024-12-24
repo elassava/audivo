@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter/services.dart';
 
 class PatientAddScreen extends StatefulWidget {
   @override
@@ -16,6 +17,7 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
   String gender = 'Male';
   String email = '';
   String phone = '';
+  String countryCode = '+1'; // Default country code
   final _auth = FirebaseAuth.instance;
 
   void _addPatient() async {
@@ -23,13 +25,16 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
       try {
         final doctorId = _auth.currentUser!.uid;
 
+        // Combine country code with the phone number
+        String fullPhoneNumber = countryCode + phone;
+
         await FirebaseFirestore.instance.collection('users').add({
           'name': name,
           'surname': surname,
           'birthDate': birthDate,
           'gender': gender,
           'email': email,
-          'phone': phone,
+          'phone': fullPhoneNumber, // Save combined phone number with country code
           'role': "patient"
         });
 
@@ -40,7 +45,7 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
           'birthDate': birthDate,
           'gender': gender,
           'email': email,
-          'phone': phone,
+          'phone': fullPhoneNumber, // Save combined phone number with country code
         });
 
         ScaffoldMessenger.of(context).showSnackBar(
@@ -61,6 +66,26 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
       initialDate: DateTime.now(),
       firstDate: DateTime(1900),
       lastDate: DateTime.now(),
+      builder: (BuildContext context, Widget? child) {
+        return Theme(
+          data: ThemeData.light().copyWith(
+            primaryColor: Color.fromARGB(255, 60, 145, 230), // App bar color
+            hintColor: Color.fromARGB(255, 60, 145, 230), // Selected day color
+            buttonTheme: ButtonThemeData(textTheme: ButtonTextTheme.primary), // Button style
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(foregroundColor: Color.fromARGB(255, 60, 145, 230)), // Button text color
+            ),
+            textTheme: TextTheme(
+              bodySmall: TextStyle(
+                fontSize: 18, // Increased font size for Select Date
+                fontWeight: FontWeight.bold,
+                color: Colors.black, // Black text color
+              ),
+            ),
+          ),
+          child: child!,
+        );
+      },
     );
 
     if (selectedDate != null) {
@@ -84,6 +109,38 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // List of country codes for dropdown, sorted in ascending order
+    List<String> countryCodes = [
+      '+1',  // USA/Canada
+      '+20', // Egypt
+      '+27', // South Africa
+      '+31', // Netherlands
+      '+33', // France
+      '+34', // Spain
+      '+39', // Italy
+      '+41', // Switzerland
+      '+43', // Austria
+      '+44', // United Kingdom
+      '+47', // Norway
+      '+48', // Poland
+      '+49', // Germany
+      '+52', // Mexico
+      '+55', // Brazil
+      '+61', // Australia
+      '+64', // New Zealand
+      '+63', // Philippines
+      '+64', // New Zealand
+      '+71', // Russia
+      '+82', // South Korea
+      '+86', // China
+      '+91', // India
+      '+90', // Turkey
+      '+971', // United Arab Emirates
+      '+213', // Algeria
+      '+254', // Kenya
+      '+256', // Uganda
+    ]..sort(); // Sorting the list in ascending order.
+
     return Scaffold(
       appBar: AppBar(
         iconTheme: IconThemeData(color: Colors.white),
@@ -132,13 +189,17 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
                     onTap: () => _selectBirthDate(context),
                     child: AbsorbPointer(
                       child: TextFormField(
+                        readOnly: true, // Prevent manual input
+                        keyboardType: TextInputType.none, // Disable keyboard
+                        textInputAction: TextInputAction.none, // Disable text action on the keyboard
                         decoration: _inputDecoration(
-                            birthDate.isEmpty ? 'Select Birth Date' : birthDate),
+                          birthDate.isEmpty ? 'Select Birth Date' : birthDate),
                         validator: (value) =>
-                            birthDate.isEmpty ? 'Please select the birth date(YYYY/DD/MM)' : null,
+                            birthDate.isEmpty ? 'Please select the birth date (YYYY/DD/MM)' : null,
                       ),
                     ),
                   ),
+                    
                   SizedBox(height: 20),
                   DropdownButtonFormField<String>(
                     value: gender,
@@ -152,6 +213,7 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
                     decoration: _inputDecoration('Gender'),
                     validator: (value) =>
                         value == null || value.isEmpty ? 'Please select the gender' : null,
+                    style: GoogleFonts.poppins(fontWeight: FontWeight.bold, color: Colors.black), // Bold text
                   ),
                   SizedBox(height: 20),
                   TextFormField(
@@ -161,11 +223,45 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
                         value!.isEmpty ? 'Please enter the email' : null,
                   ),
                   SizedBox(height: 20),
-                  TextFormField(
-                    decoration: _inputDecoration('Phone'),
-                    onChanged: (value) => setState(() => phone = value),
-                    validator: (value) =>
-                        value!.isEmpty ? 'Please enter the phone' : null,
+                  Row(
+                    children: [
+                      Expanded(
+                        flex: 3, // This gives 30% width
+                        child: DropdownButtonFormField<String>(
+                          value: countryCode,
+                          items: countryCodes
+                              .map((code) => DropdownMenuItem(
+                                    value: code,
+                                    child: Text(code),
+                                  ))
+                              .toList(),
+                          onChanged: (value) => setState(() => countryCode = value!),
+                          decoration: _inputDecoration('Country Code'),
+                          validator: (value) =>
+                              value == null || value.isEmpty ? 'Please select the country code' : null,
+                          style: GoogleFonts.poppins(fontWeight: FontWeight.bold, color: Colors.black), // Bold text
+                        ),
+                      ),
+                      SizedBox(width: 10),
+                      Expanded(
+                        flex: 7, // This gives 70% width
+                        child: TextFormField(
+                          decoration: _inputDecoration('Phone'),
+                          onChanged: (value) => setState(() => phone = value),
+                          validator: (value) {
+                            if (value!.isEmpty) {
+                              return 'Please enter the phone number';
+                            } else if (value.length != 10) {
+                              return 'Phone number must be exactly 10 digits';
+                            }
+                            return null;
+                          },
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly, // Allow only digits
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                   SizedBox(height: 20),
                   ElevatedButton(
