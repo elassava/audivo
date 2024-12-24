@@ -124,7 +124,7 @@ class _PatientLoginScreenState extends State<PatientLoginScreen> {
             String phoneNumber = '';
             String countryCode = '+90'; // Default Türkiye
             DateTime? birthDate;
-            
+
             return AlertDialog(
               backgroundColor: Colors.white,
               shape: RoundedRectangleBorder(
@@ -152,7 +152,8 @@ class _PatientLoginScreenState extends State<PatientLoginScreen> {
                           width: 100,
                           child: DropdownButtonFormField<String>(
                             decoration: InputDecoration(
-                              contentPadding: EdgeInsets.symmetric(horizontal: 10),
+                              contentPadding:
+                                  EdgeInsets.symmetric(horizontal: 10),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8),
                                 borderSide: BorderSide.none,
@@ -160,10 +161,14 @@ class _PatientLoginScreenState extends State<PatientLoginScreen> {
                             ),
                             value: countryCode,
                             items: [
-                              DropdownMenuItem(value: '+90', child: Text('🇹🇷 +90')),
-                              DropdownMenuItem(value: '+1', child: Text('🇺🇸 +1')),
-                              DropdownMenuItem(value: '+44', child: Text('🇬🇧 +44')),
-                              DropdownMenuItem(value: '+49', child: Text('🇩🇪 +49')),
+                              DropdownMenuItem(
+                                  value: '+90', child: Text('🇹🇷 +90')),
+                              DropdownMenuItem(
+                                  value: '+1', child: Text('🇺🇸 +1')),
+                              DropdownMenuItem(
+                                  value: '+44', child: Text('🇬🇧 +44')),
+                              DropdownMenuItem(
+                                  value: '+49', child: Text('🇩🇪 +49')),
                               // Daha fazla ülke kodu eklenebilir
                             ],
                             onChanged: (value) {
@@ -236,7 +241,8 @@ class _PatientLoginScreenState extends State<PatientLoginScreen> {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.calendar_today, color: Colors.white, size: 18),
+                          Icon(Icons.calendar_today,
+                              color: Colors.white, size: 18),
                           SizedBox(width: 8),
                           Text(
                             'Select Birth Date',
@@ -271,9 +277,9 @@ class _PatientLoginScreenState extends State<PatientLoginScreen> {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text(
-                            phoneNumber.length != 10 
-                              ? 'Phone number must be 10 digits'
-                              : 'Please fill all fields',
+                            phoneNumber.length != 10
+                                ? 'Phone number must be 10 digits'
+                                : 'Please fill all fields',
                             style: GoogleFonts.poppins(),
                           ),
                           backgroundColor: Colors.red,
@@ -307,30 +313,24 @@ class _PatientLoginScreenState extends State<PatientLoginScreen> {
           String lastName =
               nameParts.length > 1 ? nameParts.sublist(1).join(' ') : '';
 
-          // DateTime'ı String'e çevir (yyyy-MM-dd formatında)
-          String formattedDate = "${additionalInfo['birthDate'].year}-${additionalInfo['birthDate'].month.toString().padLeft(2, '0')}-${additionalInfo['birthDate'].day.toString().padLeft(2, '0')}";
+          // DateTime'ı istenen formatta (yyyy-MM-dd) string'e çevir
+          DateTime birthDate = additionalInfo['birthDate'];
+          String formattedDate = "${birthDate.year}-${birthDate.month.toString().padLeft(2, '0')}-${birthDate.day.toString().padLeft(2, '0')}";
 
           // Kullanıcı bilgilerini kaydet
-          await FirebaseFirestore.instance.collection('users').doc(uid).set({
+          Map<String, dynamic> userData = {
             'name': firstName,
             'surname': lastName,
             'email': googleUser.email,
             'role': 'patient',
             'phoneNumber': additionalInfo['phoneNumber'],
-            'birthDate': additionalInfo['birthDate'],
+            'birthDate': formattedDate,  // String olarak kaydediyoruz
             'createdAt': FieldValue.serverTimestamp(),
-          });
+          };
 
-          // Patients koleksiyonuna da aynı bilgileri kaydet
-          await FirebaseFirestore.instance.collection('patients').doc(uid).set({
-            'name': firstName,
-            'surname': lastName,
-            'email': googleUser.email,
-            'role': 'patient',
-            'phoneNumber': additionalInfo['phoneNumber'],
-            'birthDate': additionalInfo['birthDate'],
-            'createdAt': FieldValue.serverTimestamp(),
-          });
+          // Her iki koleksiyona da aynı veriyi kaydet
+          await FirebaseFirestore.instance.collection('users').doc(uid).set(userData);
+          await FirebaseFirestore.instance.collection('patients').doc(uid).set(userData);
 
           Navigator.pushReplacementNamed(context, '/patientDashboard');
         }
