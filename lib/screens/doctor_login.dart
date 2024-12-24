@@ -141,223 +141,229 @@ class _DoctorLoginScreenState extends State<DoctorLoginScreen> {
             String countryCode = '+90';
             DateTime? birthDate;
 
-            return AlertDialog(
-              backgroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(15),
-              ),
-              title: Text(
-                'Additional Information',
-                style: GoogleFonts.poppins(
-                  fontWeight: FontWeight.bold,
-                  color: Color.fromARGB(255, 60, 145, 230),
-                ),
-              ),
-              content: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Row(
+            return StatefulBuilder(
+              builder: (context, setState) {
+                return AlertDialog(
+                  backgroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  title: Text(
+                    'Additional Information',
+                    style: GoogleFonts.poppins(
+                      fontWeight: FontWeight.bold,
+                      color: Color.fromARGB(255, 60, 145, 230),
+                    ),
+                  ),
+                  content: SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        // Ülke Kodu Dropdown
-                        Container(
-                          width: 100,
-                          child: DropdownButtonFormField<String>(
-                            decoration: InputDecoration(
-                              contentPadding: EdgeInsets.symmetric(
-                                  horizontal: 10, vertical: 15),
-                              filled: true,
-                              fillColor: Color.fromARGB(255, 230, 243, 255),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                                borderSide: BorderSide.none,
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                                borderSide: BorderSide(
+                        Row(
+                          children: [
+                            // Ülke Kodu Dropdown
+                            Container(
+                              width: 100,
+                              child: DropdownButtonFormField<String>(
+                                decoration: InputDecoration(
+                                  contentPadding: EdgeInsets.symmetric(
+                                      horizontal: 10, vertical: 15),
+                                  filled: true,
+                                  fillColor: Color.fromARGB(255, 230, 243, 255),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                    borderSide: BorderSide.none,
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                    borderSide: BorderSide(
+                                      color: Color.fromARGB(255, 60, 145, 230),
+                                    ),
+                                  ),
+                                ),
+                                value: countryCode,
+                                items: [
+                                  DropdownMenuItem(
+                                      value: '+90', child: Text('🇹🇷 +90')),
+                                  DropdownMenuItem(
+                                      value: '+1', child: Text('🇺🇸 +1')),
+                                  DropdownMenuItem(
+                                      value: '+44', child: Text('🇬🇧 +44')),
+                                  DropdownMenuItem(
+                                      value: '+49', child: Text('🇩🇪 +49')),
+                                ],
+                                onChanged: (value) {
+                                  countryCode = value!;
+                                },
+                                style: GoogleFonts.poppins(
+                                  color: Colors.black87,
+                                  fontSize: 14,
+                                ),
+                                icon: Icon(
+                                  Icons.arrow_drop_down,
                                   color: Color.fromARGB(255, 60, 145, 230),
                                 ),
                               ),
                             ),
-                            value: countryCode,
-                            items: [
-                              DropdownMenuItem(
-                                  value: '+90', child: Text('🇹🇷 +90')),
-                              DropdownMenuItem(
-                                  value: '+1', child: Text('🇺🇸 +1')),
-                              DropdownMenuItem(
-                                  value: '+44', child: Text('🇬🇧 +44')),
-                              DropdownMenuItem(
-                                  value: '+49', child: Text('🇩🇪 +49')),
-                            ],
-                            onChanged: (value) {
-                              countryCode = value!;
-                            },
-                            style: GoogleFonts.poppins(
-                              color: Colors.black87,
-                              fontSize: 14,
+                            SizedBox(width: 8),
+                            // Telefon Numarası Input
+                            Expanded(
+                              child: TextField(
+                                decoration: InputDecoration(
+                                  labelText: 'Phone Number',
+                                  labelStyle: GoogleFonts.poppins(
+                                    color: Colors.black87,
+                                  ),
+                                  filled: true,
+                                  fillColor: Color.fromARGB(255, 230, 243, 255),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                    borderSide: BorderSide.none,
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                    borderSide: BorderSide(
+                                      color: Color.fromARGB(255, 60, 145, 230),
+                                    ),
+                                  ),
+                                  counterText: "",
+                                  contentPadding: EdgeInsets.symmetric(
+                                      horizontal: 15, vertical: 15),
+                                ),
+                                keyboardType: TextInputType.number,
+                                maxLength: 10,
+                                onChanged: (value) {
+                                  setState(() {
+                                    phoneNumber = value;
+                                  });
+                                },
+                                style: GoogleFonts.poppins(
+                                  fontSize: 14,
+                                  color: Colors.black87,
+                                ),
+                              ),
                             ),
-                            icon: Icon(
-                              Icons.arrow_drop_down,
-                              color: Color.fromARGB(255, 60, 145, 230),
+                          ],
+                        ),
+                        if (phoneNumber.length > 0 && phoneNumber.length < 10)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 8.0),
+                            child: Text(
+                              'Phone number must be 10 digits',
+                              style: GoogleFonts.poppins(
+                                color: Color.fromARGB(255, 60, 145, 230),
+                                fontSize: 12,
+                              ),
                             ),
                           ),
-                        ),
-                        SizedBox(width: 8),
-                        // Telefon Numarası Input
-                        Expanded(
-                          child: TextField(
-                            decoration: InputDecoration(
-                              labelText: 'Phone Number',
-                              labelStyle: GoogleFonts.poppins(
-                                color: Colors.black87,
-                              ),
-                              filled: true,
-                              fillColor: Color.fromARGB(255, 230, 243, 255),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                                borderSide: BorderSide.none,
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                                borderSide: BorderSide(
-                                  color: Color.fromARGB(255, 60, 145, 230),
-                                ),
-                              ),
-                              counterText: "",
-                              contentPadding: EdgeInsets.symmetric(
-                                  horizontal: 15, vertical: 15),
-                            ),
-                            keyboardType: TextInputType.number,
-                            maxLength: 10,
-                            onChanged: (value) {
-                              phoneNumber = value;
+                        SizedBox(height: 20),
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: () async {
+                              final DateTime? picked = await showDatePicker(
+                                context: context,
+                                initialDate: DateTime(2000),
+                                firstDate: DateTime(1900),
+                                lastDate: DateTime.now(),
+                                builder: (context, child) {
+                                  return Theme(
+                                    data: Theme.of(context).copyWith(
+                                      colorScheme: ColorScheme.light(
+                                        primary: Color.fromARGB(255, 60, 145, 230),
+                                        onPrimary: Colors.white,
+                                      ),
+                                      textButtonTheme: TextButtonThemeData(
+                                        style: TextButton.styleFrom(
+                                          foregroundColor: Color.fromARGB(255, 60, 145, 230),
+                                        ),
+                                      ),
+                                    ),
+                                    child: child!,
+                                  );
+                                },
+                              );
+                              if (picked != null) {
+                                birthDate = picked;
+                                birthDateText = "${picked.day}/${picked.month}/${picked.year}";
+                                (context as Element).markNeedsBuild();  // Force rebuild to update text
+                              }
                             },
-                            style: GoogleFonts.poppins(
-                              fontSize: 14,
-                              color: Colors.black87,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Color.fromARGB(255, 60, 145, 230),
+                              padding:
+                                  EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.calendar_today, color: Colors.white, size: 18),
+                                SizedBox(width: 8),
+                                Text(
+                                  birthDateText,  // This will update when date is picked
+                                  style: GoogleFonts.poppins(
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ),
                       ],
                     ),
-                    if (phoneNumber.length > 0 && phoneNumber.length < 10)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 8.0),
-                        child: Text(
-                          'Phone number must be 10 digits',
-                          style: GoogleFonts.poppins(
-                            color: Color.fromARGB(255, 60, 145, 230),
-                            fontSize: 12,
-                          ),
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      child: Text(
+                        'Cancel',
+                        style: GoogleFonts.poppins(
+                          color: Colors.grey[600],
                         ),
                       ),
-                    SizedBox(height: 20),
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: () async {
-                          final DateTime? picked = await showDatePicker(
-                            context: context,
-                            initialDate: DateTime(2000),
-                            firstDate: DateTime(1900),
-                            lastDate: DateTime.now(),
-                            builder: (context, child) {
-                              return Theme(
-                                data: Theme.of(context).copyWith(
-                                  colorScheme: ColorScheme.light(
-                                    primary: Color.fromARGB(255, 60, 145, 230),
-                                    onPrimary: Colors.white,
-                                  ),
-                                  textButtonTheme: TextButtonThemeData(
-                                    style: TextButton.styleFrom(
-                                      foregroundColor: Color.fromARGB(255, 60, 145, 230),
-                                    ),
-                                  ),
-                                ),
-                                child: child!,
-                              );
-                            },
-                          );
-                          if (picked != null) {
-                            birthDate = picked;
-                            birthDateText = "${picked.day}/${picked.month}/${picked.year}";
-                            (context as Element).markNeedsBuild();  // Force rebuild to update text
-                          }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Color.fromARGB(255, 60, 145, 230),
-                          padding:
-                              EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.calendar_today, color: Colors.white, size: 18),
-                            SizedBox(width: 8),
-                            Text(
-                              birthDateText,  // This will update when date is picked
-                              style: GoogleFonts.poppins(
-                                color: Colors.white,
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        if (phoneNumber.length == 10 && birthDate != null) {
+                          Navigator.of(context).pop({
+                            'phoneNumber': countryCode + phoneNumber,
+                            'birthDate':
+                                "${birthDate!.year}-${birthDate!.month.toString().padLeft(2, '0')}-${birthDate!.day.toString().padLeft(2, '0')}",
+                          });
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                phoneNumber.length != 10
+                                    ? 'Phone number must be 10 digits'
+                                    : 'Please fill all fields',
+                                style: GoogleFonts.poppins(),
                               ),
+                              backgroundColor: Colors.red,
                             ),
-                          ],
+                          );
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color.fromARGB(255, 60, 145, 230),
+                        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: Text(
+                        'Submit',
+                        style: GoogleFonts.poppins(
+                          color: Colors.white,
                         ),
                       ),
                     ),
                   ],
-                ),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: Text(
-                    'Cancel',
-                    style: GoogleFonts.poppins(
-                      color: Colors.grey[600],
-                    ),
-                  ),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    if (phoneNumber.length == 10 && birthDate != null) {
-                      Navigator.of(context).pop({
-                        'phoneNumber': countryCode + phoneNumber,
-                        'birthDate':
-                            "${birthDate!.year}-${birthDate!.month.toString().padLeft(2, '0')}-${birthDate!.day.toString().padLeft(2, '0')}",
-                      });
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            phoneNumber.length != 10
-                                ? 'Phone number must be 10 digits'
-                                : 'Please fill all fields',
-                            style: GoogleFonts.poppins(),
-                          ),
-                          backgroundColor: Colors.red,
-                        ),
-                      );
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Color.fromARGB(255, 60, 145, 230),
-                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  child: Text(
-                    'Submit',
-                    style: GoogleFonts.poppins(
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              ],
+                );
+              },
             );
           },
         );
