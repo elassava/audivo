@@ -288,14 +288,14 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
                   child: Align(
                     alignment: Alignment.topCenter,
                     child: Container(
-                      margin: EdgeInsets.only(top: 150),
+                      margin: EdgeInsets.only(top: 135),
                       padding: EdgeInsets.all(16.0),
                       decoration: BoxDecoration(
                         image: DecorationImage(
                           image: AssetImage('assets/images/background.png'),
                           fit: BoxFit.cover,
                         ),
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(35),
                       ),
                       child: GridView.count(
                         crossAxisCount: 2,

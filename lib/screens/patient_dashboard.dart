@@ -331,14 +331,14 @@ class _PatientDashboardState extends State<PatientDashboard> {
               alignment: Alignment.topCenter,
               child: Container(
                 margin: EdgeInsets.only(
-                    top: 150), // Adjust this margin for correct positioning
+                    top: 135), // Adjust this margin for correct positioning
                 padding: EdgeInsets.all(16.0),
                 decoration: BoxDecoration(
                   image: DecorationImage(
                     image: AssetImage('assets/images/background.png'),
                     fit: BoxFit.cover,
                   ),
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(35),
                 ),
                 child: GridView.count(
                   crossAxisCount: 2,
