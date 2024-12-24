@@ -271,8 +271,7 @@ class _DoctorLoginScreenState extends State<DoctorLoginScreen> {
                                   ),
                                   textButtonTheme: TextButtonThemeData(
                                     style: TextButton.styleFrom(
-                                      foregroundColor:
-                                          Color.fromARGB(255, 60, 145, 230),
+                                      foregroundColor: Color.fromARGB(255, 60, 145, 230),
                                     ),
                                   ),
                                 ),
@@ -282,6 +281,8 @@ class _DoctorLoginScreenState extends State<DoctorLoginScreen> {
                           );
                           if (picked != null) {
                             birthDate = picked;
+                            birthDateText = "${picked.day}/${picked.month}/${picked.year}";
+                            (context as Element).markNeedsBuild();  // Force rebuild to update text
                           }
                         },
                         style: ElevatedButton.styleFrom(
@@ -295,11 +296,10 @@ class _DoctorLoginScreenState extends State<DoctorLoginScreen> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.calendar_today,
-                                color: Colors.white, size: 18),
+                            Icon(Icons.calendar_today, color: Colors.white, size: 18),
                             SizedBox(width: 8),
                             Text(
-                              birthDateText,
+                              birthDateText,  // This will update when date is picked
                               style: GoogleFonts.poppins(
                                 color: Colors.white,
                               ),

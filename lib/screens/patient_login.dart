@@ -116,26 +116,27 @@ class _PatientLoginScreenState extends State<PatientLoginScreen> {
     } else {
       // Google ile giriş yapan yeni kullanıcı için ek bilgi al
       if (googleUser != null) {
-        // Telefon ve doğum tarihi için dialog göster
+        String phoneNumber = '';
+        String countryCode = '+90';
+        DateTime? birthDate;
+        String birthDateText = 'Select Birth Date';  // Add this for dynamic button text
+
         final additionalInfo = await showDialog<Map<String, dynamic>>(
           context: context,
           barrierDismissible: false,
           builder: (BuildContext context) {
-            String phoneNumber = '';
-            String countryCode = '+90'; // Default Türkiye
-            DateTime? birthDate;
-            String birthDateText = '';
-
             return AlertDialog(
               backgroundColor: Colors.white,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(15),
               ),
-              title: Text(
-                'Additional Information',
-                style: GoogleFonts.poppins(
-                  fontWeight: FontWeight.bold,
-                  color: Color.fromARGB(255, 60, 145, 230),
+              title: Center(
+                child: Text(
+                  'Additional Information',
+                  style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.bold,
+                    color: Color.fromARGB(255, 60, 145, 230),
+                  ),
                 ),
               ),
               content: SingleChildScrollView(
@@ -146,10 +147,6 @@ class _PatientLoginScreenState extends State<PatientLoginScreen> {
                       children: [
                         // Ülke Kodu Dropdown
                         Container(
-                          decoration: BoxDecoration(
-                            color: Color.fromARGB(255, 230, 243, 255),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
                           width: 100,
                           child: DropdownButtonFormField<String>(
                             decoration: InputDecoration(
