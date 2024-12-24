@@ -19,132 +19,331 @@ class _PatientLoginScreenState extends State<PatientLoginScreen> {
   final GoogleSignIn _googleSignIn = GoogleSignIn();
 
   Future<void> _login() async {
-  try {
-    UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
-      email: _emailController.text.trim(),
-      password: _passwordController.text.trim(),
-    );
+    try {
+      UserCredential userCredential =
+          await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+      );
 
-    User? user = FirebaseAuth.instance.currentUser;
-    if (user != null && !user.emailVerified) {
-      setState(() {
-        _errorMessage = "Email not verified! Please check your inbox.";
-      });
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user != null && !user.emailVerified) {
+        setState(() {
+          _errorMessage = "Email not verified! Please check your inbox.";
+        });
 
-      // Doğrulama e-postası gönder
-      await user.sendEmailVerification();
-      return;
-    }
+        // Doğrulama e-postası gönder
+        await user.sendEmailVerification();
+        return;
+      }
 
-    await _checkUserRole(userCredential.user!.uid);
-  } on FirebaseAuthException catch (e) {
-    if (e.code == 'user-not-found') {
-      setState(() {
-        _errorMessage = 'No user found for this email.';
-      });
+      await _checkUserRole(userCredential.user!.uid);
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found') {
+        setState(() {
+          _errorMessage = 'No user found for this email.';
+        });
       } else if (e.code == 'invalid-credential') {
+        setState(() {
+          _errorMessage = 'Incorrect password. Please try again.';
+        });
+      } else if (e.code == 'wrong-password') {
+        setState(() {
+          _errorMessage = 'Incorrect password. Please try again.';
+        });
+      } else if (e.code == 'invalid-email') {
+        setState(() {
+          _errorMessage = 'Invalid email address format.';
+        });
+      }
+    } catch (e) {
       setState(() {
-        _errorMessage = 'Incorrect password. Please try again.';
+        _errorMessage = 'Login failed: $e';
       });
-    } else if (e.code == 'wrong-password') {
-      setState(() {
-        _errorMessage = 'Incorrect password. Please try again.';
-      });
-    } else if (e.code == 'invalid-email') {
-      setState(() {
-        _errorMessage = 'Invalid email address format.';
-      });
-    } 
-  } catch (e) {
-    setState(() {
-      _errorMessage = 'Login failed: $e';
-    });
+    }
   }
-}
+
   // Function for Google sign-in
 // Function for Google sign-in with account selection each time
-Future<void> _googleLogin() async {
-  try {
-    // Google'dan çıkış yaparak hesap seçici ekranını göster
-    await _googleSignIn.signOut();
+  Future<void> _googleLogin() async {
+    try {
+      // Google'dan çıkış yaparak hesap seçici ekranını göster
+      await _googleSignIn.signOut();
 
-    // Google ile giriş yapmayı dene
-    final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
-    if (googleUser == null) return; // Kullanıcı girişini iptal etti
+      // Google ile giriş yapmayı dene
+      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+      if (googleUser == null) return; // Kullanıcı girişini iptal etti
 
-    // Google'dan kimlik bilgilerini al
-    final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      // Google'dan kimlik bilgilerini al
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
 
-    // Kimlik bilgilerini kullanarak yeni bir OAuthCredential oluştur
-    final OAuthCredential credential = GoogleAuthProvider.credential(
-      accessToken: googleAuth.accessToken,
-      idToken: googleAuth.idToken,
-    );
+      // Kimlik bilgilerini kullanarak yeni bir OAuthCredential oluştur
+      final OAuthCredential credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
 
-    // Firebase ile giriş yap
-    UserCredential userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
+      // Firebase ile giriş yap
+      UserCredential userCredential =
+          await FirebaseAuth.instance.signInWithCredential(credential);
 
-    // Kullanıcı rolünü kontrol et
-    await _checkUserRole(userCredential.user!.uid, googleUser: googleUser);
-
-  } catch (e) {
-    setState(() {
-      _errorMessage = 'Google Authentication failed: $e';
-    });
+      // Kullanıcı rolünü kontrol et
+      await _checkUserRole(userCredential.user!.uid, googleUser: googleUser);
+    } catch (e) {
+      setState(() {
+        _errorMessage = 'Google Authentication failed: $e';
+      });
+    }
   }
-}
 
 // Kullanıcı rolünü kontrol et, eğer yoksa yeni kullanıcı oluştur
-Future<void> _checkUserRole(String uid, {GoogleSignInAccount? googleUser}) async {
-  DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
+  Future<void> _checkUserRole(String uid,
+      {GoogleSignInAccount? googleUser}) async {
+    DocumentSnapshot userDoc =
+        await FirebaseFirestore.instance.collection('users').doc(uid).get();
 
-  if (userDoc.exists) {
-    String role = userDoc['role'] ?? '';
-    if (role == 'patient') {
-      Navigator.pushReplacementNamed(context, '/patientDashboard');
+    if (userDoc.exists) {
+      String role = userDoc['role'] ?? '';
+      if (role == 'patient') {
+        Navigator.pushReplacementNamed(context, '/patientDashboard');
+      } else {
+        setState(() {
+          _errorMessage = 'Login failed: Only patients can log in.';
+        });
+        await FirebaseAuth.instance.signOut();
+      }
     } else {
-      setState(() {
-        _errorMessage = 'Login failed: Only patients can log in.';
-      });
-      await FirebaseAuth.instance.signOut();
-    }
-  } else {
-    // Eğer kullanıcı mevcut değilse, yeni kullanıcıyı oluştur
-    if (googleUser != null) {
-      String fullName = googleUser.displayName ?? '';
-      List<String> nameParts = fullName.split(' '); // Ad ve soyadı ayırmak için boşlukla bölelim
-      String firstName = nameParts.isNotEmpty ? nameParts[0] : '';
-      String lastName = nameParts.length > 1 ? nameParts.sublist(1).join(' ') : ''; // Soyadını al
+      // Google ile giriş yapan yeni kullanıcı için ek bilgi al
+      if (googleUser != null) {
+        // Telefon ve doğum tarihi için dialog göster
+        final additionalInfo = await showDialog<Map<String, dynamic>>(
+          context: context,
+          barrierDismissible: false,
+          builder: (BuildContext context) {
+            String phoneNumber = '';
+            String countryCode = '+90'; // Default Türkiye
+            DateTime? birthDate;
+            
+            return AlertDialog(
+              backgroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15),
+              ),
+              title: Text(
+                'Additional Information',
+                style: GoogleFonts.poppins(
+                  fontWeight: FontWeight.bold,
+                  color: Color.fromARGB(255, 60, 145, 230),
+                ),
+              ),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      children: [
+                        // Ülke Kodu Dropdown
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Color.fromARGB(255, 230, 243, 255),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          width: 100,
+                          child: DropdownButtonFormField<String>(
+                            decoration: InputDecoration(
+                              contentPadding: EdgeInsets.symmetric(horizontal: 10),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: BorderSide.none,
+                              ),
+                            ),
+                            value: countryCode,
+                            items: [
+                              DropdownMenuItem(value: '+90', child: Text('🇹🇷 +90')),
+                              DropdownMenuItem(value: '+1', child: Text('🇺🇸 +1')),
+                              DropdownMenuItem(value: '+44', child: Text('🇬🇧 +44')),
+                              DropdownMenuItem(value: '+49', child: Text('🇩🇪 +49')),
+                              // Daha fazla ülke kodu eklenebilir
+                            ],
+                            onChanged: (value) {
+                              countryCode = value!;
+                            },
+                            style: GoogleFonts.poppins(),
+                          ),
+                        ),
+                        SizedBox(width: 8),
+                        // Telefon Numarası Input
+                        Expanded(
+                          child: TextField(
+                            decoration: InputDecoration(
+                              labelText: 'Phone Number',
+                              labelStyle: GoogleFonts.poppins(
+                                color: Colors.black87,
+                              ),
+                              filled: true,
+                              fillColor: Color.fromARGB(255, 230, 243, 255),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: BorderSide.none,
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: BorderSide(
+                                  color: Color.fromARGB(255, 60, 145, 230),
+                                ),
+                              ),
+                              errorStyle: GoogleFonts.poppins(
+                                color: Colors.red,
+                              ),
+                            ),
+                            keyboardType: TextInputType.number,
+                            maxLength: 10,
+                            onChanged: (value) {
+                              phoneNumber = value;
+                            },
+                            style: GoogleFonts.poppins(),
+                          ),
+                        ),
+                      ],
+                    ),
+                    if (phoneNumber.length > 0 && phoneNumber.length < 10)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8.0),
+                        child: Text(
+                          'Phone number must be 10 digits',
+                          style: GoogleFonts.poppins(
+                            color: Colors.red,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ),
+                    SizedBox(height: 20),
+                    // Doğum tarihi seçici butonu...
+                    ElevatedButton(
+                      onPressed: () async {
+                        final DateTime? picked = await showDatePicker(
+                          context: context,
+                          initialDate: DateTime(2000),
+                          firstDate: DateTime(1900),
+                          lastDate: DateTime.now(),
+                        );
+                        if (picked != null) {
+                          birthDate = picked;
+                        }
+                      },
+                      // ... mevcut buton stili ...
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.calendar_today, color: Colors.white, size: 18),
+                          SizedBox(width: 8),
+                          Text(
+                            'Select Birth Date',
+                            style: GoogleFonts.poppins(
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: Text(
+                    'Cancel',
+                    style: GoogleFonts.poppins(
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    if (phoneNumber.length == 10 && birthDate != null) {
+                      Navigator.of(context).pop({
+                        'phoneNumber': countryCode + phoneNumber,
+                        'birthDate': birthDate,
+                      });
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            phoneNumber.length != 10 
+                              ? 'Phone number must be 10 digits'
+                              : 'Please fill all fields',
+                            style: GoogleFonts.poppins(),
+                          ),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Color.fromARGB(255, 60, 145, 230),
+                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: Text(
+                    'Submit',
+                    style: GoogleFonts.poppins(
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
 
-      await FirebaseFirestore.instance.collection('users').doc(uid).set({
-        'name': firstName,  // Ad
-        'surname': lastName,    // Soyad
-        'email': googleUser.email,
-        'role': 'patient',       // Varsayılan olarak 'patient' rolü atanıyor
-        'createdAt': FieldValue.serverTimestamp(),
-      });
+        if (additionalInfo != null) {
+          String fullName = googleUser.displayName ?? '';
+          List<String> nameParts = fullName.split(' ');
+          String firstName = nameParts.isNotEmpty ? nameParts[0] : '';
+          String lastName =
+              nameParts.length > 1 ? nameParts.sublist(1).join(' ') : '';
 
-      // Aynı veriyi 'patients' koleksiyonuna da kaydedelim
-      await FirebaseFirestore.instance.collection('patients').doc(uid).set({
-        'name': firstName,
-        'surname': lastName,
-        'email': googleUser.email,
-        'role': 'patient', // Varsayılan hasta rolü
-        'createdAt': FieldValue.serverTimestamp(),
-      });
+          // DateTime'ı String'e çevir (yyyy-MM-dd formatında)
+          String formattedDate = "${additionalInfo['birthDate'].year}-${additionalInfo['birthDate'].month.toString().padLeft(2, '0')}-${additionalInfo['birthDate'].day.toString().padLeft(2, '0')}";
 
-      // Yeni kullanıcı kaydedildikten sonra, hastanın dashboard'una yönlendir
-      Navigator.pushReplacementNamed(context, '/patientDashboard');
-    } else {
-      await FirebaseFirestore.instance.collection('patients').doc(uid).set({
-        'email': _emailController.text.trim(),
-        'role': 'patient',
-      });
-      Navigator.pushReplacementNamed(context, '/patientDashboard');
+          // Kullanıcı bilgilerini kaydet
+          await FirebaseFirestore.instance.collection('users').doc(uid).set({
+            'name': firstName,
+            'surname': lastName,
+            'email': googleUser.email,
+            'role': 'patient',
+            'phoneNumber': additionalInfo['phoneNumber'],
+            'birthDate': additionalInfo['birthDate'],
+            'createdAt': FieldValue.serverTimestamp(),
+          });
+
+          // Patients koleksiyonuna da aynı bilgileri kaydet
+          await FirebaseFirestore.instance.collection('patients').doc(uid).set({
+            'name': firstName,
+            'surname': lastName,
+            'email': googleUser.email,
+            'role': 'patient',
+            'phoneNumber': additionalInfo['phoneNumber'],
+            'birthDate': additionalInfo['birthDate'],
+            'createdAt': FieldValue.serverTimestamp(),
+          });
+
+          Navigator.pushReplacementNamed(context, '/patientDashboard');
+        }
+      } else {
+        // Normal email/password girişi için mevcut kod
+        await FirebaseFirestore.instance.collection('patients').doc(uid).set({
+          'email': _emailController.text.trim(),
+          'role': 'patient',
+        });
+        Navigator.pushReplacementNamed(context, '/patientDashboard');
+      }
     }
   }
-}
-
 
   @override
   Widget build(BuildContext context) {
@@ -153,7 +352,9 @@ Future<void> _checkUserRole(String uid, {GoogleSignInAccount? googleUser}) async
         iconTheme: IconThemeData(
           color: Colors.white,
         ),
-        title: Text("Patient Login", style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.bold)),
+        title: Text("Patient Login",
+            style: GoogleFonts.poppins(
+                color: Colors.white, fontWeight: FontWeight.bold)),
         backgroundColor: Color.fromARGB(255, 60, 145, 230),
         centerTitle: true,
       ),
@@ -207,35 +408,48 @@ Future<void> _checkUserRole(String uid, {GoogleSignInAccount? googleUser}) async
                     if (_errorMessage != null)
                       Text(
                         _errorMessage!,
-                        style: TextStyle(color: Colors.red, fontSize: 14, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                            color: Colors.red,
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold),
                       ),
                     SizedBox(height: 20),
                     // Login Button
                     ElevatedButton(
                       onPressed: _login,
-                      child: Text('Login', style: GoogleFonts.poppins(color: Colors.white)),
+                      child: Text('Login',
+                          style: GoogleFonts.poppins(color: Colors.white)),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Color.fromARGB(255, 60, 145, 230),
-                        padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 50, vertical: 15),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
-           
                       ),
                     ),
                     SizedBox(height: 20),
                     // Google Sign-In Button
                     ElevatedButton.icon(
                       icon: Padding(
-                      padding: const EdgeInsets.only(right: 0.0), // Reduces space between icon and text
-                      child: Image.asset('assets/images/google_icon.png', height: 24, width: 25),
-                     ),
-                    label: Text('Login with Google',style: GoogleFonts.poppins(color: const Color.fromARGB(255, 8, 8, 8), fontSize: 12),
-                    ),
-                    onPressed: _googleLogin,
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color.fromARGB(255, 255, 255, 255),  // White background
-                        padding: EdgeInsets.symmetric(horizontal: 6, vertical: 14),  // Adjust padding for button
+                        padding: const EdgeInsets.only(
+                            right: 0.0), // Reduces space between icon and text
+                        child: Image.asset('assets/images/google_icon.png',
+                            height: 24, width: 25),
+                      ),
+                      label: Text(
+                        'Login with Google',
+                        style: GoogleFonts.poppins(
+                            color: const Color.fromARGB(255, 8, 8, 8),
+                            fontSize: 12),
+                      ),
+                      onPressed: _googleLogin,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color.fromARGB(
+                            255, 255, 255, 255), // White background
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 14), // Adjust padding for button
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
@@ -243,17 +457,19 @@ Future<void> _checkUserRole(String uid, {GoogleSignInAccount? googleUser}) async
                     ),
                     SizedBox(height: 10),
                     TextButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => ForgotPasswordScreen()),
-                      );
-                    },
-                    child: Text(
-                      "Forgot my Password",
-                      style: GoogleFonts.poppins(color: Color.fromARGB(255, 60, 145, 230)),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => ForgotPasswordScreen()),
+                        );
+                      },
+                      child: Text(
+                        "Forgot my Password",
+                        style: GoogleFonts.poppins(
+                            color: Color.fromARGB(255, 60, 145, 230)),
+                      ),
                     ),
-                  ),
                     // Register Button
                     TextButton(
                       onPressed: () {
@@ -261,7 +477,8 @@ Future<void> _checkUserRole(String uid, {GoogleSignInAccount? googleUser}) async
                       },
                       child: Text(
                         "Register",
-                        style: GoogleFonts.poppins(color: Color.fromARGB(255, 60, 145, 230)),
+                        style: GoogleFonts.poppins(
+                            color: Color.fromARGB(255, 60, 145, 230)),
                       ),
                     ),
                   ],

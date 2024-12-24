@@ -147,8 +147,253 @@ Future<void> _googleLogin(BuildContext context) async {
     String role = userDoc['role'] ?? '';
 
     if (role == 'doctor') {
-      // Rol 'doctor' ise doktor dashboard'una yönlendir
-      Navigator.pushReplacementNamed(context, '/doctorDashboard');
+      // Telefon ve doğum tarihi için dialog göster
+      final additionalInfo = await showDialog<Map<String, dynamic>>(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          String phoneNumber = '';
+          String countryCode = '+90';
+          DateTime? birthDate;
+          
+          return AlertDialog(
+            backgroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15),
+            ),
+            title: Text(
+              'Additional Information',
+              style: GoogleFonts.poppins(
+                fontWeight: FontWeight.bold,
+                color: Color.fromARGB(255, 60, 145, 230),
+              ),
+            ),
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    children: [
+                      // Ülke Kodu Dropdown
+                      Container(
+                        width: 100,
+                        child: DropdownButtonFormField<String>(
+                          decoration: InputDecoration(
+                            contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 15),
+                            filled: true,
+                            fillColor: Color.fromARGB(255, 230, 243, 255),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                              borderSide: BorderSide.none,
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                              borderSide: BorderSide(
+                                color: Color.fromARGB(255, 60, 145, 230),
+                              ),
+                            ),
+                          ),
+                          value: countryCode,
+                          items: [
+                            DropdownMenuItem(value: '+90', child: Text('🇹🇷 +90')),
+                            DropdownMenuItem(value: '+1', child: Text('🇺🇸 +1')),
+                            DropdownMenuItem(value: '+44', child: Text('🇬🇧 +44')),
+                            DropdownMenuItem(value: '+49', child: Text('🇩🇪 +49')),
+                          ],
+                          onChanged: (value) {
+                            countryCode = value!;
+                          },
+                          style: GoogleFonts.poppins(
+                            color: Colors.black87,
+                            fontSize: 14,
+                          ),
+                          icon: Icon(
+                            Icons.arrow_drop_down,
+                            color: Color.fromARGB(255, 60, 145, 230),
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: 8),
+                      // Telefon Numarası Input
+                      Expanded(
+                        child: TextField(
+                          decoration: InputDecoration(
+                            labelText: 'Phone Number',
+                            labelStyle: GoogleFonts.poppins(
+                              color: Colors.black87,
+                            ),
+                            filled: true,
+                            fillColor: Color.fromARGB(255, 230, 243, 255),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                              borderSide: BorderSide.none,
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                              borderSide: BorderSide(
+                                color: Color.fromARGB(255, 60, 145, 230),
+                              ),
+                            ),
+                            counterText: "",
+                            contentPadding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+                          ),
+                          keyboardType: TextInputType.number,
+                          maxLength: 10,
+                          onChanged: (value) {
+                            phoneNumber = value;
+                          },
+                          style: GoogleFonts.poppins(
+                            fontSize: 14,
+                            color: Colors.black87,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  if (phoneNumber.length > 0 && phoneNumber.length < 10)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: Text(
+                        'Phone number must be 10 digits',
+                        style: GoogleFonts.poppins(
+                          color: Color.fromARGB(255, 60, 145, 230),
+                          fontSize: 12,
+                        ),
+                      ),
+                    ),
+                  SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: () async {
+                      final DateTime? picked = await showDatePicker(
+                        context: context,
+                        initialDate: DateTime(2000),
+                        firstDate: DateTime(1900),
+                        lastDate: DateTime.now(),
+                        builder: (context, child) {
+                          return Theme(
+                            data: Theme.of(context).copyWith(
+                              colorScheme: ColorScheme.light(
+                                primary: Color.fromARGB(255, 60, 145, 230),
+                                onPrimary: Colors.white,
+                              ),
+                              textButtonTheme: TextButtonThemeData(
+                                style: TextButton.styleFrom(
+                                  foregroundColor: Color.fromARGB(255, 60, 145, 230),
+                                ),
+                              ),
+                            ),
+                            child: child!,
+                          );
+                        },
+                      );
+                      if (picked != null) {
+                        birthDate = picked;
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color.fromARGB(255, 60, 145, 230),
+                      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.calendar_today, color: Colors.white, size: 18),
+                        SizedBox(width: 8),
+                        Text(
+                          'Select Birth Date',
+                          style: GoogleFonts.poppins(
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: Text(
+                  'Cancel',
+                  style: GoogleFonts.poppins(
+                    color: Colors.grey[600],
+                  ),
+                ),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  if (phoneNumber.length == 10 && birthDate != null) {
+                    Navigator.of(context).pop({
+                      'phoneNumber': countryCode + phoneNumber,
+                      'birthDate': "${birthDate!.year}-${birthDate!.month.toString().padLeft(2, '0')}-${birthDate!.day.toString().padLeft(2, '0')}",
+                    });
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          phoneNumber.length != 10 
+                            ? 'Phone number must be 10 digits'
+                            : 'Please fill all fields',
+                          style: GoogleFonts.poppins(),
+                        ),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Color.fromARGB(255, 60, 145, 230),
+                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: Text(
+                  'Submit',
+                  style: GoogleFonts.poppins(
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
+      );
+
+      if (additionalInfo != null) {
+        String fullName = googleUser.displayName ?? '';
+        List<String> nameParts = fullName.split(' ');
+        String firstName = nameParts.isNotEmpty ? nameParts[0] : '';
+        String lastName = nameParts.length > 1 ? nameParts.sublist(1).join(' ') : '';
+
+        // Kullanıcı bilgilerini kaydet
+        await FirebaseFirestore.instance.collection('users').doc(uid).set({
+          'name': firstName,
+          'surname': lastName,
+          'email': googleUser.email,
+          'role': 'doctor',
+          'phoneNumber': additionalInfo['phoneNumber'],
+          'birthDate': additionalInfo['birthDate'],
+          'createdAt': FieldValue.serverTimestamp(),
+        });
+
+        // Doctors koleksiyonuna da aynı bilgileri kaydet
+        await FirebaseFirestore.instance.collection('doctors').doc(uid).set({
+          'name': firstName,
+          'surname': lastName,
+          'email': googleUser.email,
+          'role': 'doctor',
+          'phoneNumber': additionalInfo['phoneNumber'],
+          'birthDate': additionalInfo['birthDate'],
+          'createdAt': FieldValue.serverTimestamp(),
+        });
+
+        Navigator.pushReplacementNamed(context, '/doctorDashboard');
+      }
     } else {
       // Eğer rol uyumsuzsa, kullanıcıyı çıkış yapıp hata mesajı göster
       await FirebaseAuth.instance.signOut();

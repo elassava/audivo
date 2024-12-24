@@ -271,24 +271,22 @@ class SettingsScreen extends StatelessWidget {
                     ),
                   ),
                   SizedBox(height: 10),
-                  // Only show reset password button for non-Google users
-                  if (!_isGoogleUser())
-                    ElevatedButton(
-                      onPressed: () => _resetPassword(context),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue,
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-                      ),
-                      child: Text(
-                        'Reset Password',
-                        style: GoogleFonts.poppins(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
+                  ElevatedButton(
+                    onPressed: () => _resetPassword(context),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                    ),
+                    child: Text(
+                      'Reset Password',
+                      style: GoogleFonts.poppins(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
                       ),
                     ),
+                  ),
                 ],
               ),
             );
