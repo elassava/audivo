@@ -9,7 +9,10 @@ class SettingsScreen extends StatelessWidget {
   // Function to fetch doctor's info from Firebase
   Future<DocumentSnapshot> _getDoctorInfo() async {
     final userId = _auth.currentUser!.uid;
-    return await FirebaseFirestore.instance.collection('users').doc(userId).get();
+    return await FirebaseFirestore.instance
+        .collection('users')
+        .doc(userId)
+        .get();
   }
 
   // Function to sign out
@@ -30,17 +33,46 @@ class SettingsScreen extends StatelessWidget {
       try {
         final userId = user.uid;
 
-        // Delete user from Firestore collections
-        await FirebaseFirestore.instance.collection('doctors').doc(userId).delete();
-        await FirebaseFirestore.instance.collection('users').doc(userId).delete();
-        
+        // Show confirmation dialog
+        bool? isConfirmed = await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text('Delete Account'),
+            content: Text(
+                'Are you sure you want to delete your account? This action cannot be undone.'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                child: Text('Delete'),
+              ),
+            ],
+          ),
+        );
 
-        // Delete user from Firebase Authentication
-        await user.delete();
-
-        // Navigate to login screen
-        Navigator.popUntil(context, (route) => false);
-        Navigator.pushNamed(context, '/');
+        if (isConfirmed == true) {
+          try {
+            await FirebaseFirestore.instance
+                .collection('doctors')
+                .doc(userId)
+                .delete();
+            await FirebaseFirestore.instance
+                .collection('users')
+                .doc(userId)
+                .delete();
+            await user.delete();
+            Navigator.popUntil(context, (route) => false);
+            Navigator.pushNamed(context, '/');
+          } catch (error) {
+            print("Account deletion failed: $error");
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Failed to delete account')),
+            );
+          }
+        }
       } catch (e) {
         print('Error deleting account: $e');
         ScaffoldMessenger.of(context).showSnackBar(
@@ -120,6 +152,17 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
+  // Helper function to check if user signed in with Google
+  bool _isGoogleUser() {
+    final user = _auth.currentUser;
+    if (user != null) {
+      // Check if the user's providers list contains Google
+      return user.providerData
+          .any((userInfo) => userInfo.providerId == 'google.com');
+    }
+    return false;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -131,7 +174,8 @@ class SettingsScreen extends StatelessWidget {
           ),
           title: Text(
             'Settings',
-            style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.bold),
+            style: GoogleFonts.poppins(
+                color: Colors.white, fontWeight: FontWeight.bold),
           ),
           backgroundColor: Color.fromARGB(255, 60, 145, 230), // Blue color
         ),
@@ -141,7 +185,8 @@ class SettingsScreen extends StatelessWidget {
         width: MediaQuery.of(context).size.width,
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage('assets/images/background.png'), // Background image
+            image:
+                AssetImage('assets/images/background.png'), // Background image
             fit: BoxFit.cover,
           ),
         ),
@@ -213,7 +258,8 @@ class SettingsScreen extends StatelessWidget {
                     onPressed: () => _deleteAccount(context),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.red,
-                      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 20, vertical: 15),
                     ),
                     child: Text(
                       'Delete Account',
@@ -225,21 +271,24 @@ class SettingsScreen extends StatelessWidget {
                     ),
                   ),
                   SizedBox(height: 10),
-                  ElevatedButton(
-                    onPressed: () => _resetPassword(context),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
-                      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-                    ),
-                    child: Text(
-                      'Reset Password',
-                      style: GoogleFonts.poppins(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                  // Only show reset password button for non-Google users
+                  if (!_isGoogleUser())
+                    ElevatedButton(
+                      onPressed: () => _resetPassword(context),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue,
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                      ),
+                      child: Text(
+                        'Reset Password',
+                        style: GoogleFonts.poppins(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
-                  ),
                 ],
               ),
             );
@@ -260,7 +309,8 @@ class SettingsScreen extends StatelessWidget {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: BottomAppBar(
-        color: Color.fromARGB(255, 60, 145, 230), // Blue color for the bottom bar
+        color:
+            Color.fromARGB(255, 60, 145, 230), // Blue color for the bottom bar
         shape: CircularNotchedRectangle(),
         notchMargin: 8.0, // Notch margin for better visibility
         child: SizedBox(height: 10), // Adjust height to match button spacing
@@ -281,7 +331,8 @@ class SettingsScreen extends StatelessWidget {
         Expanded(
           child: Text(
             value,
-            style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w400),
+            style:
+                GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w400),
           ),
         ),
       ],

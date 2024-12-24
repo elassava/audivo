@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class PSettingsScreen extends StatelessWidget {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  // Function to fetch patient info from Firebase
+  // Function to fetch patient's info from Firebase
   Future<DocumentSnapshot> _getPatientInfo() async {
     final userId = _auth.currentUser!.uid;
     return await FirebaseFirestore.instance.collection('patients').doc(userId).get();
@@ -20,6 +20,80 @@ class PSettingsScreen extends StatelessWidget {
       Navigator.pushNamed(context, '/'); // Navigate to the login screen
     } catch (e) {
       print('Error signing out: $e');
+    }
+  }
+
+  // Function to delete account
+  Future<void> _deleteAccount(BuildContext context) async {
+    final user = _auth.currentUser;
+    if (user != null) {
+      try {
+        final userId = user.uid;
+
+        // Show confirmation dialog
+        bool? isConfirmed = await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text('Delete Account'),
+            content: Text(
+                'Are you sure you want to delete your account? This action cannot be undone.'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                child: Text('Delete'),
+              ),
+            ],
+          ),
+        );
+
+        if (isConfirmed == true) {
+          try {
+            await FirebaseFirestore.instance
+                .collection('patients')
+                .doc(userId)
+                .delete();
+            await FirebaseFirestore.instance
+                .collection('users')
+                .doc(userId)
+                .delete();
+            await user.delete();
+            Navigator.popUntil(context, (route) => false);
+            Navigator.pushNamed(context, '/');
+          } catch (error) {
+            print("Account deletion failed: $error");
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Failed to delete account')),
+            );
+          }
+        }
+      } catch (e) {
+        print('Error deleting account: $e');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to delete account: $e')),
+        );
+      }
+    }
+  }
+
+  // Function to reset password
+  Future<void> _resetPassword(BuildContext context) async {
+    final user = _auth.currentUser;
+    if (user != null) {
+      try {
+        await _auth.sendPasswordResetEmail(email: user.email!);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Password reset email sent to ${user.email}')),
+        );
+      } catch (e) {
+        print('Error sending password reset email: $e');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to send password reset email: $e')),
+        );
+      }
     }
   }
 
@@ -75,6 +149,17 @@ class PSettingsScreen extends StatelessWidget {
     );
   }
 
+  // Helper function to check if user signed in with Google
+  bool _isGoogleUser() {
+    final user = _auth.currentUser;
+    if (user != null) {
+      // Check if the user's providers list contains Google
+      return user.providerData
+          .any((userInfo) => userInfo.providerId == 'google.com');
+    }
+    return false;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -86,7 +171,8 @@ class PSettingsScreen extends StatelessWidget {
           ),
           title: Text(
             'Settings',
-            style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.bold),
+            style: GoogleFonts.poppins(
+                color: Colors.white, fontWeight: FontWeight.bold),
           ),
           backgroundColor: Color.fromARGB(255, 60, 145, 230), // Blue color
         ),
@@ -96,7 +182,8 @@ class PSettingsScreen extends StatelessWidget {
         width: MediaQuery.of(context).size.width,
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage('assets/images/background.png'), // Background image
+            image:
+                AssetImage('assets/images/background.png'), // Background image
             fit: BoxFit.cover,
           ),
         ),
@@ -124,40 +211,82 @@ class PSettingsScreen extends StatelessWidget {
             String patientBirthDate = patientData['birthDate'] ?? 'N/A';
 
             return SingleChildScrollView(
-              child: Card(
-                color: Colors.white.withOpacity(0.8),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12.0),
-                ),
-                elevation: 5,
-                child: Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Patient Information',
+              child: Column(
+                children: [
+                  Card(
+                    color: Colors.white.withOpacity(0.8),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12.0),
+                    ),
+                    elevation: 5,
+                    child: Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Your Information',
+                            style: GoogleFonts.poppins(
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                              color: Color.fromARGB(255, 60, 145, 230),
+                            ),
+                          ),
+                          Divider(
+                            color: Colors.grey[400],
+                            thickness: 1.0,
+                            height: 20,
+                          ),
+                          SizedBox(height: 10),
+                          _buildInfoRow('Name:', patientName),
+                          SizedBox(height: 10),
+                          _buildInfoRow('Surname:', patientSurname),
+                          SizedBox(height: 10),
+                          _buildInfoRow('Email:', patientEmail),
+                          SizedBox(height: 10),
+                          _buildInfoRow('Birth Date:', patientBirthDate),
+                          SizedBox(height: 20),
+                        ],
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: () => _deleteAccount(context),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                    ),
+                    child: Text(
+                      'Delete Account',
+                      style: GoogleFonts.poppins(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  // Only show reset password button for non-Google users
+                  if (!_isGoogleUser())
+                    ElevatedButton(
+                      onPressed: () => _resetPassword(context),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue,
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                      ),
+                      child: Text(
+                        'Reset Password',
                         style: GoogleFonts.poppins(
-                          fontSize: 22,
+                          fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: Color.fromARGB(255, 60, 145, 230),
+                          color: Colors.white,
                         ),
                       ),
-                      Divider(
-                        color: Colors.grey[400],
-                        thickness: 1.0,
-                        height: 20,
-                      ),
-                      SizedBox(height: 10),
-                      _buildInfoRow('Name:', '$patientName $patientSurname'),
-                      SizedBox(height: 10),
-                      _buildInfoRow('Email:', patientEmail),
-                      SizedBox(height: 10),
-                      _buildInfoRow('Birth Date:', patientBirthDate),
-                      SizedBox(height: 20),
-                    ],
-                  ),
-                ),
+                    ),
+                ],
               ),
             );
           },
@@ -177,10 +306,11 @@ class PSettingsScreen extends StatelessWidget {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: BottomAppBar(
-        color: Color.fromARGB(255, 60, 145, 230), // Blue color for the bottom bar
+        color:
+            Color.fromARGB(255, 60, 145, 230), // Blue color for the bottom bar
         shape: CircularNotchedRectangle(),
         notchMargin: 8.0, // Notch margin for better visibility
-        child: SizedBox(height:10), // Adjust height to match button spacing
+        child: SizedBox(height: 10), // Adjust height to match button spacing
       ),
     );
   }
@@ -198,7 +328,8 @@ class PSettingsScreen extends StatelessWidget {
         Expanded(
           child: Text(
             value,
-            style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w400),
+            style:
+                GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w400),
           ),
         ),
       ],

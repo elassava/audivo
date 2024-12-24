@@ -12,7 +12,10 @@ class PatientDashboard extends StatelessWidget {
 
   Future<DocumentSnapshot> _getPatientInfo() async {
     final userId = _auth.currentUser!.uid;
-    return await FirebaseFirestore.instance.collection('patients').doc(userId).get();
+    return await FirebaseFirestore.instance
+        .collection('patients')
+        .doc(userId)
+        .get();
   }
 
   Future<void> _signOut(BuildContext context) async {
@@ -112,10 +115,11 @@ class PatientDashboard extends StatelessWidget {
                               ),
                             ),
                             SizedBox(height: 10),
-                            FutureBuilder<DocumentSnapshot>( 
+                            FutureBuilder<DocumentSnapshot>(
                               future: _getPatientInfo(),
                               builder: (context, snapshot) {
-                                if (snapshot.connectionState == ConnectionState.waiting) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
                                   return Text(
                                     'Welcome, ...',
                                     style: GoogleFonts.poppins(
@@ -124,7 +128,9 @@ class PatientDashboard extends StatelessWidget {
                                     ),
                                   );
                                 }
-                                if (snapshot.hasError || !snapshot.hasData || !snapshot.data!.exists) {
+                                if (snapshot.hasError ||
+                                    !snapshot.hasData ||
+                                    !snapshot.data!.exists) {
                                   return Text(
                                     'Welcome, Patient!',
                                     style: GoogleFonts.poppins(
@@ -133,8 +139,10 @@ class PatientDashboard extends StatelessWidget {
                                     ),
                                   );
                                 }
-                                var patientData = snapshot.data!.data() as Map<String, dynamic>;
-                                String patientName = patientData['name'] ?? 'Patient';
+                                var patientData = snapshot.data!.data()
+                                    as Map<String, dynamic>;
+                                String patientName =
+                                    patientData['name'] ?? 'Patient';
                                 return Text(
                                   'Welcome, $patientName!',
                                   style: GoogleFonts.poppins(
@@ -150,7 +158,8 @@ class PatientDashboard extends StatelessWidget {
                       FutureBuilder<DocumentSnapshot>(
                         future: _getPatientInfo(),
                         builder: (context, snapshot) {
-                          if (snapshot.connectionState == ConnectionState.waiting) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
                             return CircleAvatar(
                               radius: 30,
                               backgroundColor: Colors.white,
@@ -158,29 +167,35 @@ class PatientDashboard extends StatelessWidget {
                                   color: Color.fromARGB(255, 60, 145, 230)),
                             );
                           }
-                          if (snapshot.hasError || !snapshot.hasData || !snapshot.data!.exists) {
+                          if (snapshot.hasError ||
+                              !snapshot.hasData ||
+                              !snapshot.data!.exists) {
                             return GestureDetector(
                               onTap: () {
                                 Navigator.push(
                                   context,
-                                  MaterialPageRoute(builder: (context) => PSettingsScreen()),
+                                  MaterialPageRoute(
+                                      builder: (context) => PSettingsScreen()),
                                 );
                               },
                               child: CircleAvatar(
                                 radius: 30,
                                 backgroundColor: Colors.white,
                                 child: Icon(Icons.person,
-                                    size: 30, color: Color.fromARGB(255, 60, 145, 230)),
+                                    size: 30,
+                                    color: Color.fromARGB(255, 60, 145, 230)),
                               ),
                             );
                           }
-                          var patientData = snapshot.data!.data() as Map<String, dynamic>;
+                          var patientData =
+                              snapshot.data!.data() as Map<String, dynamic>;
                           String? profileImg = patientData['profileImg'];
                           return GestureDetector(
                             onTap: () {
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (context) => PSettingsScreen()),
+                                MaterialPageRoute(
+                                    builder: (context) => PSettingsScreen()),
                               );
                             },
                             child: CircleAvatar(
@@ -190,7 +205,9 @@ class PatientDashboard extends StatelessWidget {
                                   ? NetworkImage(profileImg)
                                   : null,
                               child: profileImg == null
-                                  ? Icon(Icons.person, size: 30, color: Color.fromARGB(255, 60, 145, 230))
+                                  ? Icon(Icons.person,
+                                      size: 30,
+                                      color: Color.fromARGB(255, 60, 145, 230))
                                   : null,
                             ),
                           );
@@ -207,7 +224,8 @@ class PatientDashboard extends StatelessWidget {
             child: Align(
               alignment: Alignment.topCenter,
               child: Container(
-                margin: EdgeInsets.only(top: 150), // Adjust this margin for correct positioning
+                margin: EdgeInsets.only(
+                    top: 150), // Adjust this margin for correct positioning
                 padding: EdgeInsets.all(16.0),
                 decoration: BoxDecoration(
                   image: DecorationImage(
@@ -230,7 +248,8 @@ class PatientDashboard extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => PPatientTestsScreen(patientId: patientId),
+                            builder: (context) =>
+                                PPatientTestsScreen(patientId: patientId),
                           ),
                         );
                       },
@@ -240,11 +259,12 @@ class PatientDashboard extends StatelessWidget {
                       icon: Icons.settings,
                       label: 'Settings',
                       onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) => PSettingsScreen()),
-                              );
-                            },
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => PSettingsScreen()),
+                        );
+                      },
                     ),
                   ],
                 ),
@@ -256,7 +276,8 @@ class PatientDashboard extends StatelessWidget {
     );
   }
 
-  Widget _buildGlassEffectCard(BuildContext context, {
+  Widget _buildGlassEffectCard(
+    BuildContext context, {
     required IconData icon,
     required String label,
     required VoidCallback onTap,
