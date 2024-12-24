@@ -23,6 +23,51 @@ class SettingsScreen extends StatelessWidget {
     }
   }
 
+  // Function to delete account
+  Future<void> _deleteAccount(BuildContext context) async {
+    final user = _auth.currentUser;
+    if (user != null) {
+      try {
+        final userId = user.uid;
+
+        // Delete user from Firestore collections
+        await FirebaseFirestore.instance.collection('doctors').doc(userId).delete();
+        await FirebaseFirestore.instance.collection('users').doc(userId).delete();
+        
+
+        // Delete user from Firebase Authentication
+        await user.delete();
+
+        // Navigate to login screen
+        Navigator.popUntil(context, (route) => false);
+        Navigator.pushNamed(context, '/');
+      } catch (e) {
+        print('Error deleting account: $e');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to delete account: $e')),
+        );
+      }
+    }
+  }
+
+  // Function to reset password
+  Future<void> _resetPassword(BuildContext context) async {
+    final user = _auth.currentUser;
+    if (user != null) {
+      try {
+        await _auth.sendPasswordResetEmail(email: user.email!);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Password reset email sent to ${user.email}')),
+        );
+      } catch (e) {
+        print('Error sending password reset email: $e');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to send password reset email: $e')),
+        );
+      }
+    }
+  }
+
   // Function to show logout confirmation dialog
   Future<void> _showLogoutConfirmation(BuildContext context) async {
     showDialog(
@@ -124,42 +169,78 @@ class SettingsScreen extends StatelessWidget {
             String doctorBirthDate = doctorData['birthDate'] ?? 'N/A';
 
             return SingleChildScrollView(
-              child: Card(
-                color: Colors.white.withOpacity(0.8),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12.0),
-                ),
-                elevation: 5,
-                child: Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Your Information',
-                        style: GoogleFonts.poppins(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                          color: Color.fromARGB(255, 60, 145, 230),
-                        ),
+              child: Column(
+                children: [
+                  Card(
+                    color: Colors.white.withOpacity(0.8),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12.0),
+                    ),
+                    elevation: 5,
+                    child: Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Your Information',
+                            style: GoogleFonts.poppins(
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                              color: Color.fromARGB(255, 60, 145, 230),
+                            ),
+                          ),
+                          Divider(
+                            color: Colors.grey[400],
+                            thickness: 1.0,
+                            height: 20,
+                          ),
+                          SizedBox(height: 10),
+                          _buildInfoRow('Name:', doctorName),
+                          SizedBox(height: 10),
+                          _buildInfoRow('Surname:', doctorSurname),
+                          SizedBox(height: 10),
+                          _buildInfoRow('Email:', doctorEmail),
+                          SizedBox(height: 10),
+                          _buildInfoRow('Birth Date:', doctorBirthDate),
+                          SizedBox(height: 20),
+                        ],
                       ),
-                      Divider(
-                        color: Colors.grey[400],
-                        thickness: 1.0,
-                        height: 20,
-                      ),
-                      SizedBox(height: 10),
-                      _buildInfoRow('Name:', doctorName),
-                      SizedBox(height: 10),
-                      _buildInfoRow('Surname:', doctorSurname),
-                      SizedBox(height: 10),
-                      _buildInfoRow('Email:', doctorEmail),
-                      SizedBox(height: 10),
-                      _buildInfoRow('Birth Date:', doctorBirthDate),
-                      SizedBox(height: 20),
-                    ],
+                    ),
                   ),
-                ),
+                  SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: () => _deleteAccount(context),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                    ),
+                    child: Text(
+                      'Delete Account',
+                      style: GoogleFonts.poppins(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  ElevatedButton(
+                    onPressed: () => _resetPassword(context),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                    ),
+                    child: Text(
+                      'Reset Password',
+                      style: GoogleFonts.poppins(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             );
           },
@@ -182,7 +263,7 @@ class SettingsScreen extends StatelessWidget {
         color: Color.fromARGB(255, 60, 145, 230), // Blue color for the bottom bar
         shape: CircularNotchedRectangle(),
         notchMargin: 8.0, // Notch margin for better visibility
-        child: SizedBox(height:10), // Adjust height to match button spacing
+        child: SizedBox(height: 10), // Adjust height to match button spacing
       ),
     );
   }
