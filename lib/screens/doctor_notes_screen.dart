@@ -62,7 +62,7 @@ class _NotesScreenState extends State<NotesScreen> {
                 child: ListTile(
                   title: Text(note['content']),
                   subtitle: Text(
-                    _formatDate(note['timestamp'].toDate()),
+                    _formatDate(note['timestamp']?.toDate()),
                     style: TextStyle(fontSize: 12),
                   ),
                   trailing: Row(
@@ -87,7 +87,8 @@ class _NotesScreenState extends State<NotesScreen> {
     );
   }
 
-  String _formatDate(DateTime date) {
+  String _formatDate(DateTime? date) {
+    if (date == null) return 'Tarih yok';
     return '${date.day}/${date.month}/${date.year} ${date.hour}:${date.minute}';
   }
 
