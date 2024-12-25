@@ -38,120 +38,124 @@ class PatientTestsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        iconTheme: IconThemeData(
-          color: Colors.white,
-        ),
-        title: Text('Tests',
-            style: GoogleFonts.poppins(
-                color: Colors.white, fontWeight: FontWeight.bold)),
-        backgroundColor: Color.fromARGB(255, 60, 145, 230), // Blue
-      ),
-      body: Stack(
-        children: [
-          // Background image
-          Positioned.fill(
-            child: Image.asset(
-              'assets/images/background.png', // Update this with the path to your background image
-              fit: BoxFit.cover,
-            ),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color.fromARGB(255, 60, 145, 230),
+              Color.fromARGB(255, 60, 145, 230).withOpacity(0.8),
+            ],
           ),
-          // Content on top of the background
-          Container(
-            color: Color.fromARGB(50, 230, 243, 255), // Semi-transparent overlay
-            padding: const EdgeInsets.all(16.0),
-            child: FutureBuilder<Map<String, dynamic>>(
-              future: _fetchPatientInfo(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
-                } else if (snapshot.hasError) {
-                  return Center(child: Text('Error loading patient info'));
-                } else {
-                  final patientInfo = snapshot.data!;
-                  final birthDate = patientInfo['birthDate'] ?? '';
-                  final age = birthDate.isNotEmpty ? _calculateAge(birthDate) : 'N/A';
+        ),
+        child: SafeArea(
+          child: FutureBuilder<Map<String, dynamic>>(
+            future: _fetchPatientInfo(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Center(child: CircularProgressIndicator(color: Colors.white));
+              }
+              if (snapshot.hasError) {
+                return Center(child: Text('Error loading patient info'));
+              }
 
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Card(
-                        color: Colors.white.withOpacity(0.8),
-                        elevation: 4,
-                        child: Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Patient Information',
-                                style: GoogleFonts.poppins(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: Color.fromARGB(255, 60, 145, 230),
-                                ),
-                              ),
-                              SizedBox(height: 8.0),
-                              _buildInfoRow('Name', patientInfo['name']),
-                              _buildInfoRow('Surname', patientInfo['surname']),
-                              _buildInfoRow('Age', age.toString()),
-                              _buildInfoRow('DOB', birthDate),
-                              _buildInfoRow('Gender', patientInfo['gender']),
-                              _buildInfoRow('Email', patientInfo['email']),
-                              _buildInfoRow('Phone', patientInfo['phone']),
-                            ],
-                          ),
+              final patientInfo = snapshot.data!;
+              final birthDate = patientInfo['birthDate'] ?? '';
+              final age = birthDate.isNotEmpty ? _calculateAge(birthDate) : 'N/A';
+
+              return Column(
+                children: [
+                  _buildHeader(context, patientInfo),
+                  Expanded(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.grey[50],
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(30),
+                          topRight: Radius.circular(30),
                         ),
                       ),
-                      SizedBox(height: 16.0),
-                      // Video Test Card
-                      _buildTestCard(
-                        context,
-                        title: "Video Test",
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => VideoScreen(patientId: patientId),
+                      child: SingleChildScrollView(
+                        padding: EdgeInsets.all(20),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _buildPatientInfoCard(patientInfo, age, birthDate),
+                            SizedBox(height: 24),
+                            Text(
+                              'Available Tests',
+                              style: GoogleFonts.poppins(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black87,
+                              ),
                             ),
-                          );
-                        },
-                        icon: Icons.video_camera_front, // Blue Video Icon
+                            SizedBox(height: 16),
+                            _buildTestsList(context),
+                          ],
+                        ),
                       ),
-                      SizedBox(height: 16.0),
-                      // Masked Video Test Card
-                      _buildTestCard(
-                        context,
-                        title: "Masked Video Test",
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => MaskedVideoScreen(patientId: patientId),
-                            ),
-                          );
-                        },
-                        icon: Icons.videocam_off, // Blue Masked Video Icon
-                      ),
-                      SizedBox(height: 16.0),
-                      // Audio Test Card
-                      _buildTestCard(
-                        context,
-                        title: "Audio Test",
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => AudioScreen(patientId: patientId),
-                            ),
-                          );
-                        },
-                        icon: Icons.headset, // Blue Audio Icon
-                      ),
-                    ],
-                  );
-                }
-              },
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeader(BuildContext context, Map<String, dynamic> patientInfo) {
+    return Padding(
+      padding: EdgeInsets.all(20),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              IconButton(
+                icon: Icon(Icons.arrow_back_ios, color: Colors.white),
+                onPressed: () => Navigator.pop(context),
+              ),
+              Expanded(
+                child: Text(
+                  'Patient Details',
+                  style: GoogleFonts.poppins(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              SizedBox(width: 40), // Balance for back button
+            ],
+          ),
+          SizedBox(height: 20),
+          Container(
+            width: 80,
+            height: 80,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 10,
+                  offset: Offset(0, 5),
+                ),
+              ],
+            ),
+            child: Center(
+              child: Text(
+                '${patientInfo['name'][0]}${patientInfo['surname'][0]}'.toUpperCase(),
+                style: GoogleFonts.poppins(
+                  fontSize: 30,
+                  fontWeight: FontWeight.bold,
+                  color: Color.fromARGB(255, 60, 145, 230),
+                ),
+              ),
             ),
           ),
         ],
@@ -159,65 +163,167 @@ class PatientTestsScreen extends StatelessWidget {
     );
   }
 
-  // Helper method to build info rows
-  Widget _buildInfoRow(String label, String value) {
-    return Row(
-      children: [
-        Expanded(
-          flex: 2,
-          child: Text(
-            '$label: ',
+  Widget _buildPatientInfoCard(Map<String, dynamic> patientInfo, dynamic age, String birthDate) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: Offset(0, 4),
+          ),
+        ],
+      ),
+      padding: EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '${patientInfo['name']} ${patientInfo['surname']}',
             style: GoogleFonts.poppins(
-              fontSize: 16,
+              fontSize: 24,
               fontWeight: FontWeight.bold,
-              color: Colors.black,
+              color: Colors.black87,
             ),
           ),
-        ),
-        Expanded(
-          flex: 3,
-          child: Text(
-            value,
-            overflow: TextOverflow.ellipsis,
-            style: GoogleFonts.poppins(fontSize: 16),
-          ),
-        ),
-      ],
+          SizedBox(height: 16),
+          _buildInfoItem(Icons.cake, 'Age', '$age years'),
+          _buildInfoItem(Icons.calendar_today, 'Birth Date', birthDate),
+          _buildInfoItem(Icons.person, 'Gender', patientInfo['gender'] ?? 'N/A'),
+          _buildInfoItem(Icons.email, 'Email', patientInfo['email'] ?? 'N/A'),
+          _buildInfoItem(Icons.phone, 'Phone', patientInfo['phone'] ?? 'N/A'),
+        ],
+      ),
     );
   }
 
-  // Test Card builder with icon on the right side
-  Widget _buildTestCard(BuildContext context,
-      {required String title, required VoidCallback onTap, required IconData icon}) {
-    return SizedBox(
-      height: MediaQuery.of(context).size.height * 0.15,
-      child: Card(
-        color: Colors.white.withOpacity(0.8),
-        elevation: 4,
-        child: InkWell(
-          onTap: onTap,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
+  Widget _buildInfoItem(IconData icon, String label, String value) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        children: [
+          Container(
+            padding: EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: Color.fromARGB(255, 60, 145, 230).withOpacity(0.1),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(
+              icon,
+              size: 20,
+              color: Color.fromARGB(255, 60, 145, 230),
+            ),
+          ),
+          SizedBox(width: 12),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Padding(
-                padding: const EdgeInsets.only(left: 16.0), // Shift text slightly to the right
-                child: Text(
-                  title,
-                  style: GoogleFonts.poppins(
-                    fontSize: 20,
-                    fontWeight: FontWeight.normal, // No bold here
-                  ),
+              Text(
+                label,
+                style: GoogleFonts.poppins(
+                  fontSize: 12,
+                  color: Colors.grey[600],
                 ),
               ),
-              Spacer(), // Push icon to the right
-              Padding(
-                padding: const EdgeInsets.only(right: 16.0), // Shift icon slightly to the left
-                child: Icon(
-                  icon,
-                  color: Color.fromARGB(255, 60, 145, 230), // Blue Icon
+              Text(
+                value,
+                style: GoogleFonts.poppins(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.black87,
                 ),
               ),
             ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTestsList(BuildContext context) {
+    final tests = [
+      {
+        'title': 'Video Test',
+        'icon': Icons.video_camera_front,
+        'color': Colors.blue,
+        'screen': VideoScreen(patientId: patientId),
+      },
+      {
+        'title': 'Masked Video Test',
+        'icon': Icons.videocam_off,
+        'color': Colors.purple,
+        'screen': MaskedVideoScreen(patientId: patientId),
+      },
+      {
+        'title': 'Audio Test',
+        'icon': Icons.headset,
+        'color': Colors.green,
+        'screen': AudioScreen(patientId: patientId),
+      },
+    ];
+
+    return Column(
+      children: tests.map((test) => _buildTestCard(context, test)).toList(),
+    );
+  }
+
+  Widget _buildTestCard(BuildContext context, Map<String, dynamic> test) {
+    return Container(
+      margin: EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(15),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(15),
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => test['screen'] as Widget),
+          ),
+          child: Padding(
+            padding: EdgeInsets.all(20),
+            child: Row(
+              children: [
+                Container(
+                  padding: EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: (test['color'] as Color).withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(
+                    test['icon'] as IconData,
+                    color: test['color'] as Color,
+                    size: 24,
+                  ),
+                ),
+                SizedBox(width: 16),
+                Expanded(
+                  child: Text(
+                    test['title'] as String,
+                    style: GoogleFonts.poppins(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+                Icon(
+                  Icons.arrow_forward_ios,
+                  color: Colors.grey[400],
+                  size: 16,
+                ),
+              ],
+            ),
           ),
         ),
       ),
