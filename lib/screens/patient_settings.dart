@@ -166,7 +166,7 @@ class PSettingsScreen extends StatelessWidget {
       backgroundColor: Color.fromARGB(255, 245, 245, 245),
       appBar: AppBar(
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black),
+          icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
@@ -174,21 +174,17 @@ class PSettingsScreen extends StatelessWidget {
           style: GoogleFonts.poppins(
             fontSize: 20,
             fontWeight: FontWeight.w600,
-            color: Colors.black,
+            color: Colors.white,
           ),
         ),
-        backgroundColor: Colors.white,
+        backgroundColor: Color.fromARGB(255, 60, 145, 230),
         elevation: 0,
       ),
       body: Container(
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage('assets/images/background.png'),
+            image: AssetImage('assets/images/background.png'), // Kendi image path'inizi kullanın
             fit: BoxFit.cover,
-            colorFilter: ColorFilter.mode(
-              Colors.white.withOpacity(0.8), // Arka plan üzerindeki içeriğin daha okunabilir olması için
-              BlendMode.srcOver,
-            ),
           ),
         ),
         child: FutureBuilder<DocumentSnapshot>(
