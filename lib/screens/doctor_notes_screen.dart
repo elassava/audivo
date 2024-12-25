@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
 class NotesScreen extends StatefulWidget {
   @override
@@ -76,19 +77,17 @@ class _NotesScreenState extends State<NotesScreen> {
                         children: [
                           Icon(Icons.note_alt_outlined, size: 64, color: Colors.grey),
                           SizedBox(height: 16),
-                          Text('Henüz not eklenmemiş'),
+                          Text('No notes added yet.'),
                         ],
                       ),
                     );
                   }
-
-                  return GridView.builder(
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  return MasonryGridView.builder(
+                    gridDelegate: SliverSimpleGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
-                      crossAxisSpacing: 16.0,
-                      mainAxisSpacing: 16.0,
-                      childAspectRatio: 0.8,
                     ),
+                    mainAxisSpacing: 16.0,
+                    crossAxisSpacing: 16.0,
                     itemCount: snapshot.data!.docs.length,
                     itemBuilder: (context, index) {
                       final note = snapshot.data!.docs[index];
@@ -111,6 +110,7 @@ class _NotesScreenState extends State<NotesScreen> {
                               padding: EdgeInsets.all(16),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Text(
                                     note['title'] ?? 'No Title',
@@ -124,15 +124,11 @@ class _NotesScreenState extends State<NotesScreen> {
                                   ),
                                   Divider(color: Colors.grey[200]),
                                   SizedBox(height: 8),
-                                  Expanded(
-                                    child: Text(
-                                      note['content'],
-                                      style: GoogleFonts.poppins(
-                                        fontSize: 14,
-                                        color: Colors.black87,
-                                      ),
-                                      maxLines: 6,
-                                      overflow: TextOverflow.ellipsis,
+                                  Text(
+                                    note['content'],
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 14,
+                                      color: Colors.black87,
                                     ),
                                   ),
                                   SizedBox(height: 8),
@@ -150,13 +146,46 @@ class _NotesScreenState extends State<NotesScreen> {
                               right: 0,
                               top: 0,
                               child: PopupMenuButton(
-                                icon: Icon(Icons.more_vert),
+                                icon: Icon(
+                                  Icons.more_vert,
+                                  color: Color.fromARGB(255, 60, 145, 230),
+                                  size: 22,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                position: PopupMenuPosition.under,
+                                elevation: 4,
+                                color: Colors.white,
                                 itemBuilder: (context) => [
                                   PopupMenuItem(
-                                    child: ListTile(
-                                      leading: Icon(Icons.edit, color: Colors.blue),
-                                      title: Text('Düzenle'),
-                                      contentPadding: EdgeInsets.zero,
+                                    height: 40,
+                                    padding: EdgeInsets.symmetric(horizontal: 12),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Container(
+                                          padding: EdgeInsets.all(6),
+                                          decoration: BoxDecoration(
+                                            color: Colors.blue.withOpacity(0.1),
+                                            borderRadius: BorderRadius.circular(8),
+                                          ),
+                                          child: Icon(
+                                            Icons.edit_rounded,
+                                            color: Color.fromARGB(255, 60, 145, 230),
+                                            size: 18,
+                                          ),
+                                        ),
+                                        SizedBox(width: 8),
+                                        Text(
+                                          'Düzenle',
+                                          style: GoogleFonts.poppins(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w500,
+                                            color: Colors.black87,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                     onTap: () => Future.delayed(
                                       Duration.zero,
@@ -164,10 +193,33 @@ class _NotesScreenState extends State<NotesScreen> {
                                     ),
                                   ),
                                   PopupMenuItem(
-                                    child: ListTile(
-                                      leading: Icon(Icons.delete, color: Colors.red),
-                                      title: Text('Sil'),
-                                      contentPadding: EdgeInsets.zero,
+                                    height: 40,
+                                    padding: EdgeInsets.symmetric(horizontal: 12),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Container(
+                                          padding: EdgeInsets.all(6),
+                                          decoration: BoxDecoration(
+                                            color: Colors.red.withOpacity(0.1),
+                                            borderRadius: BorderRadius.circular(8),
+                                          ),
+                                          child: Icon(
+                                            Icons.delete_rounded,
+                                            color: Colors.red[400],
+                                            size: 18,
+                                          ),
+                                        ),
+                                        SizedBox(width: 8),
+                                        Text(
+                                          'Sil',
+                                          style: GoogleFonts.poppins(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w500,
+                                            color: Colors.red[400],
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                     onTap: () => Future.delayed(
                                       Duration.zero,
@@ -225,7 +277,7 @@ class _NotesScreenState extends State<NotesScreen> {
                 decoration: InputDecoration(
                   hintText: 'Title',
                   filled: true,
-                  fillColor: Colors.grey[100],
+                  fillColor: Color.fromARGB(122, 170, 213, 255),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide.none,
@@ -239,7 +291,7 @@ class _NotesScreenState extends State<NotesScreen> {
                 decoration: InputDecoration(
                   hintText: 'Write your note...',
                   filled: true,
-                  fillColor: Colors.grey[100],
+                  fillColor: Color.fromARGB(122, 170, 213, 255),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide.none,
@@ -271,6 +323,7 @@ class _NotesScreenState extends State<NotesScreen> {
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Color.fromARGB(255, 60, 145, 230),
+              foregroundColor: Colors.white,
               padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -289,16 +342,17 @@ class _NotesScreenState extends State<NotesScreen> {
     );
   }
 
-  Future<void> _showEditNoteDialog(
-      BuildContext context, DocumentSnapshot note) async {
+  Future<void> _showEditNoteDialog(BuildContext context, DocumentSnapshot note) async {
+    final TextEditingController _titleController = TextEditingController(text: note['title']);
     _noteController.text = note['content'];
+    
     await showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: Text(
           'Edit Note',
           style: GoogleFonts.poppins(
-            fontSize: 20,
+            fontSize: 24,
             fontWeight: FontWeight.bold,
             color: Color.fromARGB(255, 60, 145, 230),
           ),
@@ -306,19 +360,41 @@ class _NotesScreenState extends State<NotesScreen> {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
         ),
-        content: TextField(
-          controller: _noteController,
-          decoration: InputDecoration(
-            hintText: 'Write your note...',
-            filled: true,
-            fillColor: Colors.grey[100],
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide.none,
-            ),
-            contentPadding: EdgeInsets.all(16),
+        content: Container(
+          width: MediaQuery.of(context).size.width * 0.8,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: _titleController,
+                decoration: InputDecoration(
+                  hintText: 'Title',
+                  filled: true,
+                  fillColor: Color.fromARGB(122, 170, 213, 255),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
+                  contentPadding: EdgeInsets.all(16),
+                ),
+              ),
+              SizedBox(height: 16),
+              TextField(
+                controller: _noteController,
+                decoration: InputDecoration(
+                  hintText: 'Write your note...',
+                  filled: true,
+                  fillColor: Color.fromARGB(122, 170, 213, 255),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
+                  contentPadding: EdgeInsets.all(16),
+                ),
+                maxLines: 5,
+              ),
+            ],
           ),
-          maxLines: 5,
         ),
         actions: [
           TextButton(
@@ -333,13 +409,14 @@ class _NotesScreenState extends State<NotesScreen> {
           ),
           ElevatedButton(
             onPressed: () {
-              if (_noteController.text.isNotEmpty) {
-                _updateNote(note.id);
+              if (_noteController.text.isNotEmpty && _titleController.text.isNotEmpty) {
+                _updateNote(note.id, _titleController.text);
                 Navigator.pop(context);
               }
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Color.fromARGB(255, 60, 145, 230),
+              foregroundColor: Colors.white,
               padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -371,9 +448,10 @@ class _NotesScreenState extends State<NotesScreen> {
     }
   }
 
-  Future<void> _updateNote(String noteId) async {
+  Future<void> _updateNote(String noteId, String title) async {
     try {
       await _firestore.collection('doctor_notes').doc(noteId).update({
+        'title': title,
         'content': _noteController.text,
         'timestamp': FieldValue.serverTimestamp(),
       });
@@ -430,6 +508,7 @@ class _NotesScreenState extends State<NotesScreen> {
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.red[400],
+              foregroundColor: Colors.white,
               padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),

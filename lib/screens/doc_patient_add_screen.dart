@@ -29,16 +29,6 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
         // Combine country code with the phone number
         String fullPhoneNumber = countryCode + phone;
 
-        await FirebaseFirestore.instance.collection('users').add({
-          'name': name,
-          'surname': surname,
-          'birthDate': birthDate,
-          'gender': gender,
-          'email': email,
-          'phone':
-              fullPhoneNumber, // Save combined phone number with country code
-          'role': "patient"
-        });
 
         await FirebaseFirestore.instance.collection('patients').add({
           'doctorId': doctorId,

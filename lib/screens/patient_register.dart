@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter/services.dart';
 
 class PatientRegisterScreen extends StatefulWidget {
   @override
@@ -18,6 +19,49 @@ class _PatientRegisterScreenState extends State<PatientRegisterScreen> {
   String _gender = 'Male';
   String _dob = '';
   String? _errorMessage;
+  String countryCode = '+90';
+
+  BoxDecoration _containerDecoration() {
+    return BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(12),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withOpacity(0.05),
+          blurRadius: 10,
+          offset: Offset(0, 4),
+        ),
+      ],
+    );
+  }
+
+  InputDecoration _inputDecoration(String label) {
+    return InputDecoration(
+      labelText: label,
+      labelStyle: GoogleFonts.poppins(
+        fontWeight: FontWeight.w500,
+        color: Colors.black54,
+      ),
+      filled: true,
+      fillColor: Colors.white,
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: Colors.grey.shade200),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: Color.fromARGB(255, 60, 145, 230), width: 2),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: Colors.red.shade300),
+      ),
+      focusedErrorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: Colors.red.shade300, width: 2),
+      ),
+    );
+  }
 
   // Doğum tarihi seçimi için takvim fonksiyonu
   Future<void> _selectDate(BuildContext context) async {
@@ -61,6 +105,9 @@ class _PatientRegisterScreenState extends State<PatientRegisterScreen> {
     }
 
     try {
+      // Combine country code with phone number
+      String fullPhoneNumber = countryCode + _phoneController.text.trim();
+
       // Firebase Authentication ile kullanıcı kaydı
       UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: _emailController.text.trim(),
@@ -77,12 +124,7 @@ class _PatientRegisterScreenState extends State<PatientRegisterScreen> {
 
       // Kullanıcı verisini users koleksiyonuna kaydet
       await FirebaseFirestore.instance.collection('users').doc(userCredential.user!.uid).set({
-        'name': firstName,
-        'surname': lastName,
         'email': _emailController.text.trim(),
-        'phone': _phoneController.text.trim(),
-        'birthDate': _dob,
-        'gender': _gender,
         'role': 'patient',  // Kullanıcı rolü hasta
       });
 
@@ -91,7 +133,7 @@ class _PatientRegisterScreenState extends State<PatientRegisterScreen> {
         'name': firstName,
         'surname': lastName,
         'email': _emailController.text.trim(),
-        'phone': _phoneController.text.trim(),
+        'phone': fullPhoneNumber,
         'birthDate': _dob,
         'gender': _gender,
       });
@@ -122,203 +164,379 @@ class _PatientRegisterScreenState extends State<PatientRegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        iconTheme: IconThemeData(
-          color: Colors.white,
-        ),
-        title: Text(
-          "Patient Register",
-          style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.bold),
-        ),
-        backgroundColor: Color.fromARGB(255, 60, 145, 230),
-      ),
       body: Container(
-        width: double.infinity,
-        height: MediaQuery.of(context).size.height, // Full screen height
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage("assets/images/background.png"),
+            image: AssetImage('assets/images/background.png'),
             fit: BoxFit.cover,
           ),
         ),
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
+        child: SafeArea(
           child: SingleChildScrollView(
-            child: ConstrainedBox(
-              constraints: BoxConstraints(
-                minHeight: MediaQuery.of(context).size.height - kToolbarHeight - 20,
-              ),
-              child: IntrinsicHeight(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    // Ad alanı
-                    TextField(
+            physics: BouncingScrollPhysics(),
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // Sign Up Text
+                  Text(
+                    'Sign Up',
+                    style: GoogleFonts.poppins(
+                      fontSize: 32,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF283593),
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: 40),
+
+                  // Name TextField
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 10,
+                          offset: Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: TextField(
                       controller: _firstNameController,
                       decoration: InputDecoration(
-                        labelText: 'Name',
-                        labelStyle: GoogleFonts.poppins(color: Colors.black, fontWeight: FontWeight.w600),
-                        filled: true,
-                        fillColor: Colors.white.withOpacity(0.8),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
+                        hintText: 'Enter your Name',
+                        hintStyle: GoogleFonts.poppins(color: Colors.grey[400]),
+                        prefixIcon: Icon(Icons.person_outline, color: Colors.grey[400]),
+                        border: InputBorder.none,
+                        contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                       ),
-                      style: GoogleFonts.poppins(),
-                      textCapitalization: TextCapitalization.words, // Her kelimenin ilk harfini büyük yapar
                     ),
-                    SizedBox(height: 20),
-                    // Soyad alanı
-                    TextField(
+                  ),
+                  SizedBox(height: 20),
+
+                  // Surname TextField
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 10,
+                          offset: Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: TextField(
                       controller: _lastNameController,
                       decoration: InputDecoration(
-                        labelText: 'Surname',
-                        labelStyle: GoogleFonts.poppins(color: Colors.black, fontWeight: FontWeight.w600),
-                        filled: true,
-                        fillColor: Colors.white.withOpacity(0.8),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
+                        hintText: 'Enter your Surname',
+                        hintStyle: GoogleFonts.poppins(color: Colors.grey[400]),
+                        prefixIcon: Icon(Icons.person_outline, color: Colors.grey[400]),
+                        border: InputBorder.none,
+                        contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                       ),
-                      style: GoogleFonts.poppins(),
-                      textCapitalization: TextCapitalization.words, // Her kelimenin ilk harfini büyük yapar
                     ),
-                    SizedBox(height: 20),
-                    // E-posta alanı
-                    TextField(
+                  ),
+                  SizedBox(height: 20),
+
+                  // Email TextField
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 10,
+                          offset: Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: TextField(
                       controller: _emailController,
                       decoration: InputDecoration(
-                        labelText: 'E-mail',
-                        labelStyle: GoogleFonts.poppins(color: Colors.black, fontWeight: FontWeight.w600),
-                        filled: true,
-                        fillColor: Colors.white.withOpacity(0.8),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
+                        hintText: 'Enter your Email',
+                        hintStyle: GoogleFonts.poppins(color: Colors.grey[400]),
+                        prefixIcon: Icon(Icons.email_outlined, color: Colors.grey[400]),
+                        border: InputBorder.none,
+                        contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                       ),
                       keyboardType: TextInputType.emailAddress,
-                      style: GoogleFonts.poppins(),
                     ),
-                    SizedBox(height: 20),
-                    // Şifre alanı
-                    TextField(
+                  ),
+                  SizedBox(height: 20),
+
+                  // Password TextField
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 10,
+                          offset: Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: TextField(
                       controller: _passwordController,
                       decoration: InputDecoration(
-                        labelText: 'Password',
-                        labelStyle: GoogleFonts.poppins(color: Colors.black, fontWeight: FontWeight.w600),
-                        filled: true,
-                        fillColor: Colors.white.withOpacity(0.8),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
+                        hintText: 'Enter your Password',
+                        hintStyle: GoogleFonts.poppins(color: Colors.grey[400]),
+                        prefixIcon: Icon(Icons.lock_outline, color: Colors.grey[400]),
+                        border: InputBorder.none,
+                        contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                       ),
                       obscureText: true,
-                      style: GoogleFonts.poppins(),
                     ),
-                    SizedBox(height: 20),
-                    TextField(
+                  ),
+                  SizedBox(height: 20),
+
+                  // Confirm Password TextField
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 10,
+                          offset: Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: TextField(
                       controller: _confirmPasswordController,
                       decoration: InputDecoration(
-                        labelText: 'Confirm Password',
-                        labelStyle: GoogleFonts.poppins(color: Colors.black, fontWeight: FontWeight.w600),
-                        filled: true,
-                        fillColor: Colors.white.withOpacity(0.8),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
+                        hintText: 'Confirm Password',
+                        hintStyle: GoogleFonts.poppins(color: Colors.grey[400]),
+                        prefixIcon: Icon(Icons.lock_outline, color: Colors.grey[400]),
+                        border: InputBorder.none,
+                        contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                       ),
                       obscureText: true,
-                      style: GoogleFonts.poppins(),
                     ),
-                    SizedBox(height: 20),
-                    // Telefon numarası alanı
-                    TextField(
-                      controller: _phoneController,
-                      decoration: InputDecoration(
-                        labelText: 'Phone Number',
-                        labelStyle: GoogleFonts.poppins(color: Colors.black, fontWeight: FontWeight.w600),
-                        filled: true,
-                        fillColor: Colors.white.withOpacity(0.8),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
+                  ),
+                  SizedBox(height: 20),
+
+                  // Birth Date Picker
+                  GestureDetector(
+                    onTap: () => _selectDate(context),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 10,
+                            offset: Offset(0, 4),
+                          ),
+                        ],
                       ),
-                      keyboardType: TextInputType.phone,
-                      style: GoogleFonts.poppins(),
-                    ),
-                    SizedBox(height: 20),
-                    // Doğum tarihi seçimi
-                    GestureDetector(
-                      onTap: () => _selectDate(context),
                       child: AbsorbPointer(
                         child: TextField(
                           controller: TextEditingController(text: _dob),
                           decoration: InputDecoration(
-                            labelText: 'Date of Birth (YYYY/MM/DD)',
-                            labelStyle: GoogleFonts.poppins(color: Colors.black, fontWeight: FontWeight.w600),
-                            filled: true,
-                            fillColor: Colors.white.withOpacity(0.8),
-                            hintText: _dob.isEmpty ? 'Choose Date' : _dob,
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
+                            hintText: _dob.isEmpty ? 'Select Birth Date' : _dob,
+                            hintStyle: GoogleFonts.poppins(color: Colors.grey[400]),
+                            prefixIcon: Icon(Icons.calendar_today, color: Colors.grey[400]),
+                            border: InputBorder.none,
+                            contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                           ),
-                          style: GoogleFonts.poppins(),
                         ),
                       ),
                     ),
-                    SizedBox(height: 20),
-                    // Cinsiyet seçim alanı
-                    Container(
-                      padding: EdgeInsets.symmetric(horizontal: 10),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.8),
-                        border: Border.all(color: Colors.black),
-                        borderRadius: BorderRadius.circular(10),
+                  ),
+                  SizedBox(height: 20),
+
+                  // Gender Dropdown
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 10,
+                          offset: Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: DropdownButtonFormField<String>(
+                      value: _gender,
+                      items: ['Male', 'Female']
+                          .map((label) => DropdownMenuItem(
+                                value: label,
+                                child: Text(label),
+                              ))
+                          .toList(),
+                      onChanged: (value) => setState(() => _gender = value!),
+                      decoration: InputDecoration(
+                        hintText: 'Select Gender',
+                        prefixIcon: Icon(Icons.person_outline, color: Colors.grey[400]),
+                        border: InputBorder.none,
+                        contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                       ),
-                      child: DropdownButton<String>(
-                        value: _gender,
-                        onChanged: (String? newValue) {
-                          setState(() {
-                            _gender = newValue!;
-                          });
-                        },
-                        items: <String>['Male', 'Female', 'Other']
-                            .map<DropdownMenuItem<String>>((String value) {
-                          return DropdownMenuItem<String>(
-                            value: value,
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                              child: Text(value, style: GoogleFonts.poppins()),
+                      style: GoogleFonts.poppins(color: Colors.grey[700]),
+                    ),
+                  ),
+                  SizedBox(height: 20),
+
+                  // Phone Number Row
+                  Row(
+                    children: [
+                      // Country Code Dropdown
+                      Expanded(
+                        flex: 3,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(12),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.1),
+                                blurRadius: 10,
+                                offset: Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: DropdownButtonFormField<String>(
+                            value: countryCode,
+                            items: [
+                              DropdownMenuItem(value: '+90', child: Text('🇹🇷 +90')),
+                              DropdownMenuItem(value: '+1', child: Text('🇺🇸 +1')),
+                              DropdownMenuItem(value: '+44', child: Text('🇬🇧 +44')),
+                              DropdownMenuItem(value: '+49', child: Text('🇩🇪 +49')),
+                            ],
+                            onChanged: (value) => setState(() => countryCode = value!),
+                            decoration: InputDecoration(
+                              border: InputBorder.none,
+                              contentPadding: EdgeInsets.symmetric(horizontal: 12),
                             ),
-                          );
-                        }).toList(),
-                        isExpanded: true,
-                        underline: SizedBox(),
-                      ),
-                    ),
-                    SizedBox(height: 20),
-                    // Hata mesajı
-                    if (_errorMessage != null)
-                      Text(
-                        _errorMessage!,
-                        style: GoogleFonts.poppins(color: Colors.red, fontWeight: FontWeight.bold),
-                      ),
-                    SizedBox(height: 20),
-                    // Kayıt butonu
-                    ElevatedButton(
-                      onPressed: _register,
-                      child: Text('Register', style: GoogleFonts.poppins(color: Colors.white)),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Color.fromARGB(255, 60, 145, 230),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                            style: GoogleFonts.poppins(color: Colors.grey[700]),
+                          ),
                         ),
-                        padding: EdgeInsets.symmetric(vertical: 15, horizontal: 40),
+                      ),
+                      SizedBox(width: 8),
+                      // Phone Number TextField
+                      Expanded(
+                        flex: 7,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(12),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.1),
+                                blurRadius: 10,
+                                offset: Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: TextField(
+                            controller: _phoneController,
+                            decoration: InputDecoration(
+                              hintText: 'Phone Number',
+                              hintStyle: GoogleFonts.poppins(color: Colors.grey[400]),
+                              prefixIcon: Icon(Icons.phone_outlined, color: Colors.grey[400]),
+                              border: InputBorder.none,
+                              contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                            ),
+                            keyboardType: TextInputType.phone,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly,
+                              LengthLimitingTextInputFormatter(10),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 20),
+
+                  // Error Message
+                  if (_errorMessage != null)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                      child: Text(
+                        _errorMessage!,
+                        style: GoogleFonts.poppins(
+                          color: Colors.red[400],
+                          fontSize: 14,
+                        ),
+                        textAlign: TextAlign.center,
                       ),
                     ),
-                  ],
-                ),
+
+                  // Register Button
+                  Container(
+                    height: 55,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      gradient: LinearGradient(
+                        colors: [Colors.white, Colors.white],
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 10,
+                          offset: Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: ElevatedButton(
+                      onPressed: _register,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: Text(
+                        'REGISTER',
+                        style: GoogleFonts.poppins(
+                          color: Color.fromARGB(255, 60, 145, 230),
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 30),
+
+                  // Already have an account
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "Already have an Account? ",
+                        style: GoogleFonts.poppins(
+                          color: Color(0xFF283593),
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.pop(context);
+                        },
+                        child: Text(
+                          'Sign In',
+                          style: GoogleFonts.poppins(
+                            color: Color(0xFF283593),
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 20),
+                ],
               ),
             ),
           ),

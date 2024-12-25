@@ -418,16 +418,6 @@ class _DoctorLoginScreenState extends State<DoctorLoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        iconTheme: IconThemeData(
-          color: Colors.white,
-        ),
-        title: Text("Doctor Login",
-            style: GoogleFonts.poppins(
-                color: Colors.white, fontWeight: FontWeight.bold)),
-        backgroundColor: Color.fromARGB(255, 60, 145, 230),
-        centerTitle: true,
-      ),
       body: Container(
         decoration: BoxDecoration(
           image: DecorationImage(
@@ -435,118 +425,241 @@ class _DoctorLoginScreenState extends State<DoctorLoginScreen> {
             fit: BoxFit.cover,
           ),
         ),
-        padding: const EdgeInsets.all(20.0),
-        child: Center(
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // Email TextField
-                TextField(
-                  controller: _emailController,
-                  decoration: InputDecoration(
-                    labelText: 'E-mail',
-                    labelStyle: GoogleFonts.poppins(),
-                    filled: true,
-                    fillColor: Colors.blue[50],
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Center(
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // Sign In Text
+                    Text(
+                      'Doctor Sign In',
+                      style: GoogleFonts.poppins(
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF283593)
+                      ),
+                      textAlign: TextAlign.center,
                     ),
-                  ),
-                  keyboardType: TextInputType.emailAddress,
-                ),
-                SizedBox(height: 20),
-                // Password TextField
-                TextField(
-                  controller: _passwordController,
-                  decoration: InputDecoration(
-                    labelText: 'Password',
-                    labelStyle: GoogleFonts.poppins(),
-                    filled: true,
-                    fillColor: Colors.blue[50],
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  obscureText: true,
-                ),
-                SizedBox(height: 20),
-                // Error message
-                if (_errorMessage != null)
-                  Text(
-                    _errorMessage!,
-                    style: TextStyle(
-                        color: Colors.red,
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold),
-                  ),
-                SizedBox(height: 20),
-                // Email Login Button
-                ElevatedButton(
-                  onPressed: _login,
-                  child: Text('Login',
-                      style: GoogleFonts.poppins(color: Colors.white)),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Color.fromARGB(255, 60, 145, 230),
-                    padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                ),
-                SizedBox(height: 20),
-                // Google Login Button
-                ElevatedButton.icon(
-                  onPressed: () => _googleLogin(context),
-                  icon: Padding(
-                    padding: const EdgeInsets.only(right: 0.0),
-                    child: Image.asset(
-                        'assets/images/google_icon.png', // This loads the image from assets
-                        height: 24,
-                        width: 25 // Adjust the size of the icon
+                    SizedBox(height: 40),
+
+                    // Email TextField
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 10,
+                            offset: Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: TextField(
+                        controller: _emailController,
+                        decoration: InputDecoration(
+                          hintText: 'Enter your Email',
+                          hintStyle: GoogleFonts.poppins(
+                            color: Colors.grey[400],
+                          ),
+                          prefixIcon: Icon(Icons.email_outlined, color: Colors.grey[400]),
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                         ),
-                  ),
-                  label: Text(
-                    'Login with Google',
-                    style: GoogleFonts.poppins(
-                        color: const Color.fromARGB(255, 8, 8, 8),
-                        fontSize: 12),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color.fromARGB(255, 255, 255, 255),
-                    padding: EdgeInsets.symmetric(horizontal: 6, vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                        keyboardType: TextInputType.emailAddress,
+                      ),
                     ),
-                  ),
+                    SizedBox(height: 20),
+
+                    // Password TextField
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 10,
+                            offset: Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: TextField(
+                        controller: _passwordController,
+                        decoration: InputDecoration(
+                          hintText: 'Enter your Password',
+                          hintStyle: GoogleFonts.poppins(
+                            color: Colors.grey[400],
+                          ),
+                          prefixIcon: Icon(Icons.lock_outline, color: Colors.grey[400]),
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                        ),
+                        obscureText: true,
+                      ),
+                    ),
+
+                    // Forgot Password
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: TextButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => ForgotPasswordScreen()),
+                          );
+                        },
+                        child: Text(
+                          'Forgot Password?',
+                          style: GoogleFonts.poppins(
+                            color: Color(0xFF283593),
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    // Error Message
+                    if (_errorMessage != null)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        child: Text(
+                          _errorMessage!,
+                          style: GoogleFonts.poppins(
+                            color: Colors.red[400],
+                            fontSize: 14,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+
+                    // Login Button
+                    Container(
+                      height: 55,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        gradient: LinearGradient(
+                          colors: [Colors.white, Colors.white],
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 10,
+                            offset: Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: ElevatedButton(
+                        onPressed: _login,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          elevation: 0,
+                        ),
+                        child: Text(
+                          'LOGIN',
+                          style: GoogleFonts.poppins(
+                            color: Color.fromARGB(255, 60, 145, 230),
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 20),
+
+                    // OR Divider
+                    Row(
+                      children: [
+                        Expanded(child: Divider(color: Color.fromARGB(255, 38, 38, 38), thickness: 1)),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: Text(
+                            'OR',
+                            style: GoogleFonts.poppins(
+                              color:Color(0xFF283593),
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                        Expanded(child: Divider(color: Color(0xFF283593), thickness: 1)),
+                      ],
+                    ),
+                    SizedBox(height: 20),
+
+                    // Sign in with text
+                    Text(
+                      'Sign in with',
+                      style: GoogleFonts.poppins(
+                        color:Color(0xFF283593),
+                        fontWeight: FontWeight.w500,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(height: 20),
+
+                    // Social Login Buttons
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        // Google Login Button
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.1),
+                                blurRadius: 10,
+                                offset: Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: IconButton(
+                            icon: Image.asset(
+                              'assets/images/google_icon.png',
+                              height: 24,
+                            ),
+                            onPressed: () => _googleLogin(context),
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 30),
+
+                    // Don't have an account
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "Don't have an Account? ",
+                          style: GoogleFonts.poppins(
+                            color:Color(0xFF283593),
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.pushNamed(context, '/doctorRegister');
+                          },
+                          child: Text(
+                            'Sign Up',
+                            style: GoogleFonts.poppins(
+                              color: Color(0xFF283593),
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
-                SizedBox(height: 10),
-                TextButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => ForgotPasswordScreen()),
-                    );
-                  },
-                  child: Text(
-                    "Forgot my Password",
-                    style: GoogleFonts.poppins(
-                        color: Color.fromARGB(255, 60, 145, 230)),
-                  ),
-                ),
-                // Register Button
-                TextButton(
-                  onPressed: () {
-                    Navigator.pushNamed(context, '/doctorRegister');
-                  },
-                  child: Text(
-                    "Register",
-                    style: GoogleFonts.poppins(
-                        color: Color.fromARGB(255, 60, 145, 230)),
-                  ),
-                ),
-              ],
+              ),
             ),
           ),
         ),

@@ -1,93 +1,301 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'dart:math' as math;
 
-class IntroScreen extends StatelessWidget {
+class IntroScreen extends StatefulWidget {
+  @override
+  _IntroScreenState createState() => _IntroScreenState();
+}
+
+class _IntroScreenState extends State<IntroScreen> with TickerProviderStateMixin {
+  late AnimationController _controller;
+  late AnimationController _pulseController;
+  late Animation<double> _fadeAnimation;
+  late Animation<Offset> _slideAnimation;
+  late Animation<double> _textOpacity;
+  late Animation<double> _scaleAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: Duration(seconds: 2),
+      vsync: this,
+    );
+
+    _pulseController = AnimationController(
+      duration: Duration(seconds: 2),
+      vsync: this,
+    )..repeat(reverse: true);
+
+    _fadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _controller,
+      curve: Interval(0.0, 0.5, curve: Curves.easeOut),
+    ));
+
+    _textOpacity = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _controller,
+      curve: Interval(0.2, 0.7, curve: Curves.easeIn),
+    ));
+
+    _slideAnimation = Tween<Offset>(
+      begin: Offset(0, 0.5),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _controller,
+      curve: Interval(0.3, 1.0, curve: Curves.easeOut),
+    ));
+
+    _scaleAnimation = Tween<double>(
+      begin: 0.95,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _pulseController,
+      curve: Curves.easeInOut,
+    ));
+
+    _controller.forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    _pulseController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        iconTheme: IconThemeData(
-          color: Colors.white,
-        ),
-        centerTitle: true,
-        title: Text(
-          "Audivo",
-          style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.bold),
-        ),
-        backgroundColor: Color.fromARGB(255, 60, 145, 230),
-      ),
       body: Container(
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage('assets/images/background.png'), // Arka plan görseli
-            fit: BoxFit.cover, // Görselin ekran boyutuna uyacak şekilde sığdırılması
+            image: AssetImage('assets/images/background.png'),
+            fit: BoxFit.cover,
           ),
         ),
-        padding: EdgeInsets.all(20.0),
-        child: Center( // Metinleri ve butonları ortalamak için Center widget'ı eklendi
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                // Uygulama tanıtımı başlığı
-                Text(
-                  'Welcome to Audivo!',
-                  style: GoogleFonts.poppins(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Color.fromARGB(255, 60, 145, 230),
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                SizedBox(height: 20),
-                // Uygulama tanıtımı açıklaması
-                Text(
-                  "Whether you're a doctor or a patient, we're here to help you understand emotions through hearing and take meaningful steps toward better health.",
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.poppins(fontSize: 16, color: Colors.black),
-                ),
-                SizedBox(height: 40),
-                // Doktor girişine yönlendiren buton
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.pushNamed(context, '/doctorLogin');
+        child: SafeArea(
+          child: Stack(
+            children: [
+              // Animated Background Circles
+              Positioned(
+                top: -50,
+                right: -50,
+                child: AnimatedBuilder(
+                  animation: _pulseController,
+                  builder: (context, child) {
+                    return Transform.rotate(
+                      angle: _pulseController.value * 2 * math.pi,
+                      child: Container(
+                        width: 200,
+                        height: 200,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          gradient: LinearGradient(
+                            colors: [
+                              Color(0x301A237E),
+                              Color(0x105C6BC0),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
                   },
-                  child: Text(
-                    'Doctor Login',
-                    style: GoogleFonts.poppins(color: Colors.white),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Color.fromARGB(255, 60, 145, 230),
-                    padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
                 ),
-                SizedBox(height: 20),
-                // Hasta girişine yönlendiren buton
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.pushNamed(context, '/patientLogin');
+              ),
+              Positioned(
+                bottom: -100,
+                left: -100,
+                child: AnimatedBuilder(
+                  animation: _pulseController,
+                  builder: (context, child) {
+                    return Transform.rotate(
+                      angle: -_pulseController.value * 2 * math.pi,
+                      child: Container(
+                        width: 300,
+                        height: 300,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          gradient: LinearGradient(
+                            colors: [
+                              Color(0x205C6BC0),
+                              Color(0x151A237E),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
                   },
-                  child: Text(
-                    'Patient Login',
-                    style: GoogleFonts.poppins(color: Colors.white),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Color.fromARGB(255, 60, 145, 230),
-                    padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
                 ),
-              ],
-            ),
+              ),
+              
+              // Main Content
+              Padding(
+                padding: EdgeInsets.all(24.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // Logo or App Icon
+                    ScaleTransition(
+                      scale: _scaleAnimation,
+                      child: Container(
+                        width: 120,
+                        height: 120,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 20,
+                              offset: Offset(0, 10),
+                            ),
+                          ],
+                        ),
+                        child: Icon(
+                          Icons.hearing,
+                          size: 60,
+                          color: Color(0xFF1A237E),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 40),
+
+                    // Animated Title
+                    FadeTransition(
+                      opacity: _textOpacity,
+                      child: ShaderMask(
+                        shaderCallback: (bounds) => LinearGradient(
+                          colors: [Color(0xFF1A237E), Color(0xFF5C6BC0)],
+                        ).createShader(bounds),
+                        child: Text(
+                          'Welcome to Audivo!',
+                          style: GoogleFonts.poppins(
+                            fontSize: 32,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 30),
+
+                    // Animated Description
+                    SlideTransition(
+                      position: _slideAnimation,
+                      child: FadeTransition(
+                        opacity: _fadeAnimation,
+                        child: Container(
+                          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.9),
+                            borderRadius: BorderRadius.circular(15),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.05),
+                                blurRadius: 10,
+                                offset: Offset(0, 5),
+                              ),
+                            ],
+                          ),
+                          child: Text(
+                            "Whether you're a doctor or a patient, we're here to help you understand emotions through hearing and take meaningful steps toward better health.",
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.poppins(
+                              fontSize: 16,
+                              color: Color(0xFF1A237E),
+                              height: 1.5,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 50),
+
+                    // Animated Buttons
+                    SlideTransition(
+                      position: _slideAnimation,
+                      child: FadeTransition(
+                        opacity: _fadeAnimation,
+                        child: Column(
+                          children: [
+                            // Doctor Login Button
+                            _buildLoginButton('Doctor Login', () {
+                              Navigator.pushNamed(context, '/doctorLogin');
+                            }, 0.03),
+                            SizedBox(height: 20),
+
+                            // Patient Login Button
+                            _buildLoginButton('Patient Login', () {
+                              Navigator.pushNamed(context, '/patientLogin');
+                            }, 0.02),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildLoginButton(String text, VoidCallback onPressed, double pulseIntensity) {
+    return AnimatedBuilder(
+      animation: _pulseController,
+      builder: (context, child) {
+        return Transform.scale(
+          scale: 1 + _pulseController.value * pulseIntensity,
+          child: Container(
+            width: double.infinity,
+            height: 55,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              color: Colors.white,
+              image: DecorationImage(
+                image: AssetImage('assets/images/background.png'),
+                fit: BoxFit.cover,
+                opacity: 0.05,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 10,
+                  offset: Offset(0, 4),
+                ),
+              ],
+            ),
+            child: ElevatedButton(
+              onPressed: onPressed,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.transparent,
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: Text(
+                text,
+                style: GoogleFonts.poppins(
+                  color: Color(0xFF1A237E),
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }
