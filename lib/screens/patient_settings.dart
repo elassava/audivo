@@ -220,10 +220,10 @@ class PSettingsScreen extends StatelessWidget {
                           CircleAvatar(
                             radius: 30,
                             backgroundColor: Colors.white,
-                            backgroundImage: patientData['profilemg'] != null
-                                ? NetworkImage(patientData['profilemg'])
+                            backgroundImage: patientData['profileImg'] != null
+                                ? NetworkImage(patientData['profileImg'])
                                 : null,
-                            child: patientData['profilemg'] == null
+                            child: patientData['profileImg'] == null
                                 ? Icon(Icons.person, size: 30, color: Colors.grey)
                                 : null,
                           ),
