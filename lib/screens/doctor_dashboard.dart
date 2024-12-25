@@ -10,6 +10,7 @@ import 'doc_patients_screen.dart';
 import 'doc_patient_add_screen.dart';
 import 'doc_settings_screen.dart';
 
+
 class DoctorDashboard extends StatefulWidget {
   @override
   _DoctorDashboardState createState() => _DoctorDashboardState();
@@ -297,54 +298,142 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
                         ),
                         borderRadius: BorderRadius.circular(35),
                       ),
-                      child: GridView.count(
-                        crossAxisCount: 2,
-                        crossAxisSpacing: 16.0,
-                        mainAxisSpacing: 16.0,
+                      child: Column(
                         children: [
-                          _buildDashboardTile(
-                            context,
-                            icon: Icons.person,
-                            title: 'My Patients',
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) => PatientsScreen()),
-                              );
-                            },
+                          Container(
+                            margin: EdgeInsets.fromLTRB(0, 10, 0, 10),
+                            padding: EdgeInsets.all(20),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.8),
+                              borderRadius: BorderRadius.circular(24),
+                              border: Border.all(color: Colors.white.withOpacity(0.3)),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.15),
+                                  blurRadius: 10,
+                                  spreadRadius: 0,
+                                  offset: Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                // Tarih Bilgisi
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Today',
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 16,
+                                        color: Colors.black54,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                    SizedBox(height: 8),
+                                    Text(
+                                    DateTime.now().toString().split(' ')[0].replaceAll('-', '.'), // YYYY.MM.DD formatında
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 20,
+                                      color: Color.fromARGB(255, 60, 145, 230),
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  ],
+                                ),
+                                Container(
+                                  height: 50,
+                                  width: 1,
+                                  color: Colors.grey.withOpacity(0.3),
+                                ),
+                                // Hasta Sayısı
+                                StreamBuilder<QuerySnapshot>(
+                                  stream: FirebaseFirestore.instance
+                                      .collection('patients')
+                                      .where('doctorId', isEqualTo: _auth.currentUser!.uid)
+                                      .snapshots(),
+                                  builder: (context, snapshot) {
+                                    int patientCount = snapshot.hasData ? snapshot.data!.docs.length : 0;
+                                    return Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Total Patients',
+                                          style: GoogleFonts.poppins(
+                                            fontSize: 16,
+                                            color: Colors.black54,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                        SizedBox(height: 8),
+                                        Text(
+                                          patientCount.toString(),
+                                          style: GoogleFonts.poppins(
+                                            fontSize: 20,
+                                            color: Color.fromARGB(255, 60, 145, 230),
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                ),
+                              ],
+                            ),
                           ),
-                          _buildDashboardTile(
-                            context,
-                            icon: Icons.add,
-                            title: 'Add Patient',
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) => PatientAddScreen()),
-                              );
-                            },
-                          ),
-                          _buildDashboardTile(
-                            context,
-                            icon: Icons.notes,
-                            title: 'Notes',
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) => NotesScreen()),
-                              );
-                            },
-                          ),
-                          _buildDashboardTile(
-                            context,
-                            icon: Icons.settings,
-                            title: 'Settings',
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) => SettingsScreen()),
-                              );
-                            },
+                          Expanded(
+                            child: GridView.count(
+                              crossAxisCount: 2,
+                              crossAxisSpacing: 16.0,
+                              mainAxisSpacing: 16.0,
+                              children: [
+                                _buildDashboardTile(
+                                  context,
+                                  icon: Icons.person,
+                                  title: 'My Patients',
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(builder: (context) => PatientsScreen()),
+                                    );
+                                  },
+                                ),
+                                _buildDashboardTile(
+                                  context,
+                                  icon: Icons.add,
+                                  title: 'Add Patient',
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(builder: (context) => PatientAddScreen()),
+                                    );
+                                  },
+                                ),
+                                _buildDashboardTile(
+                                  context,
+                                  icon: Icons.notes,
+                                  title: 'Notes',
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(builder: (context) => NotesScreen()),
+                                    );
+                                  },
+                                ),
+                                _buildDashboardTile(
+                                  context,
+                                  icon: Icons.settings,
+                                  title: 'Settings',
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(builder: (context) => SettingsScreen()),
+                                    );
+                                  },
+                                ),
+                              ],
+                            ),
                           ),
                         ],
                       ),

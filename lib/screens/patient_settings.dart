@@ -163,31 +163,34 @@ class PSettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(50), // Reduce height of AppBar
-        child: AppBar(
-          iconTheme: IconThemeData(
-            color: Colors.white,
-          ),
-          title: Text(
-            'Settings',
-            style: GoogleFonts.poppins(
-                color: Colors.white, fontWeight: FontWeight.bold),
-          ),
-          backgroundColor: Color.fromARGB(255, 60, 145, 230), // Blue color
+      backgroundColor: Color.fromARGB(255, 245, 245, 245),
+      appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () => Navigator.of(context).pop(),
         ),
+        title: Text(
+          'Settings',
+          style: GoogleFonts.poppins(
+            fontSize: 20,
+            fontWeight: FontWeight.w600,
+            color: Colors.black,
+          ),
+        ),
+        backgroundColor: Colors.white,
+        elevation: 0,
       ),
       body: Container(
-        height: MediaQuery.of(context).size.height, // Full screen height
-        width: MediaQuery.of(context).size.width,
         decoration: BoxDecoration(
           image: DecorationImage(
-            image:
-                AssetImage('assets/images/background.png'), // Background image
+            image: AssetImage('assets/images/background.png'),
             fit: BoxFit.cover,
+            colorFilter: ColorFilter.mode(
+              Colors.white.withOpacity(0.8), // Arka plan üzerindeki içeriğin daha okunabilir olması için
+              BlendMode.srcOver,
+            ),
           ),
         ),
-        padding: const EdgeInsets.all(20.0),
         child: FutureBuilder<DocumentSnapshot>(
           future: _getPatientInfo(),
           builder: (context, snapshot) {
@@ -195,144 +198,211 @@ class PSettingsScreen extends StatelessWidget {
               return Center(child: CircularProgressIndicator());
             }
 
-            if (snapshot.hasError) {
-              return Center(child: Text("Error: ${snapshot.error}"));
-            }
-
             if (!snapshot.hasData || !snapshot.data!.exists) {
               return Center(child: Text("No patient data found."));
             }
 
             var patientData = snapshot.data!.data() as Map<String, dynamic>;
-
             String patientName = patientData['name'] ?? 'N/A';
             String patientSurname = patientData['surname'] ?? 'N/A';
-            String patientEmail = patientData['email'] ?? 'N/A';
-            String patientBirthDate = patientData['birthDate'] ?? 'N/A';
 
-            return SingleChildScrollView(
-              child: Column(
-                children: [
-                  Card(
-                    color: Colors.white.withOpacity(0.8),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12.0),
-                    ),
-                    elevation: 5,
-                    child: Padding(
-                      padding: const EdgeInsets.all(20.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+            return SafeArea(
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Header with profile photo and name
+                    Container(
+                      padding: EdgeInsets.all(20),
+                      margin: EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Color.fromARGB(255, 60, 145, 230),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Row(
                         children: [
+                          CircleAvatar(
+                            radius: 30,
+                            backgroundColor: Colors.white,
+                            backgroundImage: patientData['profilemg'] != null
+                                ? NetworkImage(patientData['profilemg'])
+                                : null,
+                            child: patientData['profilemg'] == null
+                                ? Icon(Icons.person, size: 30, color: Colors.grey)
+                                : null,
+                          ),
+                          SizedBox(width: 16),
                           Text(
-                            'Your Information',
+                            '$patientName $patientSurname',
                             style: GoogleFonts.poppins(
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
-                              color: Color.fromARGB(255, 60, 145, 230),
+                              fontSize: 20,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
                             ),
                           ),
-                          Divider(
-                            color: Colors.grey[400],
-                            thickness: 1.0,
-                            height: 20,
-                          ),
-                          SizedBox(height: 10),
-                          _buildInfoRow('Name:', patientName),
-                          SizedBox(height: 10),
-                          _buildInfoRow('Surname:', patientSurname),
-                          SizedBox(height: 10),
-                          _buildInfoRow('Email:', patientEmail),
-                          SizedBox(height: 10),
-                          _buildInfoRow('Birth Date:', patientBirthDate),
-                          SizedBox(height: 20),
                         ],
                       ),
                     ),
-                  ),
-                  SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: () => _deleteAccount(context),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red,
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-                    ),
-                    child: Text(
-                      'Delete Account',
-                      style: GoogleFonts.poppins(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
+
+                    // Personal Information Section
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildInfoSection(
+                            'Name',
+                            patientName,
+                            Icons.person,
+                            Colors.blue,
+                          ),
+                          _buildInfoSection(
+                            'Surname',
+                            patientSurname,
+                            Icons.person_outline,
+                            Colors.green,
+                          ),
+                          _buildInfoSection(
+                            'Email',
+                            patientData['email'] ?? 'N/A',
+                            Icons.email,
+                            Colors.orange,
+                          ),
+                          _buildInfoSection(
+                            'Date of Birth',
+                            patientData['birthDate'] ?? 'N/A',
+                            Icons.cake,
+                            Colors.purple,
+                          ),
+                          SizedBox(height: 24),
+                          
+                          // Account Section
+                          Text(
+                            'Account',
+                            style: GoogleFonts.poppins(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.black87,
+                            ),
+                          ),
+                          SizedBox(height: 12),
+                          
+                          // Account Actions
+                          if (!_isGoogleUser())
+                            _buildActionButton(
+                              'Change Password',
+                              Icons.lock_outline,
+                              Colors.blue,
+                              () => _resetPassword(context),
+                            ),
+                          _buildActionButton(
+                            'Delete Account',
+                            Icons.delete_outline,
+                            Colors.red,
+                            () => _deleteAccount(context),
+                          ),
+                          _buildActionButton(
+                            'Sign Out',
+                            Icons.logout,
+                            Colors.grey,
+                            () => _showLogoutConfirmation(context),
+                          ),
+                        ],
                       ),
                     ),
-                  ),
-                  SizedBox(height: 10),
-                  // Only show reset password button for non-Google users
-                  if (!_isGoogleUser())
-                    ElevatedButton(
-                      onPressed: () => _resetPassword(context),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue,
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-                      ),
-                      child: Text(
-                        'Reset Password',
-                        style: GoogleFonts.poppins(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                ],
+                  ],
+                ),
               ),
             );
           },
         ),
       ),
-      floatingActionButton: SizedBox(
-        height: 80, // Increase button size
-        width: 80, // Increase button size
-        child: FloatingActionButton(
-          onPressed: () => _showLogoutConfirmation(context),
-          backgroundColor: Colors.red, // Change color to red
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(40), // Make it circular
+    );
+  }
+
+  Widget _buildInfoSection(String label, String value, IconData icon, Color color) {
+    return Container(
+      margin: EdgeInsets.symmetric(vertical: 8),
+      padding: EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 4,
+            offset: Offset(0, 2),
           ),
-          child: Icon(Icons.exit_to_app, color: Colors.white, size: 30),
-        ),
+        ],
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      bottomNavigationBar: BottomAppBar(
-        color:
-            Color.fromARGB(255, 60, 145, 230), // Blue color for the bottom bar
-        shape: CircularNotchedRectangle(),
-        notchMargin: 8.0, // Notch margin for better visibility
-        child: SizedBox(height: 10), // Adjust height to match button spacing
+      child: Row(
+        children: [
+          Container(
+            padding: EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(icon, color: color),
+          ),
+          SizedBox(width: 16),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: GoogleFonts.poppins(
+                  fontSize: 14,
+                  color: Colors.grey[600],
+                ),
+              ),
+              Text(
+                value,
+                style: GoogleFonts.poppins(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
 
-  // Helper widget to style each information row
-  Widget _buildInfoRow(String label, String value) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w500),
+  Widget _buildActionButton(String title, IconData icon, Color color, VoidCallback onTap) {
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        margin: EdgeInsets.symmetric(vertical: 8),
+        padding: EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 4,
+              offset: Offset(0, 2),
+            ),
+          ],
         ),
-        SizedBox(width: 8),
-        Expanded(
-          child: Text(
-            value,
-            style:
-                GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w400),
-          ),
+        child: Row(
+          children: [
+            Icon(icon, color: color),
+            SizedBox(width: 16),
+            Text(
+              title,
+              style: GoogleFonts.poppins(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            Spacer(),
+            Icon(Icons.chevron_right, color: Colors.grey),
+          ],
         ),
-      ],
+      ),
     );
   }
 }
