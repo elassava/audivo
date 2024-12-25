@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:emotionmobileversion/screens/audio_screens.dart';
 import 'package:emotionmobileversion/screens/video_test_screen.dart';
 import 'package:emotionmobileversion/screens/masked_video_test_screen.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class PPatientTestsScreen extends StatelessWidget {
   final String patientId;
@@ -90,29 +91,46 @@ class PPatientTestsScreen extends StatelessWidget {
   }
 
   Widget _buildTestsList(BuildContext context) {
-    final tests = [
-      {
-        'title': 'Video Test',
-        'icon': Icons.video_camera_front,
-        'color': Colors.blue,
-        'screen': VideoScreen(patientId: patientId),
-      },
-      {
-        'title': 'Masked Video Test',
-        'icon': Icons.videocam_off,
-        'color': Colors.purple,
-        'screen': MaskedVideoScreen(patientId: patientId),
-      },
-      {
-        'title': 'Audio Test',
-        'icon': Icons.headset,
-        'color': Colors.green,
-        'screen': AudioScreen(patientId: patientId),
-      },
-    ];
+    return FutureBuilder<DocumentSnapshot>(
+      future: FirebaseFirestore.instance
+          .collection('patients')
+          .doc(patientId)
+          .get(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        }
 
-    return Column(
-      children: tests.map((test) => _buildTestCard(context, test)).toList(),
+        final data = snapshot.data?.data() as Map<String, dynamic>? ?? {};
+        
+        final tests = [
+          {
+            'title': 'Video Test',
+            'icon': Icons.video_camera_front,
+            'color': Colors.blue,
+            'screen': VideoScreen(patientId: patientId),
+            'isCompleted': data['VideoIsCompleted'] ?? false,
+          },
+          {
+            'title': 'Masked Video Test',
+            'icon': Icons.videocam_off,
+            'color': Colors.purple,
+            'screen': MaskedVideoScreen(patientId: patientId),
+            'isCompleted': data['MaskedVideoIsCompleted'] ?? false,
+          },
+          {
+            'title': 'Audio Test',
+            'icon': Icons.headset,
+            'color': Colors.green,
+            'screen': AudioScreen(patientId: patientId),
+            'isCompleted': data['AudioIsCompleted'] ?? false,
+          },
+        ];
+
+        return Column(
+          children: tests.map((test) => _buildTestCard(context, test)).toList(),
+        );
+      },
     );
   }
 
@@ -164,6 +182,13 @@ class PPatientTestsScreen extends StatelessWidget {
                     ),
                   ),
                 ),
+                if (test['isCompleted'] == true)
+                  Icon(
+                    Icons.check_circle,
+                    color: Colors.green,
+                    size: 24,
+                  ),
+                SizedBox(width: 8),
                 Icon(
                   Icons.arrow_forward_ios,
                   color: Colors.grey[400],
