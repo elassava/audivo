@@ -35,8 +35,7 @@ class PSettingsScreen extends StatelessWidget {
           context: context,
           builder: (context) => AlertDialog(
             title: Text('Delete Account'),
-            content: Text(
-                'Are you sure you want to delete your account? This action cannot be undone.'),
+            content: Text('Are you sure you want to delete your account? This action cannot be undone.'),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(false),
@@ -51,29 +50,44 @@ class PSettingsScreen extends StatelessWidget {
         );
 
         if (isConfirmed == true) {
-          try {
-            await FirebaseFirestore.instance
-                .collection('patients')
-                .doc(userId)
-                .delete();
-            await FirebaseFirestore.instance
-                .collection('users')
-                .doc(userId)
-                .delete();
-            await user.delete();
-            Navigator.popUntil(context, (route) => false);
-            Navigator.pushNamed(context, '/');
-          } catch (error) {
-            print("Account deletion failed: $error");
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Failed to delete account')),
-            );
-          }
+          // First try to delete the authentication account
+          await user.delete();
+            
+          // Only if authentication deletion succeeds, delete from Firestore
+          await FirebaseFirestore.instance
+              .collection('patients')
+              .doc(userId)
+              .delete();
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(userId)
+              .delete();
+            
+          Navigator.popUntil(context, (route) => false);
+          Navigator.pushNamed(context, '/');
         }
-      } catch (e) {
-        print('Error deleting account: $e');
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to delete account: $e')),
+      } catch (error) {
+        print("Account deletion failed: $error");
+        // Show dialog for any deletion error
+        await showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text('Account Deletion Failed'),
+            content: Text('For security reasons, you need to sign out and sign in again before deleting your account. Would you like to sign out now?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  _signOut(context);
+                },
+                child: Text('Sign Out'),
+              ),
+            ],
+          ),
         );
       }
     }
@@ -220,10 +234,10 @@ class PSettingsScreen extends StatelessWidget {
                           CircleAvatar(
                             radius: 30,
                             backgroundColor: Colors.white,
-                            backgroundImage: patientData['profileImg'] != null
-                                ? NetworkImage(patientData['profileImg'])
+                            backgroundImage: patientData['profilemg'] != null
+                                ? NetworkImage(patientData['profilemg'])
                                 : null,
-                            child: patientData['profileImg'] == null
+                            child: patientData['profilemg'] == null
                                 ? Icon(Icons.person, size: 30, color: Colors.grey)
                                 : null,
                           ),
