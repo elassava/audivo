@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/cupertino.dart';
 
 class PatientAddScreen extends StatefulWidget {
   @override
@@ -14,10 +15,10 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
   String name = '';
   String surname = '';
   String birthDate = '';
-  String gender = 'Male';
   String email = '';
   String phone = '';
-  String countryCode = '+1'; // Default country code
+  String? gender;
+  String countryCode = '+90'; // Default country code
   final _auth = FirebaseAuth.instance;
 
   void _addPatient() async {
@@ -34,7 +35,8 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
           'birthDate': birthDate,
           'gender': gender,
           'email': email,
-          'phone': fullPhoneNumber, // Save combined phone number with country code
+          'phone':
+              fullPhoneNumber, // Save combined phone number with country code
           'role': "patient"
         });
 
@@ -45,7 +47,8 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
           'birthDate': birthDate,
           'gender': gender,
           'email': email,
-          'phone': fullPhoneNumber, // Save combined phone number with country code
+          'phone':
+              fullPhoneNumber, // Save combined phone number with country code
         });
 
         ScaffoldMessenger.of(context).showSnackBar(
@@ -71,9 +74,12 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
           data: ThemeData.light().copyWith(
             primaryColor: Color.fromARGB(255, 60, 145, 230), // App bar color
             hintColor: Color.fromARGB(255, 60, 145, 230), // Selected day color
-            buttonTheme: ButtonThemeData(textTheme: ButtonTextTheme.primary), // Button style
+            buttonTheme: ButtonThemeData(
+                textTheme: ButtonTextTheme.primary), // Button style
             textButtonTheme: TextButtonThemeData(
-              style: TextButton.styleFrom(foregroundColor: Color.fromARGB(255, 60, 145, 230)), // Button text color
+              style: TextButton.styleFrom(
+                  foregroundColor:
+                      Color.fromARGB(255, 60, 145, 230)), // Button text color
             ),
             textTheme: TextTheme(
               bodySmall: TextStyle(
@@ -95,14 +101,45 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
     }
   }
 
+  BoxDecoration _containerDecoration() {
+    return BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(12),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withOpacity(0.05),
+          blurRadius: 10,
+          offset: Offset(0, 4),
+        ),
+      ],
+    );
+  }
+
   InputDecoration _inputDecoration(String label) {
     return InputDecoration(
       labelText: label,
-      labelStyle: GoogleFonts.poppins(fontWeight: FontWeight.bold, color: Colors.black),
+      labelStyle: GoogleFonts.poppins(
+        fontWeight: FontWeight.w500,
+        color: Colors.black54,
+      ),
       filled: true,
-      fillColor: Color.fromARGB(255, 230, 243, 255),
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8),
+      fillColor: Colors.white,
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: Colors.grey.shade200),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide:
+            BorderSide(color: Color.fromARGB(255, 60, 145, 230), width: 2),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: Colors.red.shade300),
+      ),
+      focusedErrorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: Colors.red.shade300, width: 2),
       ),
     );
   }
@@ -111,44 +148,26 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
   Widget build(BuildContext context) {
     // List of country codes for dropdown, sorted in ascending order
     List<String> countryCodes = [
-      '+1',  // USA/Canada
+      '+1', // USA/Canada
       '+20', // Egypt
       '+27', // South Africa
       '+31', // Netherlands
       '+33', // France
       '+34', // Spain
       '+39', // Italy
-      '+41', // Switzerland
-      '+43', // Austria
-      '+44', // United Kingdom
-      '+47', // Norway
-      '+48', // Poland
-      '+49', // Germany
-      '+52', // Mexico
-      '+55', // Brazil
-      '+61', // Australia
-      '+64', // New Zealand
-      '+63', // Philippines
-      '+64', // New Zealand
-      '+71', // Russia
-      '+82', // South Korea
-      '+86', // China
-      '+91', // India
+
       '+90', // Turkey
-      '+971', // United Arab Emirates
-      '+213', // Algeria
-      '+254', // Kenya
-      '+256', // Uganda
     ]..sort(); // Sorting the list in ascending order.
 
     return Scaffold(
       appBar: AppBar(
+        elevation: 0,
         iconTheme: IconThemeData(color: Colors.white),
         title: Text(
           'Add Patient',
           style: GoogleFonts.poppins(
             color: Colors.white,
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w600,
           ),
         ),
         backgroundColor: Color.fromARGB(255, 60, 145, 230),
@@ -163,119 +182,162 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
           ),
         ),
         child: SingleChildScrollView(
+          physics: BouncingScrollPhysics(),
           child: Padding(
             padding: const EdgeInsets.all(16.0),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  SizedBox(height: 20),
-                  TextFormField(
-                    decoration: _inputDecoration('Name'),
-                    onChanged: (value) => setState(() => name = value),
-                    validator: (value) =>
-                        value!.isEmpty ? 'Please enter the name' : null,
-                  ),
-                  SizedBox(height: 20),
-                  TextFormField(
-                    decoration: _inputDecoration('Surname'),
-                    onChanged: (value) => setState(() => surname = value),
-                    validator: (value) =>
-                        value!.isEmpty ? 'Please enter the surname' : null,
-                  ),
-                  SizedBox(height: 20),
-                  GestureDetector(
-                    onTap: () => _selectBirthDate(context),
-                    child: AbsorbPointer(
-                      child: TextFormField(
-                        readOnly: true, // Prevent manual input
-                        keyboardType: TextInputType.none, // Disable keyboard
-                        textInputAction: TextInputAction.none, // Disable text action on the keyboard
-                        decoration: _inputDecoration(
-                          birthDate.isEmpty ? 'Select Birth Date' : birthDate),
-                        validator: (value) =>
-                            birthDate.isEmpty ? 'Please select the birth date (YYYY/DD/MM)' : null,
+            child: Container(
+              padding: EdgeInsets.all(20),
+              decoration: _containerDecoration(),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Text(
+                      'Patient Information',
+                      style: GoogleFonts.poppins(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black87,
                       ),
                     ),
-                  ),
-                    
-                  SizedBox(height: 20),
-                  DropdownButtonFormField<String>(
-                    value: gender,
-                    items: ['Female', 'Male']
-                        .map((label) => DropdownMenuItem(
-                              value: label,
-                              child: Text(label),
-                            ))
-                        .toList(),
-                    onChanged: (value) => setState(() => gender = value!),
-                    decoration: _inputDecoration('Gender'),
-                    validator: (value) =>
-                        value == null || value.isEmpty ? 'Please select the gender' : null,
-                    style: GoogleFonts.poppins(fontWeight: FontWeight.bold, color: Colors.black), // Bold text
-                  ),
-                  SizedBox(height: 20),
-                  TextFormField(
-                    decoration: _inputDecoration('Email'),
-                    onChanged: (value) => setState(() => email = value),
-                    validator: (value) =>
-                        value!.isEmpty ? 'Please enter the email' : null,
-                  ),
-                  SizedBox(height: 20),
-                  Row(
-                    children: [
-                      Expanded(
-                        flex: 3, // This gives 30% width
-                        child: DropdownButtonFormField<String>(
-                          value: countryCode,
-                          items: countryCodes
-                              .map((code) => DropdownMenuItem(
-                                    value: code,
-                                    child: Text(code),
-                                  ))
-                              .toList(),
-                          onChanged: (value) => setState(() => countryCode = value!),
-                          decoration: _inputDecoration('Country Code'),
-                          validator: (value) =>
-                              value == null || value.isEmpty ? 'Please select the country code' : null,
-                          style: GoogleFonts.poppins(fontWeight: FontWeight.bold, color: Colors.black), // Bold text
-                        ),
-                      ),
-                      SizedBox(width: 10),
-                      Expanded(
-                        flex: 7, // This gives 70% width
+                    SizedBox(height: 24),
+                    TextFormField(
+                      decoration: _inputDecoration('Name'),
+                      onChanged: (value) => setState(() => name = value),
+                      validator: (value) =>
+                          value!.isEmpty ? 'Please enter the name' : null,
+                    ),
+                    SizedBox(height: 20),
+                    TextFormField(
+                      decoration: _inputDecoration('Surname'),
+                      onChanged: (value) => setState(() => surname = value),
+                      validator: (value) =>
+                          value!.isEmpty ? 'Please enter the surname' : null,
+                    ),
+                    SizedBox(height: 20),
+                    GestureDetector(
+                      onTap: () => _selectBirthDate(context),
+                      child: AbsorbPointer(
                         child: TextFormField(
-                          decoration: _inputDecoration('Phone'),
-                          onChanged: (value) => setState(() => phone = value),
-                          validator: (value) {
-                            if (value!.isEmpty) {
-                              return 'Please enter the phone number';
-                            } else if (value.length != 10) {
-                              return 'Phone number must be exactly 10 digits';
-                            }
-                            return null;
-                          },
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly, // Allow only digits
-                          ],
+                          readOnly: true, // Prevent manual input
+                          keyboardType: TextInputType.none, // Disable keyboard
+                          textInputAction: TextInputAction
+                              .none, // Disable text action on the keyboard
+                          decoration: _inputDecoration(birthDate.isEmpty
+                              ? 'Select Birth Date'
+                              : birthDate),
+                          validator: (value) => birthDate.isEmpty
+                              ? 'Please select the birth date (YYYY/DD/MM)'
+                              : null,
                         ),
                       ),
-                    ],
-                  ),
-                  SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: _addPatient,
-                    child: Text('Add Patient', style: GoogleFonts.poppins(fontWeight: FontWeight.bold, color: Colors.white)),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Color.fromARGB(255, 60, 145, 230),
-                      padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                    ),
+                    SizedBox(height: 20),
+                    DropdownButtonFormField<String>(
+  value: gender,
+  hint: Text('Select Gender'), // Add this line for default text
+  items: ['Female', 'Male']
+      .map((label) => DropdownMenuItem(
+            value: label,
+            child: Text(label),
+          ))
+      .toList(),
+  onChanged: (value) => setState(() => gender = value),
+  decoration: _inputDecoration('Gender'),
+  validator: (value) =>
+      value == null || value.isEmpty ? 'Please select the gender' : null,
+  style: GoogleFonts.poppins(fontWeight: FontWeight.w600, color: const Color.fromARGB(255, 177, 177, 177)),
+),
+                    SizedBox(height: 20),
+                    TextFormField(
+                      decoration: _inputDecoration('Email'),
+                      onChanged: (value) => setState(() => email = value),
+                      validator: (value) =>
+                          value!.isEmpty ? 'Please enter the email' : null,
+                    ),
+                    SizedBox(height: 20),
+                    Row(
+                      children: [
+                        Expanded(
+                          flex: 3, // This gives 30% width
+                          child: DropdownButtonFormField<String>(
+                            value: countryCode,
+                            items: [
+                              DropdownMenuItem(
+                                  value: '+90', child: Text('🇹🇷 +90')),
+                              DropdownMenuItem(
+                                  value: '+1', child: Text('🇺🇸 +1')),
+                              DropdownMenuItem(
+                                  value: '+44', child: Text('🇬🇧 +44')),
+                              DropdownMenuItem(
+                                  value: '+49', child: Text('🇩🇪 +49')),
+                            ],
+                            onChanged: (value) {
+                              countryCode = value!;
+                            },
+                            style: GoogleFonts.poppins(
+                              color: Colors.black87,
+                              fontSize: 14,
+                            ),
+                            icon: Icon(
+                              Icons.arrow_drop_down,
+                              color: Color.fromARGB(255, 60, 145, 230),
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 8),
+                        Expanded(
+                          flex: 7, // This gives 70% width
+                          child: TextFormField(
+                            decoration: _inputDecoration('Phone'),
+                            onChanged: (value) => setState(() => phone = value),
+                            validator: (value) {
+                              if (value!.isEmpty) {
+                                return 'Please enter the phone number';
+                              } else if (value.length != 10) {
+                                return 'Phone number must be exactly 10 digits';
+                              }
+                              return null;
+                            },
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly,
+                              LengthLimitingTextInputFormatter(
+                                  10), // Allow only digits
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 32),
+                    ElevatedButton(
+                      onPressed: _addPatient,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.person_add, size: 20),
+                          SizedBox(width: 8),
+                          Text(
+                            'Add Patient',
+                            style: GoogleFonts.poppins(
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ],
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color.fromARGB(255, 60, 145, 230),
+                        padding: EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 2,
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

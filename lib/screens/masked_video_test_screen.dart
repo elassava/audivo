@@ -270,73 +270,144 @@ class _MaskedVideoScreenState extends State<MaskedVideoScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        iconTheme: IconThemeData(
-          color: Colors.white,
+        elevation: 0,
+        iconTheme: IconThemeData(color: Colors.white),
+        title: Text(
+          'Masked Video Test',
+          style: GoogleFonts.poppins(
+            color: Colors.white,
+            fontWeight: FontWeight.w600,
+            fontSize: 22,
+          ),
         ),
-        title: Text('Masked Video Test',
-            style: GoogleFonts.poppins(
-                color: Colors.white, fontWeight: FontWeight.bold)),
         backgroundColor: Color.fromARGB(255, 60, 145, 230),
       ),
-      body: _isLoading
-          ? Center(child: CircularProgressIndicator())
-          : _videoPlayerController != null &&
-                  _videoPlayerController!.value.isInitialized
-              ? Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                        'Question: $_questionNumber',
-                        style: GoogleFonts.poppins(
-                            fontSize: 20, color: Colors.black),
-                      ),
-                    ),
-                    AspectRatio(
-                      aspectRatio: _videoPlayerController!.value.aspectRatio,
-                      child: VideoPlayer(_videoPlayerController!),
-                    ),
-                    SizedBox(height: 16),
-                    Text(
-                      'How do you feel after watching?',
-                      style: GoogleFonts.poppins(
-                          fontSize: 18, color: Colors.black),
-                    ),
-                    SizedBox(height: 16),
-                    Wrap(
-                      alignment: WrapAlignment.center,
-                      spacing: 10.0,
-                      runSpacing: 10.0,
-                      children: List.generate(_options.length, (index) {
-                        return SizedBox(
-                          width: MediaQuery.of(context).size.width * 0.4,
-                          child: ElevatedButton(
-                            onPressed: _isAnswered
-                                ? null
-                                : () => _submitEmotion(index),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor:
-                                  Color.fromARGB(255, 60, 145, 230),
+      body: Container(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/images/background.png'),
+            fit: BoxFit.cover,
+            colorFilter: ColorFilter.mode(
+              Colors.white.withOpacity(0.9),
+              BlendMode.lighten,
+            ),
+          ),
+        ),
+        child: Center(
+          child: _isLoading
+              ? CircularProgressIndicator(
+                  color: Color.fromARGB(255, 60, 145, 230),
+                )
+              : _videoPlayerController != null && _videoPlayerController!.value.isInitialized
+                  ? Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            padding: EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.9),
+                              borderRadius: BorderRadius.circular(15),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.1),
+                                  blurRadius: 10,
+                                  offset: Offset(0, 5),
+                                ),
+                              ],
                             ),
-                            child: Text(
-                              _options[index],
-                              style: GoogleFonts.poppins(
-                                  fontSize: 14, color: Colors.white),
-                              textAlign: TextAlign.center,
+                            child: Column(
+                              children: [
+                                Text(
+                                  'Question $_questionNumber',
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color.fromARGB(255, 60, 145, 230),
+                                  ),
+                                ),
+                                SizedBox(height: 20),
+                                Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(15),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.2),
+                                        blurRadius: 8,
+                                        offset: Offset(0, 4),
+                                      ),
+                                    ],
+                                  ),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(15),
+                                    child: AspectRatio(
+                                      aspectRatio: _videoPlayerController!.value.aspectRatio,
+                                      child: VideoPlayer(_videoPlayerController!),
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(height: 24),
+                                Text(
+                                  'How do you feel after watching?',
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.black87,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                        );
-                      }),
+                          SizedBox(height: 24),
+                          Wrap(
+                            alignment: WrapAlignment.center,
+                            spacing: 12.0,
+                            runSpacing: 12.0,
+                            children: List.generate(_options.length, (index) {
+                              return SizedBox(
+                                width: MediaQuery.of(context).size.width * 0.4,
+                                child: ElevatedButton(
+                                  onPressed: _isAnswered ? null : () {
+                                    setState(() {
+                                      _isAnswered = true;
+                                    });
+                                    _submitEmotion(index);
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Color.fromARGB(255, 60, 145, 230),
+                                    padding: EdgeInsets.symmetric(vertical: 12),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    elevation: 3,
+                                  ),
+                                  child: Text(
+                                    _options[index],
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              );
+                            }),
+                          ),
+                        ],
+                      ),
+                    )
+                  : Center(
+                      child: Text(
+                        'No video available or error loading video.',
+                        style: GoogleFonts.poppins(
+                          fontSize: 16,
+                          color: Colors.black87,
+                        ),
+                      ),
                     ),
-                  ],
-                )
-              : Center(
-                  child: Text(
-                    'No video available or error loading video.',
-                    style: GoogleFonts.poppins(),
-                  ),
-                ),
+        ),
+      ),
     );
   }
 }

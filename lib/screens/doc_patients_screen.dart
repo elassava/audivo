@@ -31,17 +31,51 @@ class _PatientsScreenState extends State<PatientsScreen> {
         .where('doctorId', isEqualTo: doctorId)
         .get();
 
-    List<Map<String, dynamic>> patientsList = querySnapshot.docs.map((doc) {
-      Map<String, dynamic> patientData = doc.data() as Map<String, dynamic>;
-      return {
-        'name': patientData['name'] ?? 'Unknown Name',
-        'surname': patientData['surname'] ?? 'Unknown Surname',
-        'email': patientData['email'] ?? 'Unknown Email',
-        'id': doc.id,
-        'lastTest': patientData['lastTest'] ?? 'No test taken',
-        'testCount': patientData['testCount'] ?? 0,
-      };
-    }).toList();
+    List<Map<String, dynamic>> patientsList = await Future.wait(
+      querySnapshot.docs.map((doc) async {
+        Map<String, dynamic> patientData = doc.data() as Map<String, dynamic>;
+        
+        // Tamamlanmış test sayısını hesapla
+        int completedTests = 0;
+        String? lastTest; // null olarak başlat
+        
+        // Test durumlarını ve tarihlerini kontrol et
+        Map<String, DateTime?> testDates = {
+          'Video Test': patientData['VideoCompletedAt']?.toDate(),
+          'Masked Video Test': patientData['MaskedVideoCompletedAt']?.toDate(),
+          'Audio Test': patientData['AudioCompletedAt']?.toDate(),
+        };
+
+        // Tamamlanmış testleri say
+        if (patientData['VideoIsCompleted'] == true) completedTests++;
+        if (patientData['MaskedVideoIsCompleted'] == true) completedTests++;
+        if (patientData['AudioIsCompleted'] == true) completedTests++;
+
+        // En son yapılan testi bul
+        DateTime? latestDate;
+        testDates.forEach((testName, date) {
+          if (date != null && (latestDate == null || date.isAfter(latestDate!))) {
+            latestDate = date;
+            lastTest = testName;
+          }
+        });
+
+        // Firestore'da testCount ve lastTest'i güncelle
+        await _firestore.collection('patients').doc(doc.id).update({
+          'testCount': completedTests,
+          'lastTest': lastTest, // null olabilir
+        });
+
+        return {
+          'name': patientData['name'] ?? 'Unknown Name',
+          'surname': patientData['surname'] ?? 'Unknown Surname',
+          'email': patientData['email'] ?? 'Unknown Email',
+          'id': doc.id,
+          'lastTest': lastTest, // null olabilir
+          'testCount': completedTests,
+        };
+      }),
+    );
 
     return patientsList;
   }
@@ -252,6 +286,11 @@ class _PatientsScreenState extends State<PatientsScreen> {
   }
 
   Widget _buildInfoChip(IconData icon, String label, Color color) {
+    // lastTest null ise chip'i gösterme
+    if (label.startsWith('Last: ') && label == 'Last: null') {
+      return Container(); // Boş container döndür
+    }
+
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
