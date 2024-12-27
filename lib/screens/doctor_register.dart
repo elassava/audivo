@@ -289,8 +289,33 @@ class _DoctorRegisterScreenState extends State<DoctorRegisterScreen> {
         ),
       );
     } catch (e) {
+      String errorMessage = 'An unexpected error occurred. Please try again.';
+      
+      if (e is FirebaseAuthException) {
+        switch (e.code) {
+          case 'email-already-in-use':
+            errorMessage = 'This email is already registered. Please use a different email or sign in.';
+            break;
+          case 'invalid-email':
+            errorMessage = 'Please enter a valid email address.';
+            break;
+          case 'operation-not-allowed':
+            errorMessage = 'Email/password registration is not enabled. Please contact support.';
+            break;
+          case 'weak-password':
+            errorMessage = 'Please choose a stronger password. Use at least 6 characters with letters and numbers.';
+            break;
+          case 'network-request-failed':
+            errorMessage = 'Network error. Please check your internet connection and try again.';
+            break;
+          case 'too-many-requests':
+            errorMessage = 'Too many attempts. Please try again later.';
+            break;
+        }
+      }
+
       setState(() {
-        _errorMessage = e.toString();
+        _errorMessage = errorMessage;
       });
     }
   }
