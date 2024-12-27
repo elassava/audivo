@@ -178,7 +178,7 @@ class _NotesScreenState extends State<NotesScreen> {
                                         ),
                                         SizedBox(width: 8),
                                         Text(
-                                          'Düzenle',
+                                          'Edit',
                                           style: GoogleFonts.poppins(
                                             fontSize: 14,
                                             fontWeight: FontWeight.w500,
@@ -212,7 +212,7 @@ class _NotesScreenState extends State<NotesScreen> {
                                         ),
                                         SizedBox(width: 8),
                                         Text(
-                                          'Sil',
+                                          'Delete',
                                           style: GoogleFonts.poppins(
                                             fontSize: 14,
                                             fontWeight: FontWeight.w500,

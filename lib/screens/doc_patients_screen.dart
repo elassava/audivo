@@ -97,11 +97,46 @@ class _PatientsScreenState extends State<PatientsScreen> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-            'Patient deleted successfully',
-            style: GoogleFonts.poppins(),
+          content: Container(
+            padding: EdgeInsets.symmetric(vertical: 8),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.check_circle_outline,
+                  color: Colors.white,
+                ),
+                SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'Success',
+                        style: GoogleFonts.poppins(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                      Text(
+                        'Patient deleted successfully',
+                        style: GoogleFonts.poppins(
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
-          backgroundColor: Colors.green,
+          backgroundColor: Colors.green.shade600,
+          duration: Duration(seconds: 3),
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          margin: EdgeInsets.all(16),
         ),
       );
     } catch (e) {
@@ -155,30 +190,86 @@ class _PatientsScreenState extends State<PatientsScreen> {
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: Text(
-                'Delete Patient',
-                style: GoogleFonts.poppins(fontWeight: FontWeight.bold),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
               ),
-              content: Text(
-                'Are you sure you want to delete ${patient['name']} ${patient['surname']}?',
-                style: GoogleFonts.poppins(),
+              title: Column(
+                children: [
+                  Icon(
+                    Icons.warning_rounded,
+                    color: Colors.red,
+                    size: 48,
+                  ),
+                  SizedBox(height: 16),
+                  Text(
+                    'Delete Patient',
+                    style: GoogleFonts.poppins(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 24,
+                    ),
+                  ),
+                ],
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Are you sure you want to delete',
+                    style: GoogleFonts.poppins(
+                      fontSize: 16,
+                      color: Colors.grey[700],
+                    ),
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    '${patient['name']} ${patient['surname']}?',
+                    style: GoogleFonts.poppins(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black,
+                    ),
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    'This action cannot be undone.',
+                    style: GoogleFonts.poppins(
+                      fontSize: 14,
+                      color: Colors.red[400],
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+                ],
               ),
               actions: <Widget>[
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(false),
                   child: Text(
                     'Cancel',
-                    style: GoogleFonts.poppins(color: Colors.grey),
+                    style: GoogleFonts.poppins(
+                      color: Colors.grey[600],
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ),
-                TextButton(
+                ElevatedButton(
                   onPressed: () => Navigator.of(context).pop(true),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  ),
                   child: Text(
                     'Delete',
-                    style: GoogleFonts.poppins(color: Colors.red),
+                    style: GoogleFonts.poppins(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ],
+              actionsPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             );
           },
         );

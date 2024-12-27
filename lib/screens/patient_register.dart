@@ -81,15 +81,15 @@ class _PatientRegisterScreenState extends State<PatientRegisterScreen> {
   // Kayıt fonksiyonu
   Future<void> _register() async {
     setState(() {
-      _errorMessage = null; // Hata mesajını sıfırlama
+      _errorMessage = null;
     });
 
     if (_passwordController.text.trim() != _confirmPasswordController.text.trim()) {
-    setState(() {
-      _errorMessage = "Passwords do not match!";
-    });
-    return;
-  }
+      setState(() {
+        _errorMessage = "Passwords do not match!";
+      });
+      return;
+    }
 
     // Alanların boş olup olmadığını kontrol et
     if (_firstNameController.text.isEmpty ||
@@ -138,10 +138,99 @@ class _PatientRegisterScreenState extends State<PatientRegisterScreen> {
         'gender': _gender,
       });
 
+      // Send verification email
       await userCredential.user!.sendEmailVerification();
 
-      // Başarılı kayıt sonrası giriş ekranına yönlendirme
-      Navigator.pushReplacementNamed(context, '/patientLogin');
+      // Show verification email sent dialog
+      await showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: Column(
+            children: [
+              Icon(
+                Icons.mark_email_read,
+                color: Colors.green,
+                size: 64,
+              ),
+              SizedBox(height: 16),
+              Text(
+                'Verify Your Email',
+                style: GoogleFonts.poppins(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.green,
+                ),
+              ),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'A verification email has been sent to:',
+                textAlign: TextAlign.center,
+                style: GoogleFonts.poppins(
+                  fontSize: 16,
+                  color: Colors.grey[700],
+                ),
+              ),
+              SizedBox(height: 8),
+              Text(
+                _emailController.text.trim(),
+                textAlign: TextAlign.center,
+                style: GoogleFonts.poppins(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black87,
+                ),
+              ),
+              SizedBox(height: 16),
+              Text(
+                'Please check your inbox and verify your email before signing in.',
+                textAlign: TextAlign.center,
+                style: GoogleFonts.poppins(
+                  fontSize: 14,
+                  color: Colors.grey[600],
+                  height: 1.5,
+                ),
+              ),
+            ],
+          ),
+          backgroundColor: Colors.white,
+          elevation: 5,
+          actionsPadding: EdgeInsets.all(16),
+          actions: [
+            Container(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  Navigator.pushReplacementNamed(context, '/patientLogin');
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green,
+                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  elevation: 0,
+                ),
+                child: Text(
+                  'Got it',
+                  style: GoogleFonts.poppins(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
     } catch (e) {
       setState(() {
         _errorMessage = e.toString();

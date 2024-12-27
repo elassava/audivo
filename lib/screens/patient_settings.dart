@@ -142,7 +142,9 @@ class PSettingsScreen extends StatelessWidget {
                 fontWeight: FontWeight.bold,
                 color: Colors.blue,
               ),
+
             ),
+
           ),
           TextButton(
             onPressed: () {
@@ -195,6 +197,7 @@ class PSettingsScreen extends StatelessWidget {
         elevation: 0,
       ),
       body: Container(
+        height: MediaQuery.of(context).size.height,
         decoration: BoxDecoration(
           image: DecorationImage(
             image: AssetImage('assets/images/background.png'), // Kendi image path'inizi kullanın

@@ -295,7 +295,7 @@ class _ResultScreenState extends State<ResultScreen> {
       appBar: AppBar(
         iconTheme: IconThemeData(color: Colors.white),
         title: Text(
-          'Test Results - ${widget.testType.capitalize()}',
+          'Test Results',
           style: GoogleFonts.poppins(
             color: Colors.white,
             fontWeight: FontWeight.bold,

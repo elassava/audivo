@@ -25,13 +25,84 @@ class _DoctorRegisterScreenState extends State<DoctorRegisterScreen> {
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? selectedDate = await showDatePicker(
       context: context,
-      initialDate: DateTime.now(),
+      initialDate: DateTime.now().subtract(Duration(days: 365 * 18)), // 18 yaş başlangıç
       firstDate: DateTime(1900),
       lastDate: DateTime.now(),
     );
-    if (selectedDate != null && selectedDate != DateTime.now()) {
+    
+    if (selectedDate != null) {
+      // Yaş kontrolü
+      final age = DateTime.now().difference(selectedDate).inDays / 365;
+      
+      if (age < 18) {
+        // 18 yaşından küçükse uyarı göster
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            title: Column(
+              children: [
+                Icon(
+                  Icons.warning_rounded,
+                  color: Colors.orange,
+                  size: 64,
+                ),
+                SizedBox(height: 16),
+                Text(
+                  'Age Restriction',
+                  style: GoogleFonts.poppins(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.orange,
+                  ),
+                ),
+              ],
+            ),
+            content: Text(
+              'You must be at least 18 years old to register as a doctor.',
+              textAlign: TextAlign.center,
+              style: GoogleFonts.poppins(
+                fontSize: 16,
+                color: Colors.grey[700],
+                height: 1.5,
+              ),
+            ),
+            backgroundColor: Colors.white,
+            elevation: 5,
+            actionsPadding: EdgeInsets.all(16),
+            actions: [
+              Container(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.orange,
+                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    elevation: 0,
+                  ),
+                  child: Text(
+                    'Okay',
+                    style: GoogleFonts.poppins(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+        return;
+      }
+      
       setState(() {
-        _dob = '${selectedDate.toLocal()}'.split(' ')[0]; // GG/AA/YYYY formatında
+        _dob = '${selectedDate.toLocal()}'.split(' ')[0];
       });
     }
   }
@@ -127,12 +198,96 @@ class _DoctorRegisterScreenState extends State<DoctorRegisterScreen> {
       // Doğrulama e-postası gönder
       await userCredential.user!.sendEmailVerification();
 
-      // Başarılı kayıt sonrası bilgi mesajı göster ve giriş ekranına yönlendir
-      setState(() {
-        _errorMessage = "Registration successful! Please verify your email to log in.";
-      });
-
-      Navigator.pushReplacementNamed(context, '/doctorLogin');
+      // Show verification email sent dialog
+      await showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: Column(
+            children: [
+              Icon(
+                Icons.mark_email_read,
+                color: Colors.green,
+                size: 64,
+              ),
+              SizedBox(height: 16),
+              Text(
+                'Verify Your Email',
+                style: GoogleFonts.poppins(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.green,
+                ),
+              ),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'A verification email has been sent to:',
+                textAlign: TextAlign.center,
+                style: GoogleFonts.poppins(
+                  fontSize: 16,
+                  color: Colors.grey[700],
+                ),
+              ),
+              SizedBox(height: 8),
+              Text(
+                _emailController.text.trim(),
+                textAlign: TextAlign.center,
+                style: GoogleFonts.poppins(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black87,
+                ),
+              ),
+              SizedBox(height: 16),
+              Text(
+                'Please check your inbox and verify your email before signing in.',
+                textAlign: TextAlign.center,
+                style: GoogleFonts.poppins(
+                  fontSize: 14,
+                  color: Colors.grey[600],
+                  height: 1.5,
+                ),
+              ),
+            ],
+          ),
+          backgroundColor: Colors.white,
+          elevation: 5,
+          actionsPadding: EdgeInsets.all(16),
+          actions: [
+            Container(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  Navigator.pushReplacementNamed(context, '/doctorLogin');
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green,
+                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  elevation: 0,
+                ),
+                child: Text(
+                  'Got it',
+                  style: GoogleFonts.poppins(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
     } catch (e) {
       setState(() {
         _errorMessage = e.toString();
