@@ -150,18 +150,13 @@ class _IntroScreenState extends State<IntroScreen> with TickerProviderStateMixin
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           color: Colors.white,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
-                              blurRadius: 20,
-                              offset: Offset(0, 10),
-                            ),
-                          ],
+                    
                         ),
-                        child: Icon(
-                          Icons.hearing,
-                          size: 60,
-                          color: Color(0xFF1A237E),
+                        child: Image.asset(
+                          'assets/images/iconi.png',
+                          width: 60,
+                          height: 60,
+                          fit: BoxFit.contain,
                         ),
                       ),
                     ),
