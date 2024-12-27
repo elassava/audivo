@@ -48,15 +48,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        iconTheme: IconThemeData(color: Colors.white),
-        title: Text(
-          "Reset Password",
-          style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.bold),
-        ),
-        backgroundColor: Color.fromARGB(255, 60, 145, 230),
-        centerTitle: true,
-      ),
       body: Container(
         decoration: BoxDecoration(
           image: DecorationImage(
@@ -70,31 +61,73 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                TextField(
-                  controller: _emailController,
-                  decoration: InputDecoration(
-                    labelText: 'E-mail',
-                    labelStyle: GoogleFonts.poppins(),
-                    filled: true,
-                    fillColor: Colors.blue[50]?.withOpacity(0.8),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
+                Icon(
+                  Icons.lock_reset_rounded,
+                  size: 100,
+                  color: Color(0xFF283593)
+                ),
+                SizedBox(height: 10),
+                Text(
+                  'Reset Password',
+                  style: GoogleFonts.poppins(
+                    color: Color(0xFF283593),
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
                   ),
-                  keyboardType: TextInputType.emailAddress,
+                ),
+                SizedBox(height: 10),
+                Text(
+                  'Enter your email to reset your password',
+                  style: GoogleFonts.poppins(
+                    color: Color(0xFF283593),
+                    fontSize: 16,
+                  ),
+                ),
+                SizedBox(height: 30),
+                Container(
+                  margin: EdgeInsets.symmetric(horizontal: 25),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: TextField(
+                    controller: _emailController,
+                    decoration: InputDecoration(
+                      labelText: 'E-mail',
+                      labelStyle: GoogleFonts.poppins(color: Colors.grey[500]),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: Colors.white),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: Colors.blue),
+                      ),
+                      fillColor: Colors.white,
+                      filled: true,
+                    ),
+                    keyboardType: TextInputType.emailAddress,
+                  ),
                 ),
                 SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: _resetPassword,
-                  child: Text(
-                    'Reset Password',
-                    style: GoogleFonts.poppins(color: Colors.white),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Color.fromARGB(255, 60, 145, 230),
-                    padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                  child: ElevatedButton(
+                    onPressed: _resetPassword,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      minimumSize: Size(double.infinity, 50),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: Text(
+                      'Reset Password',
+                      style: GoogleFonts.poppins(
+                        color:Color(0xFF283593),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
                     ),
                   ),
                 ),
@@ -102,12 +135,18 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 if (_successMessage != null)
                   Text(
                     _successMessage!,
-                    style: TextStyle(color: Colors.green, fontSize: 14),
+                    style: GoogleFonts.poppins(
+                      color: Colors.green,
+                      fontSize: 14,
+                    ),
                   ),
                 if (_errorMessage != null)
                   Text(
                     _errorMessage!,
-                    style: TextStyle(color: Colors.red, fontSize: 14),
+                    style: GoogleFonts.poppins(
+                      color: Colors.red,
+                      fontSize: 14,
+                    ),
                   ),
               ],
             ),
