@@ -136,7 +136,7 @@ class _DoctorRegisterScreenState extends State<DoctorRegisterScreen> {
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: Color.fromARGB(255, 60, 145, 230), width: 2),
+        borderSide: BorderSide(color: Color(0xFF1A237E), width: 2),
       ),
       errorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
@@ -672,7 +672,7 @@ class _DoctorRegisterScreenState extends State<DoctorRegisterScreen> {
                       child: Text(
                         'REGISTER',
                         style: GoogleFonts.poppins(
-                          color: Color.fromARGB(255, 60, 145, 230),
+                          color: Color(0xFF1A237E),
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
                         ),

@@ -152,7 +152,7 @@ class _DoctorLoginScreenState extends State<DoctorLoginScreen> {
                     'Additional Information',
                     style: GoogleFonts.poppins(
                       fontWeight: FontWeight.bold,
-                      color: Color.fromARGB(255, 60, 145, 230),
+                      color: Color(0xFF1A237E),
                     ),
                   ),
                   content: SingleChildScrollView(
@@ -177,7 +177,7 @@ class _DoctorLoginScreenState extends State<DoctorLoginScreen> {
                                   focusedBorder: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(8),
                                     borderSide: BorderSide(
-                                      color: Color.fromARGB(255, 60, 145, 230),
+                                      color: Color(0xFF1A237E),
                                     ),
                                   ),
                                 ),
@@ -201,7 +201,7 @@ class _DoctorLoginScreenState extends State<DoctorLoginScreen> {
                                 ),
                                 icon: Icon(
                                   Icons.arrow_drop_down,
-                                  color: Color.fromARGB(255, 60, 145, 230),
+                                  color: Color(0xFF1A237E),
                                 ),
                               ),
                             ),
@@ -223,7 +223,7 @@ class _DoctorLoginScreenState extends State<DoctorLoginScreen> {
                                   focusedBorder: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(8),
                                     borderSide: BorderSide(
-                                      color: Color.fromARGB(255, 60, 145, 230),
+                                      color: Color(0xFF1A237E),
                                     ),
                                   ),
                                   counterText: "",
@@ -251,7 +251,7 @@ class _DoctorLoginScreenState extends State<DoctorLoginScreen> {
                             child: Text(
                               'Phone number must be 10 digits',
                               style: GoogleFonts.poppins(
-                                color: Color.fromARGB(255, 60, 145, 230),
+                                color: Color(0xFF1A237E),
                                 fontSize: 12,
                               ),
                             ),
@@ -270,12 +270,12 @@ class _DoctorLoginScreenState extends State<DoctorLoginScreen> {
                                   return Theme(
                                     data: Theme.of(context).copyWith(
                                       colorScheme: ColorScheme.light(
-                                        primary: Color.fromARGB(255, 60, 145, 230),
+                                        primary: Color(0xFF1A237E),
                                         onPrimary: Colors.white,
                                       ),
                                       textButtonTheme: TextButtonThemeData(
                                         style: TextButton.styleFrom(
-                                          foregroundColor: Color.fromARGB(255, 60, 145, 230),
+                                          foregroundColor: Color(0xFF1A237E),
                                         ),
                                       ),
                                     ),
@@ -290,7 +290,7 @@ class _DoctorLoginScreenState extends State<DoctorLoginScreen> {
                               }
                             },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Color.fromARGB(255, 60, 145, 230),
+                              backgroundColor: Color(0xFF1A237E),
                               padding:
                                   EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                               shape: RoundedRectangleBorder(
@@ -348,7 +348,7 @@ class _DoctorLoginScreenState extends State<DoctorLoginScreen> {
                         }
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Color.fromARGB(255, 60, 145, 230),
+                        backgroundColor: Color(0xFF1A237E),
                         padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
@@ -565,7 +565,7 @@ class _DoctorLoginScreenState extends State<DoctorLoginScreen> {
                         child: Text(
                           'LOGIN',
                           style: GoogleFonts.poppins(
-                            color: Color.fromARGB(255, 60, 145, 230),
+                            color: Color(0xFF1A237E),
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
                           ),

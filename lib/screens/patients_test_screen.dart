@@ -19,8 +19,8 @@ class PPatientTestsScreen extends StatelessWidget {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Color.fromARGB(255, 60, 145, 230),
-              Color.fromARGB(255, 60, 145, 230).withOpacity(0.8),
+              Color(0xFF1A237E),
+              Color(0xFF1A237E).withOpacity(0.8),
             ],
           ),
         ),

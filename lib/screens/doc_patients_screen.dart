@@ -169,7 +169,7 @@ class _PatientsScreenState extends State<PatientsScreen> {
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(30),
-            borderSide: BorderSide(color: Color.fromARGB(255, 60, 145, 230)),
+            borderSide: BorderSide(color: Color(0xFF1A237E)),
           ),
         ),
         onChanged: (value) {
@@ -311,7 +311,7 @@ class _PatientsScreenState extends State<PatientsScreen> {
                   width: 45,
                   height: 45,
                   decoration: BoxDecoration(
-                    color: Color.fromARGB(255, 60, 145, 230).withOpacity(0.1),
+                    color: Color(0xFF1A237E).withOpacity(0.1),
                     shape: BoxShape.circle,
                   ),
                   child: Center(
@@ -320,7 +320,7 @@ class _PatientsScreenState extends State<PatientsScreen> {
                       style: GoogleFonts.poppins(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
-                        color: Color.fromARGB(255, 60, 145, 230),
+                        color: Color(0xFF1A237E),
                       ),
                     ),
                   ),
@@ -419,7 +419,7 @@ class _PatientsScreenState extends State<PatientsScreen> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        backgroundColor: Color.fromARGB(255, 60, 145, 230),
+        backgroundColor: Color(0xFF1A237E),
       ),
       body: Container(
         decoration: BoxDecoration(

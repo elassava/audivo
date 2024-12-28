@@ -48,7 +48,7 @@ class _PatientDashboardState extends State<PatientDashboard> {
           style: GoogleFonts.poppins(
             fontSize: 20,
             fontWeight: FontWeight.bold,
-            color: Color.fromARGB(255, 60, 145, 230),
+            color: Color(0xFF1A237E),
           ),
         ),
         content: Text(
@@ -110,7 +110,7 @@ class _PatientDashboardState extends State<PatientDashboard> {
               children: [
                 Icon(
                   Icons.account_circle_rounded,
-                  color: Color.fromARGB(255, 60, 145, 230),
+                  color: Color(0xFF1A237E),
                   size: 48,
                 ),
                 SizedBox(height: 16),
@@ -119,7 +119,7 @@ class _PatientDashboardState extends State<PatientDashboard> {
                   style: GoogleFonts.poppins(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
-                    color: Color.fromARGB(255, 60, 145, 230),
+                    color: Color(0xFF1A237E),
                   ),
                 ),
               ],
@@ -173,7 +173,7 @@ class _PatientDashboardState extends State<PatientDashboard> {
               ElevatedButton(
                 onPressed: () => Navigator.of(context).pop(true),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Color.fromARGB(255, 60, 145, 230),
+                  backgroundColor: Color(0xFF1A237E),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
@@ -314,7 +314,7 @@ class _PatientDashboardState extends State<PatientDashboard> {
         child: CircleAvatar(
           radius: 30,
           backgroundColor: Colors.white,
-          child: Icon(Icons.person, size: 30, color: Color.fromARGB(255, 60, 145, 230)),
+          child: Icon(Icons.person, size: 30, color: Color(0xFF1A237E)),
         ),
       );
     }
@@ -329,7 +329,7 @@ class _PatientDashboardState extends State<PatientDashboard> {
         backgroundColor: Colors.white,
         backgroundImage: profileImgUrl != null ? NetworkImage(profileImgUrl) : null,
         child: profileImgUrl == null
-            ? Icon(Icons.person, size: 30, color: Color.fromARGB(255, 60, 145, 230))
+            ? Icon(Icons.person, size: 30, color: Color(0xFF1A237E))
             : null,
       ),
     );
@@ -353,7 +353,7 @@ class _PatientDashboardState extends State<PatientDashboard> {
                 Container(
                   padding: EdgeInsets.symmetric(vertical: 50, horizontal: 20),
                   decoration: BoxDecoration(
-                    color: Color.fromARGB(255, 60, 145, 230),
+                    color: Color(0xFF1A237E),
                   ),
                   child: Row(
                     children: [
@@ -419,7 +419,7 @@ class _PatientDashboardState extends State<PatientDashboard> {
                               radius: 30,
                               backgroundColor: Colors.white,
                               child: CircularProgressIndicator(
-                                  color: Color.fromARGB(255, 60, 145, 230)),
+                                  color: Color(0xFF1A237E)),
                             );
                           }
                           return _buildProfileAvatar(snapshot.data);
@@ -493,7 +493,7 @@ class _PatientDashboardState extends State<PatientDashboard> {
     required IconData icon,
     required String label,
     required VoidCallback onTap,
-    Color iconColor = const Color.fromARGB(255, 60, 145, 230),
+    Color iconColor = const Color(0xFF1A237E),
     Color textColor = Colors.black,
   }) {
     return GestureDetector(

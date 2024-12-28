@@ -395,7 +395,7 @@ class PSettingsScreen extends StatelessWidget {
             color: Colors.white,
           ),
         ),
-        backgroundColor: Color.fromARGB(255, 60, 145, 230),
+        backgroundColor: Color(0xFF1A237E),
         elevation: 0,
       ),
       body: Container(
@@ -431,7 +431,7 @@ class PSettingsScreen extends StatelessWidget {
                       padding: EdgeInsets.all(20),
                       margin: EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: Color.fromARGB(255, 60, 145, 230),
+                        color: Color(0xFF1A237E),
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: Row(

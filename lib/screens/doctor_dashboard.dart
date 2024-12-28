@@ -39,7 +39,7 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
               children: [
                 Icon(
                   Icons.account_circle_rounded,
-                  color: Color.fromARGB(255, 60, 145, 230),
+                  color: Color(0xFF1A237E),
                   size: 48,
                 ),
                 SizedBox(height: 16),
@@ -48,7 +48,7 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
                   style: GoogleFonts.poppins(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
-                    color: Color.fromARGB(255, 60, 145, 230),
+                    color: Color(0xFF1A237E),
                   ),
                 ),
               ],
@@ -102,7 +102,7 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
               ElevatedButton(
                 onPressed: () => Navigator.of(context).pop(true),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Color.fromARGB(255, 60, 145, 230),
+                  backgroundColor: Color(0xFF1A237E),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
@@ -260,7 +260,7 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
           style: GoogleFonts.poppins(
             fontSize: 20,
             fontWeight: FontWeight.bold,
-            color: Color.fromARGB(255, 60, 145, 230),
+            color: Color(0xFF1A237E),
           ),
         ),
         content: Text(
@@ -343,7 +343,7 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
                     Container(
                       padding: EdgeInsets.symmetric(vertical: 50, horizontal: 20),
                       decoration: BoxDecoration(
-                        color: Color.fromARGB(255, 60, 145, 230),
+                        color: Color(0xFF1A237E),
                       ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -381,7 +381,7 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
                                   : null,
                               child: profileImg == null
                                   ? Icon(Icons.person,
-                                      size: 30, color: Color.fromARGB(255, 60, 145, 230))
+                                      size: 30, color: Color(0xFF1A237E),)
                                   : null,
                             ),
                           ),
@@ -442,7 +442,7 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
                                     DateTime.now().toString().split(' ')[0].replaceAll('-', '.'), // YYYY.MM.DD formatında
                                     style: GoogleFonts.poppins(
                                       fontSize: 20,
-                                      color: Color.fromARGB(255, 60, 145, 230),
+                                      color: Color(0xFF1A237E),
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
@@ -477,7 +477,7 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
                                           patientCount.toString(),
                                           style: GoogleFonts.poppins(
                                             fontSize: 20,
-                                            color: Color.fromARGB(255, 60, 145, 230),
+                                            color: Color(0xFF1A237E),
                                             fontWeight: FontWeight.bold,
                                           ),
                                         ),
@@ -563,7 +563,7 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
     required IconData icon,
     required String title,
     required VoidCallback onTap,
-    Color iconColor = const Color.fromARGB(255, 60, 145, 230),
+    Color iconColor = const Color(0xFF1A237E),
   }) {
     return GestureDetector(
       onTap: onTap,

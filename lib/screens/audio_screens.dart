@@ -244,7 +244,7 @@ class _AudioScreenState extends State<AudioScreen> {
                 );
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Color.fromARGB(255, 60, 145, 230),
+                backgroundColor: Color(0xFF1A237E),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
@@ -284,7 +284,7 @@ class _AudioScreenState extends State<AudioScreen> {
             fontSize: 22,
           ),
         ),
-        backgroundColor: Color.fromARGB(255, 60, 145, 230),
+        backgroundColor: Color(0xFF1A237E),
       ),
       body: Container(
         decoration: BoxDecoration(
@@ -300,7 +300,7 @@ class _AudioScreenState extends State<AudioScreen> {
         child: Center(
           child: _isLoading
               ? CircularProgressIndicator(
-                  color: Color.fromARGB(255, 60, 145, 230),
+                  color: Color(0xFF1A237E),
                 )
               : Padding(
                   padding: const EdgeInsets.all(20.0),
@@ -327,14 +327,14 @@ class _AudioScreenState extends State<AudioScreen> {
                               style: GoogleFonts.poppins(
                                 fontSize: 24,
                                 fontWeight: FontWeight.bold,
-                                color: Color.fromARGB(255, 60, 145, 230),
+                                color: Color(0xFF1A237E),
                               ),
                             ),
                             SizedBox(height: 20),
                             Container(
                               padding: EdgeInsets.all(12),
                               decoration: BoxDecoration(
-                                color: Color.fromARGB(255, 60, 145, 230).withOpacity(0.1),
+                                color: Color(0xFF1A237E).withOpacity(0.1),
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               child: Column(
@@ -342,7 +342,7 @@ class _AudioScreenState extends State<AudioScreen> {
                                   Icon(
                                     Icons.music_note_rounded,
                                     size: 40,
-                                    color: Color.fromARGB(255, 60, 145, 230),
+                                    color: Color(0xFF1A237E),
                                   ),
                                   SizedBox(height: 10),
                                   LinearProgressIndicator(
@@ -350,7 +350,7 @@ class _AudioScreenState extends State<AudioScreen> {
                                         ? (_audioPosition.inSeconds / _audioDuration.inSeconds).clamp(0.0, 1.0)
                                         : 0,
                                     backgroundColor: Colors.grey[200],
-                                    color: Color.fromARGB(255, 60, 145, 230),
+                                    color: Color(0xFF1A237E),
                                     minHeight: 8,
                                     borderRadius: BorderRadius.circular(4),
                                   ),
@@ -385,7 +385,7 @@ class _AudioScreenState extends State<AudioScreen> {
                                 _submitEmotion(index);
                               },
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: Color.fromARGB(255, 60, 145, 230),
+                                backgroundColor: Color(0xFF1A237E),
                                 padding: EdgeInsets.symmetric(vertical: 12),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),

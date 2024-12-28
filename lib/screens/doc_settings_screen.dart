@@ -476,7 +476,7 @@ class SettingsScreen extends StatelessWidget {
             color: Colors.white,
           ),
         ),
-        backgroundColor: Color.fromARGB(255, 60, 145, 230),
+        backgroundColor: Color(0xFF1A237E),
         elevation: 0,
       ),
       body: Container(
@@ -515,7 +515,7 @@ class SettingsScreen extends StatelessWidget {
                       margin: EdgeInsets.all(16),
                       decoration: BoxDecoration(
                         
-                        color: Color.fromARGB(255, 60, 145, 230), // Orange color like in the image
+                        color: Color(0xFF1A237E), // Orange color like in the image
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: Row(

@@ -202,14 +202,14 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
       builder: (BuildContext context, Widget? child) {
         return Theme(
           data: ThemeData.light().copyWith(
-            primaryColor: Color.fromARGB(255, 60, 145, 230), // App bar color
-            hintColor: Color.fromARGB(255, 60, 145, 230), // Selected day color
+            primaryColor: Color(0xFF1A237E), // App bar color
+            hintColor: Color(0xFF1A237E), // Selected day color
             buttonTheme: ButtonThemeData(
                 textTheme: ButtonTextTheme.primary), // Button style
             textButtonTheme: TextButtonThemeData(
               style: TextButton.styleFrom(
                   foregroundColor:
-                      Color.fromARGB(255, 60, 145, 230)), // Button text color
+                      Color(0xFF1A237E)), // Button text color
             ),
             textTheme: TextTheme(
               bodySmall: TextStyle(
@@ -261,7 +261,7 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
         borderSide:
-            BorderSide(color: Color.fromARGB(255, 60, 145, 230), width: 2),
+            BorderSide(color: Color(0xFF1A237E), width: 2),
       ),
       errorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
@@ -324,7 +324,7 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
             fontWeight: FontWeight.w600,
           ),
         ),
-        backgroundColor: Color.fromARGB(255, 60, 145, 230),
+        backgroundColor: Color(0xFF1A237E),
       ),
       body: Container(
         height: MediaQuery.of(context).size.height,
@@ -436,7 +436,7 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
                             ),
                             icon: Icon(
                               Icons.arrow_drop_down,
-                              color: Color.fromARGB(255, 60, 145, 230),
+                              color: Color(0xFF1A237E),
                             ),
                           ),
                         ),
@@ -482,7 +482,7 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
                         ],
                       ),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Color.fromARGB(255, 60, 145, 230),
+                        backgroundColor: Color(0xFF1A237E),
                         padding: EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),

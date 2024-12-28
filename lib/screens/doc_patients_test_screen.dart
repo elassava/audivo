@@ -44,8 +44,8 @@ class PatientTestsScreen extends StatelessWidget {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Color.fromARGB(255, 60, 145, 230),
-              Color.fromARGB(255, 60, 145, 230).withOpacity(0.8),
+              Color(0xFF1A237E),
+              Color(0xFF1A237E).withOpacity(0.8),
             ],
           ),
         ),
@@ -153,7 +153,7 @@ class PatientTestsScreen extends StatelessWidget {
                 style: GoogleFonts.poppins(
                   fontSize: 30,
                   fontWeight: FontWeight.bold,
-                  color: Color.fromARGB(255, 60, 145, 230),
+                  color: Color(0xFF1A237E),
                 ),
               ),
             ),
@@ -207,13 +207,13 @@ class PatientTestsScreen extends StatelessWidget {
           Container(
             padding: EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: Color.fromARGB(255, 60, 145, 230).withOpacity(0.1),
+              color: Color(0xFF1A237E).withOpacity(0.1),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(
               icon,
               size: 20,
-              color: Color.fromARGB(255, 60, 145, 230),
+              color: Color(0xFF1A237E),
             ),
           ),
           SizedBox(width: 12),

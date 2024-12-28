@@ -18,7 +18,7 @@ class _NotesScreenState extends State<NotesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color.fromARGB(255, 60, 145, 230),
+        backgroundColor: Color(0xFF1A237E),
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios, color: Colors.white),
           onPressed: () => Navigator.pop(context),
@@ -117,7 +117,7 @@ class _NotesScreenState extends State<NotesScreen> {
                                     style: GoogleFonts.poppins(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
-                                      color: Color.fromARGB(255, 60, 145, 230),
+                                      color: Color(0xFF1A237E),
                                     ),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
@@ -148,7 +148,7 @@ class _NotesScreenState extends State<NotesScreen> {
                               child: PopupMenuButton(
                                 icon: Icon(
                                   Icons.more_vert,
-                                  color: Color.fromARGB(255, 60, 145, 230),
+                                  color: Color(0xFF1A237E),
                                   size: 22,
                                 ),
                                 shape: RoundedRectangleBorder(
@@ -172,7 +172,7 @@ class _NotesScreenState extends State<NotesScreen> {
                                           ),
                                           child: Icon(
                                             Icons.edit_rounded,
-                                            color: Color.fromARGB(255, 60, 145, 230),
+                                            color: Color(0xFF1A237E),
                                             size: 18,
                                           ),
                                         ),
@@ -261,7 +261,7 @@ class _NotesScreenState extends State<NotesScreen> {
           style: GoogleFonts.poppins(
             fontSize: 24,
             fontWeight: FontWeight.bold,
-            color: Color.fromARGB(255, 60, 145, 230),
+            color: Color(0xFF1A237E),
           ),
         ),
         shape: RoundedRectangleBorder(
@@ -322,7 +322,7 @@ class _NotesScreenState extends State<NotesScreen> {
               }
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Color.fromARGB(255, 60, 145, 230),
+              backgroundColor: Color(0xFF1A237E),
               foregroundColor: Colors.white,
               padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               shape: RoundedRectangleBorder(
@@ -354,7 +354,7 @@ class _NotesScreenState extends State<NotesScreen> {
           style: GoogleFonts.poppins(
             fontSize: 24,
             fontWeight: FontWeight.bold,
-            color: Color.fromARGB(255, 60, 145, 230),
+            color: Color(0xFF1A237E),
           ),
         ),
         shape: RoundedRectangleBorder(
@@ -415,7 +415,7 @@ class _NotesScreenState extends State<NotesScreen> {
               }
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Color.fromARGB(255, 60, 145, 230),
+              backgroundColor: Color(0xFF1A237E),
               foregroundColor: Colors.white,
               padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               shape: RoundedRectangleBorder(
@@ -477,7 +477,7 @@ class _NotesScreenState extends State<NotesScreen> {
           style: GoogleFonts.poppins(
             fontSize: 20,
             fontWeight: FontWeight.bold,
-            color: Color.fromARGB(255, 60, 145, 230),
+            color: Color(0xFF1A237E),
           ),
         ),
         content: Text(

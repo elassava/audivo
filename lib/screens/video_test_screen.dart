@@ -235,7 +235,7 @@ Future<void> _saveAnswer(int selectedEmotionIndex) async {
                 );
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Color.fromARGB(255, 60, 145, 230),
+                backgroundColor: Color(0xFF1A237E),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
@@ -274,7 +274,7 @@ Future<void> _saveAnswer(int selectedEmotionIndex) async {
             fontSize: 22,
           ),
         ),
-        backgroundColor: Color.fromARGB(255, 60, 145, 230),
+        backgroundColor: Color(0xFF1A237E),
       ),
       body: Container(
         decoration: BoxDecoration(
@@ -290,7 +290,7 @@ Future<void> _saveAnswer(int selectedEmotionIndex) async {
         child: Center(
           child: _isLoading
               ? CircularProgressIndicator(
-                  color: Color.fromARGB(255, 60, 145, 230),
+                  color: Color(0xFF1A237E),
                 )
               : _videoPlayerController != null && _videoPlayerController!.value.isInitialized
                   ? Padding(
@@ -318,7 +318,7 @@ Future<void> _saveAnswer(int selectedEmotionIndex) async {
                                   style: GoogleFonts.poppins(
                                     fontSize: 24,
                                     fontWeight: FontWeight.bold,
-                                    color: Color.fromARGB(255, 60, 145, 230),
+                                    color: Color(0xFF1A237E),
                                   ),
                                 ),
                                 SizedBox(height: 20),
@@ -369,7 +369,7 @@ Future<void> _saveAnswer(int selectedEmotionIndex) async {
                                     _submitEmotion(index);
                                   },
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: Color.fromARGB(255, 60, 145, 230),
+                                    backgroundColor: Color(0xFF1A237E),
                                     padding: EdgeInsets.symmetric(vertical: 12),
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(12),

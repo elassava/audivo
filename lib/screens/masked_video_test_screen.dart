@@ -239,7 +239,7 @@ class _MaskedVideoScreenState extends State<MaskedVideoScreen> {
                 );
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Color.fromARGB(255, 60, 145, 230),
+                backgroundColor: Color(0xFF1A237E),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
@@ -280,7 +280,7 @@ class _MaskedVideoScreenState extends State<MaskedVideoScreen> {
             fontSize: 22,
           ),
         ),
-        backgroundColor: Color.fromARGB(255, 60, 145, 230),
+        backgroundColor: Color(0xFF1A237E),
       ),
       body: Container(
         decoration: BoxDecoration(
@@ -296,7 +296,7 @@ class _MaskedVideoScreenState extends State<MaskedVideoScreen> {
         child: Center(
           child: _isLoading
               ? CircularProgressIndicator(
-                  color: Color.fromARGB(255, 60, 145, 230),
+                  color: Color(0xFF1A237E),
                 )
               : _videoPlayerController != null && _videoPlayerController!.value.isInitialized
                   ? Padding(
@@ -324,7 +324,7 @@ class _MaskedVideoScreenState extends State<MaskedVideoScreen> {
                                   style: GoogleFonts.poppins(
                                     fontSize: 24,
                                     fontWeight: FontWeight.bold,
-                                    color: Color.fromARGB(255, 60, 145, 230),
+                                    color: Color(0xFF1A237E),
                                   ),
                                 ),
                                 SizedBox(height: 20),
@@ -375,7 +375,7 @@ class _MaskedVideoScreenState extends State<MaskedVideoScreen> {
                                     _submitEmotion(index);
                                   },
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: Color.fromARGB(255, 60, 145, 230),
+                                    backgroundColor: Color(0xFF1A237E),
                                     padding: EdgeInsets.symmetric(vertical: 12),
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(12),
