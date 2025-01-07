@@ -167,7 +167,7 @@ class _IntroScreenState extends State<IntroScreen> with TickerProviderStateMixin
                       opacity: _textOpacity,
                       child: ShaderMask(
                         shaderCallback: (bounds) => LinearGradient(
-                          colors: [Color(0xFF1A237E), Color(0xFF5C6BC0)],
+                          colors: [Color(0xFF1A237E), Color(0xFF1A237E)],
                         ).createShader(bounds),
                         child: Text(
                           'Welcome to Audivo!',
