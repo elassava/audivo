@@ -67,33 +67,61 @@ class _PatientLoginScreenState extends State<PatientLoginScreen> {
 // Function for Google sign-in with account selection each time
   Future<void> _googleLogin() async {
     try {
-      // Google'dan çıkış yaparak hesap seçici ekranını göster
+      // Ensure we're signed out before attempting to sign in
       await _googleSignIn.signOut();
+      await FirebaseAuth.instance.signOut();
 
-      // Google ile giriş yapmayı dene
+      // Attempt to sign in
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
-      if (googleUser == null) return; // Kullanıcı girişini iptal etti
 
-      // Google'dan kimlik bilgilerini al
-      final GoogleSignInAuthentication googleAuth =
-          await googleUser.authentication;
+      // If user cancels the sign-in process
+      if (googleUser == null) {
+        // Silent return - user canceled
+        return;
+      }
 
-      // Kimlik bilgilerini kullanarak yeni bir OAuthCredential oluştur
-      final OAuthCredential credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-      );
+      try {
+        // Get authentication details
+        final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
 
-      // Firebase ile giriş yap
-      UserCredential userCredential =
-          await FirebaseAuth.instance.signInWithCredential(credential);
+        // Create credentials
+        final OAuthCredential credential = GoogleAuthProvider.credential(
+          accessToken: googleAuth.accessToken,
+          idToken: googleAuth.idToken,
+        );
 
-      // Kullanıcı rolünü kontrol et
-      await _checkUserRole(userCredential.user!.uid, googleUser: googleUser);
+        // Sign in to Firebase
+        UserCredential userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
+
+        // Check user role
+        await _checkUserRole(userCredential.user!.uid, googleUser: googleUser);
+      } catch (authError) {
+        // Clean up on authentication error
+        await _googleSignIn.signOut();
+        await FirebaseAuth.instance.signOut();
+        setState(() {
+          _errorMessage = 'Authentication failed: ${authError.toString()}';
+        });
+      }
     } catch (e) {
-      setState(() {
-        _errorMessage = 'Google Authentication failed: $e';
-      });
+      // Handle Google Sign In API exceptions
+      if (e.toString().contains('com.google.android.gms.common.api.ApiException')) {
+        setState(() {
+          _errorMessage = 'Google Sign In was canceled or failed. Please try again.';
+        });
+      } else {
+        setState(() {
+          _errorMessage = 'Sign in error: ${e.toString()}';
+        });
+      }
+      
+      // Ensure cleanup
+      try {
+        await _googleSignIn.signOut();
+        await FirebaseAuth.instance.signOut();
+      } catch (_) {
+        // Ignore cleanup errors
+      }
     }
   }
 
