@@ -83,7 +83,7 @@ class _IntroScreenState extends State<IntroScreen> with TickerProviderStateMixin
         child: SafeArea(
           child: Stack(
             children: [
-              // Animated Background Circles
+              
               Positioned(
                 top: -50,
                 right: -50,
@@ -182,7 +182,7 @@ class _IntroScreenState extends State<IntroScreen> with TickerProviderStateMixin
                     ),
                     SizedBox(height: 30),
 
-                    // Animated Description
+                    
                     SlideTransition(
                       position: _slideAnimation,
                       child: FadeTransition(
@@ -214,20 +214,20 @@ class _IntroScreenState extends State<IntroScreen> with TickerProviderStateMixin
                     ),
                     SizedBox(height: 50),
 
-                    // Animated Buttons
+                   
                     SlideTransition(
                       position: _slideAnimation,
                       child: FadeTransition(
                         opacity: _fadeAnimation,
                         child: Column(
                           children: [
-                            // Doctor Login Button
+                           
                             _buildLoginButton('Doctor Login', () {
                               Navigator.pushNamed(context, '/doctorLogin');
                             }, 0.03),
                             SizedBox(height: 20),
 
-                            // Patient Login Button
+                            
                             _buildLoginButton('Patient Login', () {
                               Navigator.pushNamed(context, '/patientLogin');
                             }, 0.02),

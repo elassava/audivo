@@ -21,21 +21,21 @@ class _DoctorRegisterScreenState extends State<DoctorRegisterScreen> {
   String? _errorMessage;
   String countryCode = '+90';
 
-  // Doğum tarihi seçimi için takvim fonksiyonu
+  
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? selectedDate = await showDatePicker(
       context: context,
-      initialDate: DateTime.now().subtract(Duration(days: 365 * 18)), // 18 yaş başlangıç
+      initialDate: DateTime.now().subtract(Duration(days: 365 * 18)), 
       firstDate: DateTime(1900),
       lastDate: DateTime.now(),
     );
     
     if (selectedDate != null) {
-      // Yaş kontrolü
+      
       final age = DateTime.now().difference(selectedDate).inDays / 365;
       
       if (age < 18) {
-        // 18 yaşından küçükse uyarı göster
+       
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
@@ -149,9 +149,9 @@ class _DoctorRegisterScreenState extends State<DoctorRegisterScreen> {
     );
   }
 
-  // Kayıt fonksiyonu
+  
   Future<void> _register() async {
-    // Alanların boş olup olmadığını kontrol et
+    
     if (_firstNameController.text.trim().isEmpty ||
         _lastNameController.text.trim().isEmpty ||
         _emailController.text.trim().isEmpty ||
@@ -165,7 +165,7 @@ class _DoctorRegisterScreenState extends State<DoctorRegisterScreen> {
       return;
     }
 
-    // Şifre eşleşme kontrolü
+    
     if (_passwordController.text.trim() != _confirmPasswordController.text.trim()) {
       setState(() {
         _errorMessage = "Passwords do not match!";
@@ -195,10 +195,10 @@ class _DoctorRegisterScreenState extends State<DoctorRegisterScreen> {
         'gender': _gender,
       });
 
-      // Doğrulama e-postası gönder
+     
       await userCredential.user!.sendEmailVerification();
 
-      // Show verification email sent dialog
+    
       await showDialog(
         context: context,
         builder: (context) => AlertDialog(
@@ -320,7 +320,7 @@ class _DoctorRegisterScreenState extends State<DoctorRegisterScreen> {
     }
   }
 
-  // İsimlerdeki her kelimenin ilk harfini büyük yapacak fonksiyon
+  
   String _capitalizeWords(String input) {
     if (input.isEmpty) return input;
 
@@ -354,7 +354,7 @@ class _DoctorRegisterScreenState extends State<DoctorRegisterScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    // Sign Up Text
+                    
                     Text(
                       'Sign Up',
                       style: GoogleFonts.poppins(
@@ -366,7 +366,7 @@ class _DoctorRegisterScreenState extends State<DoctorRegisterScreen> {
                     ),
                     SizedBox(height: 40),
 
-                    // Name TextField
+                    
                     Container(
                       decoration: BoxDecoration(
                         color: Colors.white,
@@ -392,7 +392,7 @@ class _DoctorRegisterScreenState extends State<DoctorRegisterScreen> {
                     ),
                     SizedBox(height: 20),
 
-                    // Surname TextField
+                    
                     Container(
                       decoration: BoxDecoration(
                         color: Colors.white,
@@ -418,7 +418,7 @@ class _DoctorRegisterScreenState extends State<DoctorRegisterScreen> {
                     ),
                     SizedBox(height: 20),
 
-                    // Email TextField
+                    
                     Container(
                       decoration: BoxDecoration(
                         color: Colors.white,
@@ -445,7 +445,7 @@ class _DoctorRegisterScreenState extends State<DoctorRegisterScreen> {
                     ),
                     SizedBox(height: 20),
 
-                    // Password TextField
+                    
                     Container(
                       decoration: BoxDecoration(
                         color: Colors.white,
@@ -472,7 +472,7 @@ class _DoctorRegisterScreenState extends State<DoctorRegisterScreen> {
                     ),
                     SizedBox(height: 20),
 
-                    // Confirm Password TextField
+                    
                     Container(
                       decoration: BoxDecoration(
                         color: Colors.white,
@@ -499,7 +499,7 @@ class _DoctorRegisterScreenState extends State<DoctorRegisterScreen> {
                     ),
                     SizedBox(height: 20),
 
-                    // Birth Date Picker
+                    
                     GestureDetector(
                       onTap: () => _selectDate(context),
                       child: Container(
@@ -530,7 +530,7 @@ class _DoctorRegisterScreenState extends State<DoctorRegisterScreen> {
                     ),
                     SizedBox(height: 20),
 
-                    // Gender Dropdown
+                    
                     Container(
                       decoration: BoxDecoration(
                         color: Colors.white,
@@ -563,10 +563,10 @@ class _DoctorRegisterScreenState extends State<DoctorRegisterScreen> {
                     ),
                     SizedBox(height: 20),
 
-                    // Phone Number Row
+                   
                     Row(
                       children: [
-                        // Country Code Dropdown
+                       
                         Expanded(
                           flex: 3,
                           child: Container(
@@ -599,7 +599,7 @@ class _DoctorRegisterScreenState extends State<DoctorRegisterScreen> {
                           ),
                         ),
                         SizedBox(width: 8),
-                        // Phone Number TextField
+                       
                         Expanded(
                           flex: 7,
                           child: Container(
@@ -635,7 +635,7 @@ class _DoctorRegisterScreenState extends State<DoctorRegisterScreen> {
                     ),
                     SizedBox(height: 20),
 
-                    // Error Message
+                   
                     if (_errorMessage != null)
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -649,7 +649,7 @@ class _DoctorRegisterScreenState extends State<DoctorRegisterScreen> {
                         ),
                       ),
 
-                    // Register Button
+                   
                     Container(
                       height: 55,
                       decoration: BoxDecoration(
@@ -686,7 +686,7 @@ class _DoctorRegisterScreenState extends State<DoctorRegisterScreen> {
                     ),
                     SizedBox(height: 30),
 
-                    // Already have an account
+                   
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [

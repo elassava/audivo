@@ -18,14 +18,14 @@ class _DoctorLoginScreenState extends State<DoctorLoginScreen> {
 
   Future<void> _login() async {
     try {
-      // Email ve şifre ile giriş yap
+      
       UserCredential userCredential =
           await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
 
-      // Kullanıcı doğrulama durumunu kontrol et
+      
       if (!userCredential.user!.emailVerified) {
         setState(() {
           _errorMessage = "Email not verified. Please verify your email.";
@@ -34,7 +34,7 @@ class _DoctorLoginScreenState extends State<DoctorLoginScreen> {
         return;
       }
 
-      // Kullanıcı rolünü Firestore'dan al
+      
       String uid = userCredential.user!.uid;
       DocumentSnapshot userDoc =
           await FirebaseFirestore.instance.collection('users').doc(uid).get();
@@ -42,7 +42,7 @@ class _DoctorLoginScreenState extends State<DoctorLoginScreen> {
       if (userDoc.exists) {
         String role = userDoc['role'] ?? '';
 
-        // Kullanıcı rolünü kontrol et
+        
         if (role == 'doctor') {
           Navigator.pushReplacementNamed(context, '/doctorDashboard');
         } else {
@@ -57,7 +57,7 @@ class _DoctorLoginScreenState extends State<DoctorLoginScreen> {
         });
       }
     } on FirebaseAuthException catch (e) {
-      // Firebase hata kodlarını kontrol et
+      
       setState(() {
         switch (e.code) {
           case 'user-not-found':
@@ -88,16 +88,16 @@ class _DoctorLoginScreenState extends State<DoctorLoginScreen> {
 
   Future<void> _googleLogin(BuildContext context) async {
     try {
-      // Ensure we're signed out before attempting to sign in
+      
       await _googleSignIn.signOut();
       await FirebaseAuth.instance.signOut();
 
-      // Attempt to sign in
+      
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
 
-      // If user cancels the sign-in process
+      
       if (googleUser == null) {
-        // Silent return - user canceled
+        
         return;
       }
 
@@ -109,23 +109,23 @@ class _DoctorLoginScreenState extends State<DoctorLoginScreen> {
           idToken: googleAuth.idToken,
         );
 
-        // Firebase ile giriş yap
+       
         UserCredential userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
 
-        // Kullanıcı UID'sini al
+       
         String uid = userCredential.user!.uid;
 
-        // Kullanıcı Firestore'da kayıtlı mı kontrol et
+   
         DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
 
         if (!userDoc.exists) {
-          // Yeni kullanıcı için temel bilgileri kaydet
+          
           String fullName = userCredential.user!.displayName ?? '';
           List<String> nameParts = fullName.split(' ');
           String firstName = nameParts.isNotEmpty ? nameParts[0] : '';
           String lastName = nameParts.length > 1 ? nameParts.sublist(1).join(' ') : '';
 
-          // Ek bilgileri almak için dialog göster
+          
           String phoneNumber = '';
           String countryCode = '+90';
           DateTime? birthDate;
@@ -159,7 +159,7 @@ class _DoctorLoginScreenState extends State<DoctorLoginScreen> {
                         children: [
                           Row(
                             children: [
-                              // Ülke Kodu Dropdown
+                              
                               Container(
                                 width: 100,
                                 child: DropdownButtonFormField<String>(
@@ -301,7 +301,7 @@ class _DoctorLoginScreenState extends State<DoctorLoginScreen> {
                                   Icon(Icons.calendar_today, color: Colors.white, size: 18),
                                   SizedBox(width: 8),
                                   Text(
-                                    birthDateText,  // This will update when date is picked
+                                    birthDateText,  
                                     style: GoogleFonts.poppins(
                                       color: Colors.white,
                                     ),
@@ -367,7 +367,7 @@ class _DoctorLoginScreenState extends State<DoctorLoginScreen> {
           );
 
           if (additionalInfo != null) {
-            // Kullanıcı bilgilerini kaydet
+           
             await FirebaseFirestore.instance.collection('users').doc(uid).set({
               'name': firstName,
               'surname': lastName,
@@ -378,7 +378,7 @@ class _DoctorLoginScreenState extends State<DoctorLoginScreen> {
               'createdAt': FieldValue.serverTimestamp(),
             });
 
-            // Doctors koleksiyonuna da aynı bilgileri kaydet
+            
             await FirebaseFirestore.instance.collection('doctors').doc(uid).set({
               'name': firstName,
               'surname': lastName,
@@ -389,13 +389,13 @@ class _DoctorLoginScreenState extends State<DoctorLoginScreen> {
               'createdAt': FieldValue.serverTimestamp(),
             });
           } else {
-            // Kullanıcı ek bilgileri girmekten vazgeçti
+            
             await FirebaseAuth.instance.signOut();
             return;
           }
         }
 
-        // Kullanıcı rolünü kontrol et
+        
         String role = userDoc.exists ? userDoc['role'] ?? '' : 'doctor';
 
         if (role == 'doctor') {
@@ -407,7 +407,7 @@ class _DoctorLoginScreenState extends State<DoctorLoginScreen> {
           });
         }
       } catch (authError) {
-        // Clean up on authentication error
+        
         await _googleSignIn.signOut();
         await FirebaseAuth.instance.signOut();
         setState(() {
@@ -415,7 +415,7 @@ class _DoctorLoginScreenState extends State<DoctorLoginScreen> {
         });
       }
     } catch (e) {
-      // Handle Google Sign In API exceptions
+      
       if (e.toString().contains('com.google.android.gms.common.api.ApiException')) {
         setState(() {
           _errorMessage = 'Google Sign In was canceled or failed. Please try again.';
@@ -426,12 +426,12 @@ class _DoctorLoginScreenState extends State<DoctorLoginScreen> {
         });
       }
       
-      // Ensure cleanup
+      
       try {
         await _googleSignIn.signOut();
         await FirebaseAuth.instance.signOut();
       } catch (_) {
-        // Ignore cleanup errors
+        
       }
     }
   }
@@ -458,7 +458,7 @@ class _DoctorLoginScreenState extends State<DoctorLoginScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      // Sign In Text
+                      
                       Text(
                         'Doctor Sign In',
                         style: GoogleFonts.poppins(
@@ -470,7 +470,7 @@ class _DoctorLoginScreenState extends State<DoctorLoginScreen> {
                       ),
                       SizedBox(height: 40),
 
-                      // Email TextField
+                     
                       Container(
                         decoration: BoxDecoration(
                           color: Colors.white,
@@ -499,7 +499,7 @@ class _DoctorLoginScreenState extends State<DoctorLoginScreen> {
                       ),
                       SizedBox(height: 20),
 
-                      // Password TextField
+                     
                       Container(
                         decoration: BoxDecoration(
                           color: Colors.white,
@@ -527,7 +527,7 @@ class _DoctorLoginScreenState extends State<DoctorLoginScreen> {
                         ),
                       ),
 
-                      // Forgot Password
+                      
                       Align(
                         alignment: Alignment.centerRight,
                         child: TextButton(
@@ -547,7 +547,7 @@ class _DoctorLoginScreenState extends State<DoctorLoginScreen> {
                         ),
                       ),
 
-                      // Error Message
+                      
                       if (_errorMessage != null)
                         Padding(
                           padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -561,7 +561,7 @@ class _DoctorLoginScreenState extends State<DoctorLoginScreen> {
                           ),
                         ),
 
-                      // Login Button
+                     
                       Container(
                         height: 55,
                         decoration: BoxDecoration(
@@ -598,7 +598,7 @@ class _DoctorLoginScreenState extends State<DoctorLoginScreen> {
                       ),
                       SizedBox(height: 20),
 
-                      // OR Divider
+                      
                       Row(
                         children: [
                           Expanded(child: Divider(color: Color.fromARGB(255, 38, 38, 38), thickness: 1)),
@@ -617,7 +617,7 @@ class _DoctorLoginScreenState extends State<DoctorLoginScreen> {
                       ),
                       SizedBox(height: 20),
 
-                      // Sign in with text
+                      
                       Text(
                         'Sign in with',
                         style: GoogleFonts.poppins(
@@ -628,11 +628,11 @@ class _DoctorLoginScreenState extends State<DoctorLoginScreen> {
                       ),
                       SizedBox(height: 20),
 
-                      // Social Login Buttons
+                      
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          // Google Login Button
+                          
                           Container(
                             decoration: BoxDecoration(
                               color: Colors.white,
@@ -657,7 +657,7 @@ class _DoctorLoginScreenState extends State<DoctorLoginScreen> {
                       ),
                       SizedBox(height: 30),
 
-                      // Don't have an account
+                      
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [

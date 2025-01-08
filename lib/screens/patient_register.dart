@@ -63,7 +63,7 @@ class _PatientRegisterScreenState extends State<PatientRegisterScreen> {
     );
   }
 
-  // Doğum tarihi seçimi için takvim fonksiyonu
+  
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? selectedDate = await showDatePicker(
       context: context,
@@ -73,12 +73,12 @@ class _PatientRegisterScreenState extends State<PatientRegisterScreen> {
     );
     if (selectedDate != null && selectedDate != DateTime.now()) {
       setState(() {
-        _dob = '${selectedDate.toLocal()}'.split(' ')[0]; // GG/AA/YYYY formatında
+        _dob = '${selectedDate.toLocal()}'.split(' ')[0]; 
       });
     }
   }
 
-  // Kayıt fonksiyonu
+  
   Future<void> _register() async {
     setState(() {
       _errorMessage = null;
@@ -91,7 +91,7 @@ class _PatientRegisterScreenState extends State<PatientRegisterScreen> {
       return;
     }
 
-    // Alanların boş olup olmadığını kontrol et
+    
     if (_firstNameController.text.isEmpty ||
         _lastNameController.text.isEmpty ||
         _emailController.text.isEmpty ||
@@ -105,30 +105,30 @@ class _PatientRegisterScreenState extends State<PatientRegisterScreen> {
     }
 
     try {
-      // Combine country code with phone number
+      
       String fullPhoneNumber = countryCode + _phoneController.text.trim();
 
-      // Firebase Authentication ile kullanıcı kaydı
+      
       UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
 
-      // Ad ve soyad bilgilerini ilk harfleri büyük olacak şekilde düzenleyelim
+      
       String firstName = _firstNameController.text.trim();
       String lastName = _lastNameController.text.trim();
 
-      // İlk harfleri büyük yapma
+     
       firstName = _capitalizeWords(firstName);
       lastName = _capitalizeWords(lastName);
 
-      // Kullanıcı verisini users koleksiyonuna kaydet
+      
       await FirebaseFirestore.instance.collection('users').doc(userCredential.user!.uid).set({
         'email': _emailController.text.trim(),
-        'role': 'patient',  // Kullanıcı rolü hasta
+        'role': 'patient',  
       });
 
-      // Kullanıcı verisini patients koleksiyonuna kaydet
+      
       await FirebaseFirestore.instance.collection('patients').doc(userCredential.user!.uid).set({
         'name': firstName,
         'surname': lastName,
@@ -138,10 +138,10 @@ class _PatientRegisterScreenState extends State<PatientRegisterScreen> {
         'gender': _gender,
       });
 
-      // Send verification email
+     
       await userCredential.user!.sendEmailVerification();
 
-      // Show verification email sent dialog
+      
       await showDialog(
         context: context,
         builder: (context) => AlertDialog(
@@ -263,12 +263,12 @@ class _PatientRegisterScreenState extends State<PatientRegisterScreen> {
     }
   }
 
-  // İsimlerdeki her kelimenin ilk harfini büyük yapacak fonksiyon
+  
   String _capitalizeWords(String input) {
     if (input.isEmpty) return input;
 
     return input.split(' ').map((word) {
-      // Her kelimenin ilk harfini büyük yapalım
+      
       return word.isNotEmpty
           ? word[0].toUpperCase() + word.substring(1).toLowerCase()
           : '';
@@ -336,7 +336,7 @@ class _PatientRegisterScreenState extends State<PatientRegisterScreen> {
                     ),
                     SizedBox(height: 20),
 
-                    // Surname TextField
+                   
                     Container(
                       decoration: BoxDecoration(
                         color: Colors.white,
@@ -362,7 +362,7 @@ class _PatientRegisterScreenState extends State<PatientRegisterScreen> {
                     ),
                     SizedBox(height: 20),
 
-                    // Email TextField
+                    
                     Container(
                       decoration: BoxDecoration(
                         color: Colors.white,
@@ -389,7 +389,7 @@ class _PatientRegisterScreenState extends State<PatientRegisterScreen> {
                     ),
                     SizedBox(height: 20),
 
-                    // Password TextField
+                   
                     Container(
                       decoration: BoxDecoration(
                         color: Colors.white,
@@ -416,7 +416,7 @@ class _PatientRegisterScreenState extends State<PatientRegisterScreen> {
                     ),
                     SizedBox(height: 20),
 
-                    // Confirm Password TextField
+                    
                     Container(
                       decoration: BoxDecoration(
                         color: Colors.white,
@@ -443,7 +443,7 @@ class _PatientRegisterScreenState extends State<PatientRegisterScreen> {
                     ),
                     SizedBox(height: 20),
 
-                    // Birth Date Picker
+                    
                     GestureDetector(
                       onTap: () => _selectDate(context),
                       child: Container(
@@ -474,7 +474,7 @@ class _PatientRegisterScreenState extends State<PatientRegisterScreen> {
                     ),
                     SizedBox(height: 20),
 
-                    // Gender Dropdown
+                    
                     Container(
                       decoration: BoxDecoration(
                         color: Colors.white,
@@ -507,10 +507,10 @@ class _PatientRegisterScreenState extends State<PatientRegisterScreen> {
                     ),
                     SizedBox(height: 20),
 
-                    // Phone Number Row
+                   
                     Row(
                       children: [
-                        // Country Code Dropdown
+                     
                         Expanded(
                           flex: 3,
                           child: Container(
@@ -543,7 +543,7 @@ class _PatientRegisterScreenState extends State<PatientRegisterScreen> {
                           ),
                         ),
                         SizedBox(width: 8),
-                        // Phone Number TextField
+                        
                         Expanded(
                           flex: 7,
                           child: Container(
@@ -579,7 +579,7 @@ class _PatientRegisterScreenState extends State<PatientRegisterScreen> {
                     ),
                     SizedBox(height: 20),
 
-                    // Error Message
+                    
                     if (_errorMessage != null)
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -593,7 +593,7 @@ class _PatientRegisterScreenState extends State<PatientRegisterScreen> {
                         ),
                       ),
 
-                    // Register Button
+                    
                     Container(
                       height: 55,
                       decoration: BoxDecoration(
@@ -630,7 +630,7 @@ class _PatientRegisterScreenState extends State<PatientRegisterScreen> {
                     ),
                     SizedBox(height: 30),
 
-                    // Already have an account
+                    
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [

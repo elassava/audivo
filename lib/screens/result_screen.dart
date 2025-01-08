@@ -7,12 +7,12 @@ class ResultScreen extends StatefulWidget {
   final String patientId;
   final List<String> options;
   final String
-      testType; // Add a test type parameter to handle different test types
+      testType; 
 
   ResultScreen({
     required this.patientId,
     required this.options,
-    required this.testType, // Initialize the test type
+    required this.testType, 
   });
 
   @override
@@ -33,14 +33,14 @@ class _ResultScreenState extends State<ResultScreen> {
 
   Future<void> _fetchResults() async {
     try {
-      // Firestore query to fetch results based on patientId and testType
+      
       QuerySnapshot querySnapshot;
       if (widget.testType == 'audioQuestions') {
         querySnapshot = await FirebaseFirestore.instance
             .collection('patients')
             .doc(widget.patientId)
             .collection(
-                'audioQuestions') // Fetching data specific to audio test
+                'audioQuestions') 
             .get();
       } else if (widget.testType == 'videoQuestions') {
         print(widget.testType);
@@ -54,14 +54,14 @@ class _ResultScreenState extends State<ResultScreen> {
         querySnapshot = await FirebaseFirestore.instance
             .collection('patients')
             .doc(widget.patientId)
-            .collection('maskedQuestions') // Default test type
+            .collection('maskedQuestions') 
             .get();
       }
 
       if (querySnapshot.docs.isNotEmpty) {
         List<Map<String, dynamic>> results = [];
 
-        // Loop through the documents and extract relevant data
+       
         for (var doc in querySnapshot.docs) {
           var data = doc.data() as Map<String, dynamic>;
           data.forEach((key, value) {
@@ -95,7 +95,7 @@ class _ResultScreenState extends State<ResultScreen> {
     }
   }
 
-  // Add this method to calculate statistics
+  
   void _calculateStats() {
     _totalQuestions = _results.length;
     _correctAnswers = _results.where((result) => result['isCorrect']).length;

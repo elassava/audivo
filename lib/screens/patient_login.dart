@@ -15,7 +15,7 @@ class _PatientLoginScreenState extends State<PatientLoginScreen> {
   final _passwordController = TextEditingController();
   String? _errorMessage;
 
-  // Google sign-in instance
+  
   final GoogleSignIn _googleSignIn = GoogleSignIn();
 
   Future<void> _login() async {
@@ -32,7 +32,7 @@ class _PatientLoginScreenState extends State<PatientLoginScreen> {
           _errorMessage = "Email not verified! Please check your inbox.";
         });
 
-        // Doğrulama e-postası gönder
+   
         await user.sendEmailVerification();
         return;
       }
@@ -63,40 +63,39 @@ class _PatientLoginScreenState extends State<PatientLoginScreen> {
     }
   }
 
-  // Function for Google sign-in
-// Function for Google sign-in with account selection each time
+  
   Future<void> _googleLogin() async {
     try {
-      // Ensure we're signed out before attempting to sign in
+     
       await _googleSignIn.signOut();
       await FirebaseAuth.instance.signOut();
 
-      // Attempt to sign in
+      
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
 
-      // If user cancels the sign-in process
+      
       if (googleUser == null) {
-        // Silent return - user canceled
+        
         return;
       }
 
       try {
-        // Get authentication details
+        
         final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
 
-        // Create credentials
+        
         final OAuthCredential credential = GoogleAuthProvider.credential(
           accessToken: googleAuth.accessToken,
           idToken: googleAuth.idToken,
         );
 
-        // Sign in to Firebase
+        
         UserCredential userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
 
-        // Check user role
+       
         await _checkUserRole(userCredential.user!.uid, googleUser: googleUser);
       } catch (authError) {
-        // Clean up on authentication error
+        
         await _googleSignIn.signOut();
         await FirebaseAuth.instance.signOut();
         setState(() {
@@ -104,7 +103,7 @@ class _PatientLoginScreenState extends State<PatientLoginScreen> {
         });
       }
     } catch (e) {
-      // Handle Google Sign In API exceptions
+      
       if (e.toString().contains('com.google.android.gms.common.api.ApiException')) {
         setState(() {
           _errorMessage = 'Google Sign In was canceled or failed. Please try again.';
@@ -115,17 +114,17 @@ class _PatientLoginScreenState extends State<PatientLoginScreen> {
         });
       }
       
-      // Ensure cleanup
+      
       try {
         await _googleSignIn.signOut();
         await FirebaseAuth.instance.signOut();
       } catch (_) {
-        // Ignore cleanup errors
+        
       }
     }
   }
 
-// Kullanıcı rolünü kontrol et, eğer yoksa yeni kullanıcı oluştur
+
   Future<void> _checkUserRole(String uid,
       {GoogleSignInAccount? googleUser}) async {
     DocumentSnapshot userDoc =
@@ -142,12 +141,12 @@ class _PatientLoginScreenState extends State<PatientLoginScreen> {
         await FirebaseAuth.instance.signOut();
       }
     } else {
-      // Google ile giriş yapan yeni kullanıcı için ek bilgi al
+      
       if (googleUser != null) {
         String phoneNumber = '';
         String countryCode = '+90';
         DateTime? birthDate;
-        String birthDateText = 'Select Birth Date';  // Add this for dynamic button text
+        String birthDateText = 'Select Birth Date';  
 
         final additionalInfo = await showDialog<Map<String, dynamic>>(
           context: context,
@@ -175,7 +174,7 @@ class _PatientLoginScreenState extends State<PatientLoginScreen> {
                       children: [
                         Row(
                           children: [
-                            // Ülke Kodu Dropdown
+                            
                             Container(
                               width: 100,
                               child: DropdownButtonFormField<String>(
@@ -215,7 +214,7 @@ class _PatientLoginScreenState extends State<PatientLoginScreen> {
                               ),
                             ),
                             SizedBox(width: 8),
-                            // Telefon Numarası Input
+                            
                             Expanded(
                               child: TextField(
                                 decoration: InputDecoration(
@@ -263,7 +262,7 @@ class _PatientLoginScreenState extends State<PatientLoginScreen> {
                             ),
                           ),
                         SizedBox(height: 20),
-                        // Birth Date Button
+                        
                         SizedBox(
                           width: double.infinity,
                           child: ElevatedButton(
@@ -381,29 +380,29 @@ class _PatientLoginScreenState extends State<PatientLoginScreen> {
           String lastName =
               nameParts.length > 1 ? nameParts.sublist(1).join(' ') : '';
 
-          // DateTime'ı istenen formatta (yyyy-MM-dd) string'e çevir
+          
           DateTime birthDate = additionalInfo['birthDate'];
           String formattedDate = "${birthDate.year}-${birthDate.month.toString().padLeft(2, '0')}-${birthDate.day.toString().padLeft(2, '0')}";
 
-          // Kullanıcı bilgilerini kaydet
+          
           Map<String, dynamic> userData = {
             'name': firstName,
             'surname': lastName,
             'email': googleUser.email,
             'role': 'patient',
             'phoneNumber': additionalInfo['phoneNumber'],
-            'birthDate': formattedDate,  // String olarak kaydediyoruz
+            'birthDate': formattedDate, 
             'createdAt': FieldValue.serverTimestamp(),
           };
 
-          // Her iki koleksiyona da aynı veriyi kaydet
+          
           await FirebaseFirestore.instance.collection('users').doc(uid).set(userData);
           await FirebaseFirestore.instance.collection('patients').doc(uid).set(userData);
 
           Navigator.pushReplacementNamed(context, '/patientDashboard');
         }
       } else {
-        // Normal email/password girişi için mevcut kod
+        
         await FirebaseFirestore.instance.collection('patients').doc(uid).set({
           'email': _emailController.text.trim(),
           'role': 'patient',
@@ -435,7 +434,7 @@ class _PatientLoginScreenState extends State<PatientLoginScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      // Sign In Text
+                      
                       Text(
                         'Patient Sign In',
                         style: GoogleFonts.poppins(
@@ -447,7 +446,7 @@ class _PatientLoginScreenState extends State<PatientLoginScreen> {
                       ),
                       SizedBox(height: 40),
 
-                      // Email TextField
+                     
                       Container(
                         decoration: BoxDecoration(
                           color: Colors.white,
@@ -474,7 +473,7 @@ class _PatientLoginScreenState extends State<PatientLoginScreen> {
                       ),
                       SizedBox(height: 20),
 
-                      // Password TextField
+                     
                       Container(
                         decoration: BoxDecoration(
                           color: Colors.white,
@@ -500,7 +499,7 @@ class _PatientLoginScreenState extends State<PatientLoginScreen> {
                         ),
                       ),
 
-                      // Forgot Password
+                    
                       Align(
                         alignment: Alignment.centerRight,
                         child: TextButton(
@@ -520,7 +519,7 @@ class _PatientLoginScreenState extends State<PatientLoginScreen> {
                         ),
                       ),
 
-                      // Error Message
+                      
                       if (_errorMessage != null)
                         Padding(
                           padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -534,7 +533,7 @@ class _PatientLoginScreenState extends State<PatientLoginScreen> {
                           ),
                         ),
 
-                      // Login Button
+                      
                       Container(
                         height: 55,
                         decoration: BoxDecoration(
@@ -571,7 +570,7 @@ class _PatientLoginScreenState extends State<PatientLoginScreen> {
                       ),
                       SizedBox(height: 20),
 
-                      // OR Divider
+                      
                       Row(
                         children: [
                           Expanded(child: Divider(color: Color(0xFF1A237E), thickness: 1)),
@@ -590,7 +589,7 @@ class _PatientLoginScreenState extends State<PatientLoginScreen> {
                       ),
                       SizedBox(height: 20),
 
-                      // Sign in with text
+                    
                       Text(
                         'Sign in with',
                         style: GoogleFonts.poppins(
@@ -601,11 +600,11 @@ class _PatientLoginScreenState extends State<PatientLoginScreen> {
                       ),
                       SizedBox(height: 20),
 
-                      // Social Login Buttons
+                     
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          // Google Login Button
+                          
                           Container(
                             decoration: BoxDecoration(
                               color: Colors.white,
@@ -630,7 +629,7 @@ class _PatientLoginScreenState extends State<PatientLoginScreen> {
                       ),
                       SizedBox(height: 30),
 
-                      // Don't have an account
+                     
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [

@@ -129,7 +129,7 @@ class PatientTestsScreen extends StatelessWidget {
                   textAlign: TextAlign.center,
                 ),
               ),
-              SizedBox(width: 40), // Balance for back button
+              SizedBox(width: 40), 
             ],
           ),
           SizedBox(height: 20),

@@ -94,11 +94,11 @@ class _PatientDashboardState extends State<PatientDashboard> {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(
       source: ImageSource.gallery,
-      imageQuality: 80, // Optimize image quality
+      imageQuality: 80, 
     );
 
     if (pickedFile != null) {
-      // Show confirmation dialog with image preview
+      
       bool? shouldUpload = await showDialog<bool>(
         context: context,
         builder: (BuildContext context) {
@@ -340,7 +340,6 @@ class _PatientDashboardState extends State<PatientDashboard> {
     return Scaffold(
       body: Stack(
         children: [
-          // Background image
           Container(
             decoration: BoxDecoration(
               image: DecorationImage(
@@ -431,13 +430,13 @@ class _PatientDashboardState extends State<PatientDashboard> {
               ],
             ),
           ),
-          // GridView on top of the dashboard
+          
           Positioned.fill(
             child: Align(
               alignment: Alignment.topCenter,
               child: Container(
                 margin: EdgeInsets.only(
-                    top: 135), // Adjust this margin for correct positioning
+                    top: 135), 
                 padding: EdgeInsets.all(16.0),
                 decoration: BoxDecoration(
                   image: DecorationImage(
@@ -500,7 +499,7 @@ class _PatientDashboardState extends State<PatientDashboard> {
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.7), // Glass effect opacity
+          color: Colors.white.withOpacity(0.7), 
           borderRadius: BorderRadius.circular(20),
           border: Border.all(color: Colors.white.withOpacity(0.2)),
           boxShadow: [

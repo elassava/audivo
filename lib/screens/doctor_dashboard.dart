@@ -19,15 +19,15 @@ class DoctorDashboard extends StatefulWidget {
 class _DoctorDashboardState extends State<DoctorDashboard> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseStorage _storage = FirebaseStorage.instance;
-  String? profileImg; // Profil fotoğrafı durumunu burada tutacağız.
+  String? profileImg; 
 
-  // Updated image upload logic
+  
   Future<void> _pickAndUploadImage(BuildContext context) async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
     if (pickedFile != null) {
-      // Show confirmation dialog with image preview
+      
       bool? shouldUpload = await showDialog<bool>(
         context: context,
         builder: (BuildContext context) {
@@ -322,12 +322,12 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
             String doctorName = doctorData['name'] ?? 'Doctor';
             String? storedProfileImg = doctorData['profileImg'];
 
-            // Profil fotoğrafını state'deki profilImg'den kullanacağız
+           
             profileImg ??= storedProfileImg;
 
             return Stack(
               children: [
-                // Background image
+                
                 Container(
                   decoration: BoxDecoration(
                     image: DecorationImage(
@@ -336,7 +336,7 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
                     ),
                   ),
                 ),
-                // Dashboard content (longer top layer)
+               
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -390,7 +390,7 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
                     ),
                   ],
                 ),
-                // GridView on top of the dashboard
+                
                 Positioned.fill(
                   child: Align(
                     alignment: Alignment.topCenter,
@@ -425,7 +425,7 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceAround,
                               children: [
-                                // Tarih Bilgisi
+                                
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
@@ -453,7 +453,7 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
                                   width: 1,
                                   color: Colors.grey.withOpacity(0.3),
                                 ),
-                                // Hasta Sayısı
+                                
                                 StreamBuilder<QuerySnapshot>(
                                   stream: FirebaseFirestore.instance
                                       .collection('patients')
@@ -554,7 +554,7 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
     );
   }
 
-  // Profil fotoğrafı düzenlemek için tıklama işlevi
+  
   void _editProfileImage(BuildContext context) {
     _pickAndUploadImage(context);
   }
@@ -569,7 +569,7 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.7), // Glass effect opacity
+          color: Colors.white.withOpacity(0.7), 
           borderRadius: BorderRadius.circular(20),
           border: Border.all(color: Colors.white.withOpacity(0.2)),
           boxShadow: [

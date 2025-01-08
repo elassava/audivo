@@ -6,18 +6,18 @@ import 'package:firebase_auth/firebase_auth.dart';
 class PSettingsScreen extends StatelessWidget {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  // Function to fetch patient's info from Firebase
+ 
   Future<DocumentSnapshot> _getPatientInfo() async {
     final userId = _auth.currentUser!.uid;
     return await FirebaseFirestore.instance.collection('patients').doc(userId).get();
   }
 
-  // Function to sign out
+  
   Future<void> _signOut(BuildContext context) async {
     try {
       await _auth.signOut();
       Navigator.popUntil(context, (route) => false);
-      Navigator.pushNamed(context, '/'); // Navigate to the login screen
+      Navigator.pushNamed(context, '/'); 
     } catch (e) {
       print('Error signing out: $e');
     }
@@ -30,7 +30,7 @@ class PSettingsScreen extends StatelessWidget {
       try {
         final userId = user.uid;
 
-        // Show confirmation dialog with updated design
+        
         bool? isConfirmed = await showDialog<bool>(
           context: context,
           builder: (context) => AlertDialog(
@@ -122,10 +122,10 @@ class PSettingsScreen extends StatelessWidget {
         );
 
         if (isConfirmed == true) {
-          // First try to delete the authentication account
+         
           await user.delete();
             
-          // Only if authentication deletion succeeds, delete from Firestore
+         
           await FirebaseFirestore.instance
               .collection('patients')
               .doc(userId)
@@ -238,7 +238,7 @@ class PSettingsScreen extends StatelessWidget {
     }
   }
 
-  // Function to reset password
+ 
   Future<void> _resetPassword(BuildContext context) async {
     final user = _auth.currentUser;
     if (user != null) {
@@ -256,7 +256,7 @@ class PSettingsScreen extends StatelessWidget {
     }
   }
 
-  // Function to show logout confirmation dialog
+  
   Future<void> _showLogoutConfirmation(BuildContext context) async {
     showDialog(
       context: context,
@@ -367,11 +367,11 @@ class PSettingsScreen extends StatelessWidget {
     );
   }
 
-  // Helper function to check if user signed in with Google
+ 
   bool _isGoogleUser() {
     final user = _auth.currentUser;
     if (user != null) {
-      // Check if the user's providers list contains Google
+      
       return user.providerData
           .any((userInfo) => userInfo.providerId == 'google.com');
     }
@@ -426,7 +426,7 @@ class PSettingsScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Header with profile photo and name
+                    
                     Container(
                       padding: EdgeInsets.all(20),
                       margin: EdgeInsets.all(16),
@@ -459,7 +459,7 @@ class PSettingsScreen extends StatelessWidget {
                       ),
                     ),
 
-                    // Personal Information Section
+                    
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: 16),
                       child: Column(

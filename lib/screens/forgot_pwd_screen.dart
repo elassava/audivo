@@ -17,7 +17,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     try {
       String email = _emailController.text.trim();
 
-      // Firestore'da e-posta adresini kontrol et
+      
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
           .collection('users')
           .where('email', isEqualTo: email)
@@ -31,7 +31,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         return;
       }
 
-      // Eğer e-posta mevcutsa şifre sıfırlama e-postası gönder
+      
       await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
       setState(() {
         _successMessage = 'Mail sent successfully! Please check your mail.';
