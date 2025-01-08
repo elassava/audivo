@@ -1,5 +1,3 @@
-
-
 # AUDIVO
 
 [![Flutter](https://img.shields.io/badge/Flutter-%2302569B.svg?style=for-the-badge&logo=Flutter&logoColor=white)](https://flutter.dev)
@@ -48,24 +46,48 @@ EN: This mobile application is designed for users to perform emotion recognition
 
 ## 🔧 Kurulum | Installation
 
-1. Projeyi klonlayın | Clone the project
+### 1. Projeyi Klonlayın | Clone the Project
 ```bash
 git clone [repository-url]
 ```
 
-2. Bağımlılıkları yükleyin | Install dependencies
+### 2. Bağımlılıkları Yükleyin | Install Dependencies
 ```bash
 flutter pub get
 ```
 
-3. Firebase yapılandırmasını ekleyin | Add Firebase configuration
-- google-services.json (Android)
-- GoogleService-Info.plist (iOS)
+### 3. Firebase Kurulumu | Firebase Setup
 
-4. Uygulamayı çalıştırın | Run the application
+TR: Firebase projenizi oluşturun ve yapılandırın:
+EN: Create and configure your Firebase project:
+
+1. [Firebase Console](https://console.firebase.google.com/) üzerinden yeni proje oluşturun | Create new project from Firebase Console
+2. Android/iOS uygulamanızı kaydedin | Register your Android/iOS app
+   - `google-services.json` dosyasını `android/app/` dizinine ekleyin | Add `google-services.json` to `android/app/` directory
+   - `GoogleService-Info.plist` dosyasını `ios/Runner/` dizinine ekleyin | Add `GoogleService-Info.plist` to `ios/Runner/` directory
+3. Firebase Authentication'ı etkinleştirin | Enable Firebase Authentication:
+   - Email/Password
+   - Google Sign-In
+4. Cloud Firestore'u oluşturun | Create Cloud Firestore
+5. Firebase CLI kurun | Install Firebase CLI:
+```bash
+npm install -g firebase-tools
+firebase login
+firebase init
+```
+
+### 4. Google Sign-In Yapılandırması | Google Sign-In Configuration
+TR: Google Cloud Console'da OAuth 2.0 istemci kimliklerini yapılandırın
+EN: Configure OAuth 2.0 client IDs in Google Cloud Console
+
+### 5. Uygulamayı Çalıştırın | Run the Application
 ```bash
 flutter run
 ```
+
+### ⚠️ Güvenlik Notları | Security Notes
+TR: Firebase yapılandırma dosyalarını (`google-services.json`, `GoogleService-Info.plist`) ve API anahtarlarını gizli tutun.
+EN: Keep Firebase configuration files (`google-services.json`, `GoogleService-Info.plist`) and API keys private.
 
 ## 📱 Ekran Görüntüleri | Screenshots
 
@@ -104,4 +126,5 @@ flutter run
 ## 📞 İletişim | Contact
 
 Proje Linki | Project Link: [https://github.com/elassava/emotion-recognition-mobile](https://github.com/elassava/emotion-recognition-mobile)
+
 
