@@ -51,10 +51,10 @@ class _MaskedVideoScreenState extends State<MaskedVideoScreen> {
         context,
         MaterialPageRoute(
           builder: (context) => ResultScreen(
-            patientId: widget.patientId, // patientId parametresini gönderiyoruz
+            patientId: widget.patientId, 
             options: _options,
             testType:
-                testType, // _options listesini de parametre olarak gönderiyoruz
+                testType, 
           ),
         ),
       );
@@ -122,7 +122,7 @@ class _MaskedVideoScreenState extends State<MaskedVideoScreen> {
 
   Future<void> _initializeVideoPlayer(String url) async {
     _videoPlayerController
-        ?.dispose(); // Dispose the previous controller if it exists
+        ?.dispose(); 
     _videoPlayerController = VideoPlayerController.network(url);
 
     try {
@@ -164,7 +164,7 @@ class _MaskedVideoScreenState extends State<MaskedVideoScreen> {
 
       print('Answer saved successfully');
 
-      // If all questions are answered, mark the test as completed
+      
       if (_remainingQuestions.isEmpty) {
         await FirebaseFirestore.instance
             .collection('patients')
@@ -180,7 +180,7 @@ class _MaskedVideoScreenState extends State<MaskedVideoScreen> {
   void _submitEmotion(int selectedEmotionIndex) {
     if (_correctOption != null) {
       _saveAnswer(selectedEmotionIndex);
-      _goToNextQuestion(); // Go to the next question
+      _goToNextQuestion(); 
     }
   }
 

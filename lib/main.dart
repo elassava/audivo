@@ -33,7 +33,7 @@ class MyApp extends StatelessWidget {
         '/patientLogin': (context) => PatientLoginScreen(),
         '/doctorDashboard': (context) => DoctorDashboard(),
         '/patientDashboard': (context) => PatientDashboard(),
-        '/patientsScreen': (context) => PatientsScreen(), // PatientsScreen'e rota ekledik
+        '/patientsScreen': (context) => PatientsScreen(), 
         '/patientSettings': (context) => PSettingsScreen(),
         '/audioScreen': (context) => AudioScreen(patientId: '',),
         '/notesScreen': (context) => NotesScreen(),

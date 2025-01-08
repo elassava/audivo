@@ -41,7 +41,7 @@ class _NotesScreenState extends State<NotesScreen> {
       ),
       body: Stack(
         children: [
-          // Background container
+          
           Container(
             decoration: BoxDecoration(
               image: DecorationImage(

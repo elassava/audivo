@@ -6,7 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 class SettingsScreen extends StatelessWidget {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  // Function to fetch doctor's info from Firebase
+  
   Future<DocumentSnapshot> _getDoctorInfo() async {
     final userId = _auth.currentUser!.uid;
     return await FirebaseFirestore.instance
@@ -15,25 +15,25 @@ class SettingsScreen extends StatelessWidget {
         .get();
   }
 
-  // Function to sign out
+  
   Future<void> _signOut(BuildContext context) async {
     try {
       await _auth.signOut();
       Navigator.popUntil(context, (route) => false);
-      Navigator.pushNamed(context, '/'); // Navigate to the login screen
+      Navigator.pushNamed(context, '/'); 
     } catch (e) {
       print('Error signing out: $e');
     }
   }
 
-  // Function to delete account
+  
   Future<void> _deleteAccount(BuildContext context) async {
     final user = _auth.currentUser;
     if (user != null) {
       try {
         final userId = user.uid;
 
-        // Show confirmation dialog
+        
         bool? isConfirmed = await showDialog<bool>(
           context: context,
           builder: (context) => AlertDialog(
@@ -125,10 +125,10 @@ class SettingsScreen extends StatelessWidget {
         );
 
         if (isConfirmed == true) {
-          // First try to delete the authentication account
+          
           await user.delete();
           
-          // Only if authentication deletion succeeds, delete from Firestore
+          
           await FirebaseFirestore.instance
               .collection('doctors')
               .doc(userId)
@@ -143,7 +143,7 @@ class SettingsScreen extends StatelessWidget {
         }
       } catch (error) {
         print("Account deletion failed: $error");
-        // Show dialog for any deletion error
+        
         await showDialog(
           context: context,
           builder: (context) => AlertDialog(
@@ -242,7 +242,7 @@ class SettingsScreen extends StatelessWidget {
     }
   }
 
-  // Function to reset password
+ 
   Future<void> _resetPassword(BuildContext context) async {
     final user = _auth.currentUser;
     if (user != null) {
@@ -338,7 +338,7 @@ class SettingsScreen extends StatelessWidget {
     }
   }
 
-  // Function to show logout confirmation dialog
+ 
   Future<void> _showLogoutConfirmation(BuildContext context) async {
     showDialog(
       context: context,
@@ -449,11 +449,11 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  // Helper function to check if user signed in with Google
+  
   bool _isGoogleUser() {
     final user = _auth.currentUser;
     if (user != null) {
-      // Check if the user's providers list contains Google
+      
       return user.providerData
           .any((userInfo) => userInfo.providerId == 'google.com');
     }
@@ -508,14 +508,14 @@ class SettingsScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Header with profile photo and name
+                    
                     Container(
                       
                       padding: EdgeInsets.all(20),
                       margin: EdgeInsets.all(16),
                       decoration: BoxDecoration(
                         
-                        color: Color(0xFF1A237E), // Orange color like in the image
+                        color: Color(0xFF1A237E), 
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: Row(
@@ -543,7 +543,7 @@ class SettingsScreen extends StatelessWidget {
                       ),
                     ),
 
-                    // Personal Information Section
+                    
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: 16),
                       child: Column(
@@ -575,7 +575,7 @@ class SettingsScreen extends StatelessWidget {
                           ),
                           SizedBox(height: 24),
                           
-                          // Account Section
+                         
                           Text(
                             'Account',
                             style: GoogleFonts.poppins(
@@ -586,7 +586,7 @@ class SettingsScreen extends StatelessWidget {
                           ),
                           SizedBox(height: 12),
                           
-                          // Account Actions
+                          
                           if (!_isGoogleUser())
                             _buildActionButton(
                               'Change Password',

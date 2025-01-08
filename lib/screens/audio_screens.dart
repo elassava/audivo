@@ -6,7 +6,7 @@ import 'package:emotionmobileversion/screens/result_screen.dart';
 
 class AudioScreen extends StatefulWidget {
   final String patientId;
- // Type of test (audio, visual, etc.)
+ 
 
   AudioScreen({required this.patientId});
 
@@ -66,9 +66,9 @@ class _AudioScreenState extends State<AudioScreen> {
         context,
         MaterialPageRoute(
           builder: (context) => ResultScreen(
-            patientId: widget.patientId, // patientId parametresini gönderiyoruz
+            patientId: widget.patientId, 
             options: _options,
-            testType:testType, // _options listesini de parametre olarak gönderiyoruz
+            testType:testType, 
           ),
         ),
       );

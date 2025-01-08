@@ -46,9 +46,9 @@ class _VideoScreenState extends State<VideoScreen> {
         context,
         MaterialPageRoute(
           builder: (context) => ResultScreen(
-            patientId: widget.patientId, // patientId parametresini gönderiyoruz
+            patientId: widget.patientId, 
             options: _options,
-            testType:testType, // _options listesini de parametre olarak gönderiyoruz
+            testType:testType, 
           ),
         ),
       );
@@ -111,7 +111,7 @@ class _VideoScreenState extends State<VideoScreen> {
   }
 
   Future<void> _initializeVideoPlayer(String url) async {
-    _videoPlayerController?.dispose(); // Dispose the previous controller if it exists
+    _videoPlayerController?.dispose(); 
     _videoPlayerController = VideoPlayerController.network(url);
 
     try {
@@ -132,12 +132,12 @@ class _VideoScreenState extends State<VideoScreen> {
 
 void _goToNextQuestion() {
   if (_remainingQuestions.isEmpty) {
-    // If there are no remaining questions, mark the test as completed and navigate to the result screen
+    
     _showTestFinishedDialog();
   } else {
     setState(() {
       _videoPlayerController?.pause();
-      _fetchVideoQuestion(); // Fetch the next question if available
+      _fetchVideoQuestion(); 
     });
   }
 }
@@ -166,7 +166,7 @@ Future<void> _saveAnswer(int selectedEmotionIndex) async {
 
     print('Answer saved successfully');
 
-    // If all questions are answered, mark the test as completed
+   
     if (_remainingQuestions.isEmpty) {
       await FirebaseFirestore.instance
           .collection('patients')
@@ -183,7 +183,7 @@ Future<void> _saveAnswer(int selectedEmotionIndex) async {
   void _submitEmotion(int selectedEmotionIndex) {
     if (_correctOption != null) {
       _saveAnswer(selectedEmotionIndex);
-      _goToNextQuestion(); // Go to the next question
+      _goToNextQuestion(); 
     }
   }
 

@@ -18,7 +18,7 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
   String email = '';
   String phone = '';
   String? gender;
-  String countryCode = '+90'; // Default country code
+  String countryCode = '+90'; 
   final _auth = FirebaseAuth.instance;
 
   void _addPatient() async {
@@ -37,7 +37,7 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
           'phone': fullPhoneNumber,
         });
 
-        // Show success dialog
+        
         await showDialog(
           context: context,
           builder: (context) => AlertDialog(
@@ -102,7 +102,7 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
                 child: ElevatedButton(
                   onPressed: () {
                     Navigator.of(context).pop();
-                    Navigator.pop(context); // Return to previous screen
+                    Navigator.pop(context); 
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.green,
@@ -126,7 +126,8 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
           ),
         );
       } catch (e) {
-        // Show error dialog
+        
+
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
@@ -202,20 +203,20 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
       builder: (BuildContext context, Widget? child) {
         return Theme(
           data: ThemeData.light().copyWith(
-            primaryColor: Color(0xFF1A237E), // App bar color
-            hintColor: Color(0xFF1A237E), // Selected day color
+            primaryColor: Color(0xFF1A237E), 
+            hintColor: Color(0xFF1A237E), 
             buttonTheme: ButtonThemeData(
-                textTheme: ButtonTextTheme.primary), // Button style
+                textTheme: ButtonTextTheme.primary),
             textButtonTheme: TextButtonThemeData(
               style: TextButton.styleFrom(
                   foregroundColor:
-                      Color(0xFF1A237E)), // Button text color
+                      Color(0xFF1A237E)), 
             ),
             textTheme: TextTheme(
               bodySmall: TextStyle(
-                fontSize: 18, // Increased font size for Select Date
+                fontSize: 18, 
                 fontWeight: FontWeight.bold,
-                color: Colors.black, // Black text color
+                color: Colors.black, 
               ),
             ),
           ),
@@ -274,7 +275,7 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
     );
   }
 
-  // Helper method to build info rows
+  
   Widget _buildInfoRow(String label, String value) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -300,18 +301,6 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // List of country codes for dropdown, sorted in ascending order
-    List<String> countryCodes = [
-      '+1', // USA/Canada
-      '+20', // Egypt
-      '+27', // South Africa
-      '+31', // Netherlands
-      '+33', // France
-      '+34', // Spain
-      '+39', // Italy
-
-      '+90', // Turkey
-    ]..sort(); // Sorting the list in ascending order.
 
     return Scaffold(
       appBar: AppBar(
@@ -374,10 +363,10 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
                       onTap: () => _selectBirthDate(context),
                       child: AbsorbPointer(
                         child: TextFormField(
-                          readOnly: true, // Prevent manual input
-                          keyboardType: TextInputType.none, // Disable keyboard
+                          readOnly: true, 
+                          keyboardType: TextInputType.none, 
                           textInputAction: TextInputAction
-                              .none, // Disable text action on the keyboard
+                              .none, 
                           decoration: _inputDecoration(birthDate.isEmpty
                               ? 'Select Birth Date'
                               : birthDate),
@@ -390,7 +379,7 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
                     SizedBox(height: 20),
                     DropdownButtonFormField<String>(
   value: gender,
-  hint: Text('Select Gender'), // Add this line for default text
+  hint: Text('Select Gender'), 
   items: ['Female', 'Male']
       .map((label) => DropdownMenuItem(
             value: label,
@@ -414,7 +403,7 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
                     Row(
                       children: [
                         Expanded(
-                          flex: 3, // This gives 30% width
+                          flex: 3, 
                           child: DropdownButtonFormField<String>(
                             value: countryCode,
                             items: [
@@ -442,7 +431,7 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
                         ),
                         SizedBox(width: 8),
                         Expanded(
-                          flex: 7, // This gives 70% width
+                          flex: 7, 
                           child: TextFormField(
                             decoration: _inputDecoration('Phone'),
                             onChanged: (value) => setState(() => phone = value),
@@ -457,7 +446,7 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
                             inputFormatters: [
                               FilteringTextInputFormatter.digitsOnly,
                               LengthLimitingTextInputFormatter(
-                                  10), // Allow only digits
+                                  10),
                             ],
                           ),
                         ),
